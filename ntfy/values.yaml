@@ -1,0 +1,350 @@
+#------------------------------------------------------------------
+#
+# Values for the Custom NTFY-Helm-Chart
+#
+#------------------------------------------------------------------
+
+# =================================================================
+# Pod specifications
+# =================================================================
+#
+# -- Number of Pods
+# @section -- Pod specifications
+replicaCount: 1
+#
+# -- The strategy used to replace old Pods by new ones
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+# @section -- Pod specifications
+strategy:
+  type: Recreate
+#
+# -- Pod Security Context
+# @section -- Pod specifications
+podSecurityContext:
+  runAsUser: 10000
+  runAsGroup: 10000
+  fsGroup: 10000
+  runAsNonRoot: true
+#
+# -- Additional Pod-annotations
+# @section -- Pod specifications
+podAnnotations: {}
+#
+# -- Additional Pod-Labels
+# @section -- Pod specifications
+podLabels: {}
+#
+# -- Additional Volumes
+# @section -- Pod specifications
+additionalVolumes: {}
+#
+# -- Kubernetes only schedules the Pod onto nodes that have each of the labels you specify
+# @section -- Pod specifications
+nodeSelector: {}
+#
+# -- Affinity expand the types of constraints you can define
+# @section -- Pod specifications
+affinity: {}
+#
+# -- Tolerations allow the scheduler to schedule pods with matching taints
+# @section -- Pod specifications
+tolerations: {}
+
+
+# =================================================================
+# Container specifications
+# =================================================================
+#
+containers:
+  ntfy:
+    #
+    # Image specifications of the NTFY-Container
+    image:
+      #
+      # -- Container-Image-Repository
+      # @section -- NTFY-Container specifications
+      repository: "docker.io/binwiederhier/ntfy"
+      #
+      # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
+      # @section -- NTFY-Container specifications
+      tag: "v2.18"
+      #
+      # -- Container-Image pull-policy
+      # @section -- NTFY-Container specifications
+      pullPolicy: IfNotPresent
+    #
+    # -- Container Security Context
+    # @section -- NTFY-Container specifications
+    securityContext:
+      runAsUser: 10000
+      runAsGroup: 10000
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      privileged: false
+    #
+    # -- Container Resources
+    # @section -- NTFY-Container specifications
+    resources: {}
+    #resources:
+    #  requests:
+    #    memory: 200Mi
+    #    cpu: 100m
+    #  limits:
+    #    memory: 500Mi
+    #    cpu: 500m
+    #
+    service:
+      # -- Service Type
+      # @section -- NTFY-Container specifications
+      type: ClusterIP
+      #
+      # @ignored
+      ports:
+        # @ignored
+        - name: http
+          #
+          # reference containerPort
+          # @ignored 
+          containerPort: 5000
+          #
+          # -- Exposed Container-Port
+          # @section -- NTFY-Container-Port
+          port: 5000
+          #
+          # reference containerPort by name
+          # @ignored
+          targetPort: http
+          #
+          protocol: TCP
+    #
+    # -- Additional Volume-Mounts for Container
+    # @section -- NTFY-Container specifications
+    additionalVolumeMounts: {}
+    #
+    # -- Additional Environment-variables
+    # @section -- NTFY-Container specifications
+    additionalEnv: {}
+    #
+    # -- Additional Arguments
+    # @section -- NTFY-Container specifications
+    additionalArgs: {}
+    #
+    probes:
+      #
+      livenessProbe:
+        #
+        # -- Whether to enable the Liveness-Probe
+        # @section -- NTFY-Container-Probes specifications
+        enabled: true
+        #
+        # -- Initial Delay in Seconds
+        # @section -- NTFY-Container-Probes specifications
+        initialDelaySeconds: 30
+        #
+        # -- How often to perform the liveness checks
+        # @section -- NTFY-Container-Probes specifications
+        periodSeconds: 10
+        #
+        # -- Time to wait for a response from the database
+        # @section -- NTFY-Container-Probes specifications
+        timeoutSeconds: 5
+        #
+        # -- Number of consecutive failures before restarting the Pod
+        # @section -- NTFY-Container-Probes specifications
+        failureThreshold: 3
+        #
+        # -- Number of successful checks before considering the Pod healthy (again)
+        # @section -- NTFY-Container-Probes specifications
+        successThreshold: 1
+      #
+      readinessProbe:
+        #
+        # -- Whether to enable the Readiness-Probe
+        # @section -- NTFY-Container-Probes specifications
+        enabled: true
+        #
+        # -- How long to wait before starting the first readiness Probe after the container starts
+        # @section -- NTFY-Container-Probes specifications
+        initialDelaySeconds: 30
+        #
+        # -- How often to perform the readiness checks after the initial delay
+        # @section -- NTFY-Container-Probes specifications
+        periodSeconds: 5
+        #
+        # -- The maximum amount of time the probe will wait for a response from the application
+        # @section -- NTFY-Container-Probes specifications
+        timeoutSeconds: 2
+        #
+        # -- Number of consecutive failures before restarting the Pod
+        # @section -- NTFY-Container-Probes specifications
+        failureThreshold: 3
+        #
+        # -- Number of successful checks before considering the Pod healthy
+        # @section -- NTFY-Container-Probes specifications
+        successThreshold: 1
+
+
+# =================================================================
+# Authentication specifications
+# =================================================================
+#
+authentication:
+  authTokens:
+    #
+    # -- Name of an existing Secret for Authentication-Tokens.
+    # A Secret will be created if not set.
+    # @section -- NTFY-Authentication specifications
+    existingSecretName: ""
+    #
+    # -- Secret-Key Name for Authentication-Tokens
+    # @section -- NTFY-Authentication specifications
+    secretKey: "auth-tokens"
+  #
+  authUsers:
+    #
+    # -- Name of an existing Secret for Authentication-Users.
+    # A Secret will be created if not set.
+    # @section -- NTFY-Authentication specifications
+    existingSecretName: ""
+    #
+    # -- Secret-Key Name for Authentication-Users
+    # @section -- NTFY-Authentication specifications
+    secretKey: "auth-users"
+  #
+  authAccess:
+    #
+    # -- Name of an existing Secret for Authentication-Access.
+    # A Secret will be created if not set.
+    # @section -- NTFY-Authentication specifications
+    existingSecretName: ""
+    #
+    # -- Secret-Key Name for Authentication-Access
+    # @section -- NTFY-Authentication specifications
+    secretKey: "auth-access"
+
+
+# =================================================================
+# Persistence specifications
+# =================================================================
+#
+persistence:
+  #
+  # -- Whether to enable persistence for 'cache.db' and 'user.db' (enables PVC)
+  # @section -- NTFY-Persistence specifications
+  enabled: false
+  #
+  # -- SizeLimit for emptyDir (used when persistence/PVC is disabled)
+  # @section -- NTFY-Persistence specifications
+  emptyDirSizeLimit: "1Gi"
+  #
+  # -- Whether to create a new PVC
+  # @section -- NTFY-Persistence specifications
+  createNewPVC: true
+  #
+  # -- StorageClassName of the PVC
+  # @section -- NTFY-Persistence specifications
+  storageClassName: ""
+  #
+  # -- Name of the PVC
+  # @section -- NTFY-Persistence specifications
+  claimName: "ntfy-data-pvc"
+  #
+  # -- Access-Modes of the PVC
+  # @section -- NTFY-Persistence specifications
+  accessModes:
+    - ReadWriteOnce
+  #
+  # -- storage-request for the PVC
+  # @section -- NTFY-Persistence specifications
+  storageRequest: "5Gi"
+
+
+# =================================================================
+# Config specifications
+# =================================================================
+#
+configFiles:
+  #
+  # 'server.yaml'
+  serverYAML:
+    #
+    # -- Whether to use your own 'server.yaml'-file
+    # @section -- server.yaml Config-File
+    useOwnConfigFileContent: false
+    #
+    # -- Provide own 'server.yaml' file-content
+    # @section -- server.yaml Config-File
+    ownConfigFileContent: ""
+    #ownConfigFileContent: |
+    #
+    # Configure existing 'server.yaml'-file (will be ignored, if `useOwnConfigFileContent: true`)
+    dynamicValues:
+      #
+      # -- Whether NTFY is behind a Proxy
+      # @section -- server.yaml Config-File
+      behindProxy: false
+      #
+      # -- Forwarded Proxy-Header (e.g. "X-Forwarded-For")
+      # @section -- server.yaml Config-File
+      proxyForwardedHeader: ""
+      #
+      # -- auth-file
+      # @section -- server.yaml Config-File
+      authFile: "/var/lib/ntfy/user.db"
+      #
+      # -- auth-default-access
+      # @section -- server.yaml Config-File
+      authDefaultAccess: "deny-all"
+      #
+      # -- auth-users (Secret is recommended instead)
+      # @section -- server.yaml Config-File
+      authUsers: []
+      #authUsers:
+      #  - "test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin"
+      #  - "test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user"
+      #
+      # -- auth-access (Secret is recommended instead)
+      # @section -- server.yaml Config-File
+      authAccess: []
+      #authAccess:
+      #  - "test-user:TestTopic:rw"
+      #
+      # -- auth-tokens (Secret is recommended instead)
+      # @section -- server.yaml Config-File
+      authTokens: []
+      #authTokens:
+      #  - "test-user:tk_84t6qy4qxadevc37jbqty4q8xlpzl:Test-Token for Test-User"
+      #
+      # -- cache-file
+      # @section -- server.yaml Config-File
+      cacheFile: "/var/lib/ntfy/cache.db"
+      #
+      # -- cache-duration
+      # @section -- server.yaml Config-File
+      cacheDuration: "72h"
+
+
+# =================================================================
+# IngressRoute specifications
+# =================================================================
+#
+ingressRoute:
+  #
+  # -- Whether to enable the IngressRoute for NTFY
+  # @section -- IngressRoute specifications
+  enabled: false
+  #
+  # -- Listening for Incoming Connections/Requests
+  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
+  # @section -- IngressRoute specifications
+  entryPoints:
+    - websecure
+  #
+  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
+  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
+  # @section -- IngressRoute specifications
+  certResolver: ""
+  #
+  # -- Hostname
+  # @section -- IngressRoute specifications
+  host: ""

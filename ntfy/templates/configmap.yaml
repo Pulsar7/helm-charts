@@ -1,0 +1,16 @@
+{{- $serverYAML := .Values.configFiles.serverYAML -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ntfy.fullname" . }}-cm
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+data:
+  {{- if $serverYAML.useOwnConfigFileContent }}
+  server.yaml: |-
+    {{ toYaml $serverYAML.ownConfigFileContent | indent 4 }}
+  {{- else }}
+  server.yaml: |-
+    {{- tpl ($.Files.Get "config/server.yaml") . | nindent 4 }}
+  {{- end }}

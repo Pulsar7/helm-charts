@@ -1,0 +1,49 @@
+#------------------------------------------------------------------------------
+#
+# Deployment-Unittests Test-Suite for NTFY
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test Deployment
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/deployment.yaml
+  #
+  # following are required to calculate their checksum
+  - templates/service.yaml
+  - templates/secret.yaml
+  - templates/pvc.yaml
+  - templates/ingress-route.yaml
+  - templates/configmap.yaml
+#
+tests:
+  - it: should pass without persistence
+    #
+    template: templates/deployment.yaml
+    #
+    set:
+      persistence.enabled: false
+    #
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.metadata.annotations.checksum/pvc
+  
+  - it: should pass with persistence
+    #
+    template: templates/deployment.yaml
+    #
+    set:
+      persistence.enabled: true
+    #
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations.checksum/pvc

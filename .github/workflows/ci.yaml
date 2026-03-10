@@ -1,0 +1,55 @@
+name: helm-chart-testing-action
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-template-test:
+    runs-on: ubuntu-latest
+    steps:
+      #
+      # Checkout the repo
+      - uses: actions/checkout@v6
+      #
+      # Set up Helm
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.3.0
+        with:
+          version: v4.1.1
+      #
+      # Lint all charts
+      - name: Lint Helm-Charts
+        run: |
+          set -euo pipefail
+          for chart in ./*; do
+            helm dependency update "$chart"
+            chart_name=$(basename "$chart")
+            echo "Linting $chart_name"
+            helm lint "$chart" --strict
+          done
+      #
+      # Template all charts
+      - name: Template Helm-Charts
+        run: |
+          set -euo pipefail
+          for chart in ./*; do
+            helm dependency update "$chart"
+            chart_name=$(basename "$chart")
+            echo "Template $chart_name"
+            helm template "$chart"
+          done
+      #
+      # Run Helm-Unittests of all charts
+      - name: Unittest Helm-Charts
+        run: |
+          set -euo pipefail
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false
+          for chart in ./*; do
+            helm dependency update "$chart"
+            chart_name=$(basename "$chart")
+            echo "Linting $chart_name"
+            helm lint "$chart" --strict
+          done

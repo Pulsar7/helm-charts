@@ -1,0 +1,157 @@
+{{- $ntfyContainer := .Values.containers.ntfy -}}
+{{- $ntfyContainerLivenessProbe := $ntfyContainer.probes.livenessProbe -}}
+{{- $ntfyContainerReadinessProbe := $ntfyContainer.probes.readinessProbe -}}
+{{- $persistence := .Values.persistence -}}
+{{- $authentication := .Values.authentication -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ntfy.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy: {{ toYaml .Values.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "ntfy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        #
+        # https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if and $persistence.enabled $persistence.createNewPVC }}
+        checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
+        {{- end }}
+        checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
+        {{- if .Values.ingressRoute.enabled }}
+        checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if or (not $authentication.authTokens.existingSecretName) (not $authentication.authUsers.existingSecretName) (not $authentication.authAccess.existingSecretName) }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "ntfy.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          command: ["ntfy"]
+          {{- with $ntfyContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "ntfy.containerImage" . }}
+          imagePullPolicy: {{ $ntfyContainer.image.pullPolicy }}
+          ports:
+            {{- range $ntfyContainer.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+            {{- end }}
+          env:
+            - name: "NTFY_AUTH_TOKENS"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ntfy.authTokensSecretName" . }}
+                  key: {{ $authentication.authTokens.secretKey }}
+            - name: "NTFY_AUTH_USERS"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ntfy.authUsersSecretName" . }}
+                  key: {{ $authentication.authUsers.secretKey }}
+            - name: "NTFY_AUTH_ACCESS"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ntfy.authAccessSecretName" . }}
+                  key: {{ $authentication.authAccess.secretKey }}
+            {{- with $ntfyContainer.additionalEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          args:
+            - "serve"
+            - "--config=/etc/ntfy-config/server.yaml"
+            {{- with $ntfyContainer.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $ntfyContainerLivenessProbe }}
+          {{- if .enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ index $ntfyContainer.service.ports 0 "name" }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+          {{- end }}
+          {{- end }}
+          {{- with $ntfyContainerReadinessProbe }}
+          {{- if .enabled }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ index $ntfyContainer.service.ports 0 "name" }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+          {{- end }}
+          {{- end }}
+          {{- with $ntfyContainer.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/ntfy-config
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/ntfy
+            {{- with $ntfyContainer.additionalVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "ntfy.fullname" . }}-cm
+            items:
+              - key: server.yaml
+                path: server.yaml
+        {{- if and $persistence.enabled $persistence.createNewPVC }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ $persistence.claimName }}
+        {{- else }}
+        - name: data
+          emptyDir:
+            sizeLimit: {{ $persistence.emptyDirSizeLimit }}
+        {{- end }}
+        {{- with .Values.additionalVolumes }}
+        {{- toYaml . | nindent 12 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

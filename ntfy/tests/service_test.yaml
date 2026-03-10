@@ -1,0 +1,32 @@
+#------------------------------------------------------------------------------
+#
+# Service-Unittests Test-Suite for NTFY
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test Service
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/service.yaml
+#
+tests:
+  - it: should pass with different service-type and port
+    #
+    set:
+      containers.ntfy.service.type: NodePort
+      containers.ntfy.service.ports[0].port: 8000
+    #
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: NodePort
+      - equal:
+          path: spec.ports[0].port
+          value: 8000

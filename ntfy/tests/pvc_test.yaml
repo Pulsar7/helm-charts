@@ -1,0 +1,58 @@
+#------------------------------------------------------------------------------
+#
+# PVC-Unittests Test-Suite for NTFY
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test PersistentVolumeClaim
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/pvc.yaml
+#
+tests:
+  - it: should pass with enabled PVC and createNew
+    #
+    set:
+      persistence.enabled: true
+      persistence.createNewPVC: true
+      persistence.storageClassName: "invalid-test-storageClass"
+      persistence.claimName: "test-invalid-claimName"
+      persistence.accessModes:
+        - ReadWriteMany
+    #
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.accessModes
+          value: ["ReadWriteMany"]
+      - equal:
+          path: spec.storageClassName
+          value: "invalid-test-storageClass"
+      - equal:
+          path: metadata.name
+          value: "test-invalid-claimName"
+  
+  - it: should pass with enabled PVC and not createNew
+    #
+    set:
+      persistence.enabled: true
+      persistence.createNewPVC: false
+    #
+    asserts:
+      - notExists:
+          path: spec
+  
+  - it: should pass with disabled PVC
+    #
+    set:
+      persistence.enabled: false
+    #
+    asserts:
+      - notExists:
+          path: spec    

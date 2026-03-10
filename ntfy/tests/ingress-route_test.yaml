@@ -1,0 +1,44 @@
+#------------------------------------------------------------------------------
+#
+# IngressRoute-Unittests Test-Suite for NTFY
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test IngressRoute
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/ingress-route.yaml
+#
+tests:
+  - it: should pass with enabled IngressRoute
+    #
+    set:
+      ingressRoute.enabled: true
+      ingressRoute.entryPoints:
+        - test-entrypoint
+      ingressRoute.certResolver: "test-cert-resolver"
+      ingressRoute.host: "test-host"
+    #
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - contains:
+          path: spec.entryPoints
+          content: test-entrypoint
+      - contains:
+          path: spec.routes
+          content:
+            match: Host(`test-host`)
+            kind: Rule
+            services:
+              - name: RELEASE-NAME-ntfy-service
+                port: 5000
+                scheme: http
+      - equal:
+          path: spec.tls.certResolver
+          value: "test-cert-resolver"

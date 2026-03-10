@@ -1,0 +1,29 @@
+#------------------------------------------------------------------------------
+#
+# ConfigMap-Unittests Test-Suite for NTFY
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test ConfigMap
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/configmap.yaml
+#
+tests:
+  - it: should pass with own 'server.yaml' configuration
+    #
+    set:
+      configFiles.serverYAML.useOwnConfigFileContent: true
+      configFiles.serverYAML.ownConfigFileContent: "hello world"
+    #
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: data["server.yaml"]
+          value: "hello world"

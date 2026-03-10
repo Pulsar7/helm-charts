@@ -1,0 +1,19 @@
+{{- $ntfyContainerService := .Values.containers.ntfy.service -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ntfy.fullname" . }}-service
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "ntfy.selectorLabels" . | nindent 6 }}
+  type: {{ $ntfyContainerService.type }}
+  ports:
+    {{- range $ntfyContainerService.ports }}
+    - protocol: {{ .protocol }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      name: {{ .name }}
+    {{- end }}
