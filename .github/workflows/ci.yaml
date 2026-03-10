@@ -28,6 +28,7 @@ jobs:
       - name: Lint Helm-Charts
         run: |
           set -euo pipefail
+          ls ./charts/
           for chart in ./charts/*; do
             helm dependency update "$chart"
             chart_name=$(basename "$chart")
