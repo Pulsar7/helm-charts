@@ -3,6 +3,16 @@ entries:
   ntfy:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2026-03-10T18:55:25.782329867Z"
+    description: Custom Helm-Chart for NTFY
+    digest: 84c71cc71528c2ef07439a8199cf655f316f9b1edc7cee741160d65e0ce2c295
+    name: ntfy
+    type: application
+    urls:
+    - https://github.com/Pulsar7/helm-charts/releases/download/ntfy-0.1.2-alpha.1/ntfy-0.1.2-alpha.1.tgz
+    version: 0.1.2-alpha.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2026-03-10T18:47:03.954209186Z"
     description: Custom Helm-Chart for NTFY
     digest: ba3edb9c1ab61577401a960076a66ab8103fe3bda071036f44bd231ed104362e
@@ -21,4 +31,4 @@ entries:
     urls:
     - https://github.com/Pulsar7/helm-charts/releases/download/ntfy-0.1.1/ntfy-0.1.1.tgz
     version: 0.1.1
-generated: "2026-03-10T18:47:03.954219115Z"
+generated: "2026-03-10T18:55:25.7823476Z"
