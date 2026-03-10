@@ -1,10 +1,10 @@
-name: helm-chart-testing-action
+name: test-and-release
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  #pull_request:
+  #  branches: [ main ]
 
 jobs:
   lint-template-test:
@@ -53,3 +53,27 @@ jobs:
             echo "Unittest $chart_name"
             helm unittest "$chart" --strict
           done
+  
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Install Helm
+        uses: azure/setup-helm@v4.3.0
+        with:
+          version: v4.1.1
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.7.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
