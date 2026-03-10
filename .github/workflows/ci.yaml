@@ -57,15 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false
-          for chart in ./charts/*; do
-            if [[ ! -f "$chart/Chart.yaml" ]]; then
-              continue
-            fi
-            helm dependency update "$chart"
-            chart_name=$(basename "$chart")
-            echo "Unittest $chart_name"
-            helm unittest "$chart" --strict
-          done
+          helm unittest ./charts/* --strict
       #
       - name: Configure Git
         run: |

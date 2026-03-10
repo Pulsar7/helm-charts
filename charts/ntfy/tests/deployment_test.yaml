@@ -47,3 +47,29 @@ tests:
           of: Deployment
       - exists:
           path: spec.template.metadata.annotations.checksum/pvc
+  
+  - it: should pass with IngressRoute
+    #
+    template: templates/deployment.yaml
+    #
+    set:
+      ingressRoute.enabled: true
+    #
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations.checksum/ingress-route
+  
+  - it: should pass without IngressRoute
+    #
+    template: templates/deployment.yaml
+    #
+    set:
+      ingressRoute.enabled: false
+    #
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.metadata.annotations.checksum/ingress-route
