@@ -50,6 +50,6 @@ jobs:
           for chart in ./*; do
             helm dependency update "$chart"
             chart_name=$(basename "$chart")
-            echo "Linting $chart_name"
-            helm lint "$chart" --strict
+            echo "Unittest $chart_name"
+            helm unittest "$chart" --strict
           done
