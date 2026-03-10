@@ -28,7 +28,7 @@ jobs:
       - name: Lint Helm-Charts
         run: |
           set -euo pipefail
-          for chart in ./*; do
+          for chart in ./charts/*; do
             helm dependency update "$chart"
             chart_name=$(basename "$chart")
             echo "Linting $chart_name"
@@ -39,7 +39,7 @@ jobs:
       - name: Template Helm-Charts
         run: |
           set -euo pipefail
-          for chart in ./*; do
+          for chart in ./charts/*; do
             helm dependency update "$chart"
             chart_name=$(basename "$chart")
             echo "Template $chart_name"
@@ -51,7 +51,7 @@ jobs:
         run: |
           set -euo pipefail
           helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false
-          for chart in ./*; do
+          for chart in ./charts/*; do
             helm dependency update "$chart"
             chart_name=$(basename "$chart")
             echo "Unittest $chart_name"
