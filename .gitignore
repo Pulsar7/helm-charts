@@ -1,3 +1,6 @@
 #
 # Helm unittest-generated files
 __snapshot__/
+#
+# Local test-files
+*.test.local*
