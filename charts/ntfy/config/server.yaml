@@ -1,5 +1,6 @@
 {{- $config := .Values.configFiles.serverYAML.dynamicValues -}}
 {{- $ntfyContainer := .Values.containers.ntfy -}}
+{{- $rateLimits := $config.rateLimits -}}
 # > https://github.com/binwiederhier/ntfy/blob/v2.18.0/server/server.yml
 # ntfy server config file
 #
@@ -14,7 +15,9 @@
 # - iOS push notifications for self-hosted servers (to calculate the Firebase poll_request topic)
 # - Matrix Push Gateway (to validate that the pushkey is correct)
 #
-# base-url:
+{{- if $config.baseURL }}
+base-url: {{ $config.baseURL }}
+{{- end }}
 
 # Listen address for the HTTP & HTTPS web server. If "listen-https" is set, you must also
 # set "key-file" and "cert-file". Format: [<ip>]:<port>, e.g. "1.2.3.4:8080".
@@ -151,7 +154,9 @@ auth-tokens: {{ toYaml $config.authTokens | nindent 2 }}
 #
 behind-proxy: {{ $config.behindProxy }}
 proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
-# proxy-trusted-hosts:
+{{- if and $config.behindProxy $config.proxyTrustedHosts }}
+proxy-trusted-hosts: {{ $config.proxyTrustedHosts }}
+{{- end }}
 
 # If enabled, clients can attach files to notifications as attachments. Minimum settings to enable attachments
 # are "attachment-cache-dir" and "base-url".
@@ -161,10 +166,16 @@ proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
 # - attachment-file-size-limit is the per-file attachment size limit (e.g. 300k, 2M, 100M)
 # - attachment-expiry-duration is the duration after which uploaded attachments will be deleted (e.g. 3h, 20h)
 #
-# attachment-cache-dir:
-# attachment-total-size-limit: "5G"
-# attachment-file-size-limit: "15M"
-# attachment-expiry-duration: "3h"
+
+{{- $attachments := $config.attachments -}}
+{{- if and $attachments.enabled $config.baseURL $attachments.cacheDir }}
+attachment-cache-dir: "{{ $attachments.cacheDir }}"
+attachment-total-size-limit: "{{ $attachments.totalSizeLimit }}"
+attachment-file-size-limit: "{{ $attachments.fileSizeLimit }}"
+attachment-expiry-duration: "{{ $attachments.expiryDuration }}"
+{{- else }}
+## Attachments are disabled.
+{{- end }}
 
 # Template directory for message templates.
 #
@@ -312,16 +323,16 @@ enable-reservations: {{ $config.enableReservations }}
 #   If you increase this size limit regardless, FCM and APNS will NOT work for large messages.
 # - message-delay-limit defines the max delay of a message when using the "Delay" header.
 #
-message-size-limit: "{{ $config.messageSizeLimit }}"
-message-delay-limit: "{{ $config.messageDelayLimit }}"
+message-size-limit: "{{ $rateLimits.messageSizeLimit }}"
+message-delay-limit: "{{ $rateLimits.messageDelayLimit }}"
 
 # Rate limiting: Total number of topics before the server rejects new topics.
 #
-global-topic-limit: {{ $config.globalTopicLimit }}
+global-topic-limit: {{ $rateLimits.globalTopicLimit }}
 
 # Rate limiting: Number of subscriptions per visitor (IP address)
 #
-visitor-subscription-limit: {{ $config.visitorSubscriptionLimit }}
+visitor-subscription-limit: {{ $rateLimits.visitorSubscriptionLimit }}
 
 # Rate limiting: Allowed GET/PUT/POST requests per second, per visitor:
 # - visitor-request-limit-burst is the initial bucket of requests each visitor has
@@ -330,15 +341,15 @@ visitor-subscription-limit: {{ $config.visitorSubscriptionLimit }}
 #   exempt from request rate limiting. Hostnames are resolved at the time the server is started.
 #   Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24"
 #
-# visitor-request-limit-burst: 60
-# visitor-request-limit-replenish: "5s"
-# visitor-request-limit-exempt-hosts: ""
+visitor-request-limit-burst: {{ $rateLimits.visitorRequestLimitBurst }}
+visitor-request-limit-replenish: "{{ $rateLimits.visitorRequestLimitReplenish }}"
+visitor-request-limit-exempt-hosts: "{{ $rateLimits.visitorRequestLimitExemptHosts }}"
 
 # Rate limiting: Hard daily limit of messages per visitor and day. The limit is reset
 # every day at midnight UTC. If the limit is not set (or set to zero), the request
 # limit (see above) governs the upper limit.
 #
-# visitor-message-daily-limit: 0
+visitor-message-daily-limit: {{ $rateLimits.visitorMessageDailyLimit }}
 
 # Rate limiting: Allowed emails per visitor:
 # - visitor-email-limit-burst is the initial bucket of emails each visitor has
@@ -363,8 +374,8 @@ visitor-subscription-limit: {{ $config.visitorSubscriptionLimit }}
 # - visitor-attachment-total-size-limit is the total storage limit used for attachments per visitor
 # - visitor-attachment-daily-bandwidth-limit is the total daily attachment download/upload traffic limit per visitor
 #
-# visitor-attachment-total-size-limit: "100M"
-# visitor-attachment-daily-bandwidth-limit: "500M"
+visitor-attachment-total-size-limit: "{{ $rateLimits.visitorAttachmentTotalSizeLimit }}"
+visitor-attachment-daily-bandwidth-limit: "{{ $rateLimits.visitorAttachmentDailyBandwidthLimit }}"
 
 # Rate limiting: Enable subscriber-based rate limiting (mostly used for UnifiedPush)
 #
@@ -378,7 +389,7 @@ visitor-subscription-limit: {{ $config.visitorSubscriptionLimit }}
 # If this setting is enabled, publishing to UnifiedPush topics will lead to a HTTP 507 response if
 # no "rate visitor" has been previously registered. This is to avoid burning the publisher's "visitor-message-daily-limit".
 #
-# visitor-subscriber-rate-limiting: false
+visitor-subscriber-rate-limiting: {{ $rateLimits.visitorSubscriberRateLimiting }}
 
 # Payments integration via Stripe
 #
@@ -454,8 +465,12 @@ log-level-overrides: {{ toYaml $config.logLevelOverrides | nindent 2 }}
 log-format: {{ $config.logFormat }}
 {{- if $config.logFile }}
 log-file: {{ $config.logFile }}
+{{- else }}
+## Do not use a logfile.
 {{- end }}
 
 {{- if $config.additionalConfig }}
 {{ toYaml $config.additionalConfig }}
+{{- else }}
+## No additional Config to append.
 {{- end }}

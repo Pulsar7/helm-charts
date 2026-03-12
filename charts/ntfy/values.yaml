@@ -293,6 +293,88 @@ configFiles:
       # @section -- server.yaml Config-File
       proxyForwardedHeader: ""
       #
+      # -- A comma-separated list of IP addresses, hostnames or CIDRs that are removed from 
+      # the forwarded header to determine the real IP address (e.g. "1.2.3.4, 5.6.7.8")
+      # @section -- server.yaml Config-File
+      proxyTrustedHosts: ""
+      #
+      # -- Public facing base URL of the service
+      # @section -- server.yaml Config-File
+      baseURL: ""
+      #
+      attachments:
+        #
+        # -- Whether to enable attachments.
+        # `baseURL` and `attachments.cacheDir` has to be set!
+        # @section -- server.yaml Config-File
+        enabled: false
+        #
+        # -- The cache directory for attached files
+        # @section -- server.yaml Config-File
+        cacheDir: "/var/lib/ntfy"
+        #
+        # -- The limit of the on-disk attachment cache directory (total size)
+        # @section -- server.yaml Config-File
+        totalSizeLimit: "5G"
+        #
+        # -- The per-file attachment size limit (e.g. 300k, 2M, 100M)
+        # @section -- server.yaml Config-File
+        fileSizeLimit: "15M"
+        #
+        # -- The duration after which uploaded attachments will be deleted (e.g. 3h, 20h)
+        # @section -- server.yaml Config-File
+        expiryDuration: "3h"
+      #
+      rateLimits:
+        #
+        # -- Whether to enable subscriber-based rate limiting (mostly used for UnifiedPush)
+        # @section -- server.yaml Config-File
+        visitorSubscriberRateLimiting: false
+        #
+        # -- The max size of a message body
+        # @section -- server.yaml Config-File
+        messageSizeLimit: "4k"
+        #
+        # -- The max delay of a message when using the "Delay" header
+        # @section -- server.yaml Config-File
+        messageDelayLimit: "3d"
+        #
+        # -- Total number of topics before the server rejects new topics
+        # @section -- server.yaml Config-File
+        globalTopicLimit: 15000
+        #
+        # -- Number of subscriptions per visitor (IP address)
+        # @section -- server.yaml Config-File
+        visitorSubscriptionLimit: 30
+        #
+        # -- The initial bucket of requests each visitor has
+        # @section -- server.yaml Config-File
+        visitorRequestLimitBurst: 60
+        #
+        # -- The rate at which the bucket is refilled
+        # @section -- server.yaml Config-File
+        visitorRequestLimitReplenish: "5s"
+        #
+        # -- A comma-separated list of hostnames, IPs or CIDRs to be
+        # exempt from request rate limiting. Hostnames are resolved at the time the server is started.
+        # Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24"
+        # @section -- server.yaml Config-File
+        visitorRequestLimitExemptHosts: ""
+        #
+        # -- Hard daily limit of messages per visitor and day. The limit is reset
+        # every day at midnight UTC. If the limit is not set (or set to zero), the request
+        # limit (see above) governs the upper limit.
+        # @section -- server.yaml Config-File
+        visitorMessageDailyLimit: 0
+        #
+        # -- The total storage limit used for attachments per visitor
+        # @section -- server.yaml Config-File
+        visitorAttachmentTotalSizeLimit: "100M"
+        #
+        # -- The total daily attachment download/upload traffic limit per visitor
+        # @section -- server.yaml Config-File
+        visitorAttachmentDailyBandwidthLimit: "500M"
+      #
       # -- auth-file
       # @section -- server.yaml Config-File
       authFile: "/var/lib/ntfy/user.db"
@@ -363,22 +445,6 @@ configFiles:
       # -- Whether to allow users to reserve topics (if their tier allows it)
       # @section -- server.yaml Config-File
       enableReservations: false
-      #
-      # -- The max size of a message body
-      # @section -- server.yaml Config-File
-      messageSizeLimit: "4k"
-      #
-      # -- The max delay of a message when using the "Delay" header
-      # @section -- server.yaml Config-File
-      messageDelayLimit: "3d"
-      #
-      # -- Total number of topics before the server rejects new topics
-      # @section -- server.yaml Config-File
-      globalTopicLimit: 15000
-      #
-      # -- Number of subscriptions per visitor (IP address)
-      # @section -- server.yaml Config-File
-      visitorSubscriptionLimit: 30
       #
       # -- Whether to enable Prometheus-style metrics via a `/metrics` endpoint 
       # or on a dedicated listen IP/port

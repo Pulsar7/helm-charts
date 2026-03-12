@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.2-alpha.4](https://img.shields.io/badge/Version-0.1.2--alpha.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
+![Version: 0.1.2-alpha.5](https://img.shields.io/badge/Version-0.1.2--alpha.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
 
 ## Values
 
@@ -39,11 +39,17 @@ Custom Helm-Chart for NTFY
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | configFiles.serverYAML.dynamicValues.additionalConfig | object | `{}` | Additional NTFY-YAML-Configuration that gets appended to the YAML-config. |
+| configFiles.serverYAML.dynamicValues.attachments.cacheDir | string | `"/var/lib/ntfy"` | The cache directory for attached files |
+| configFiles.serverYAML.dynamicValues.attachments.enabled | bool | `false` | Whether to enable attachments. `baseURL` and `attachments.cacheDir` has to be set! |
+| configFiles.serverYAML.dynamicValues.attachments.expiryDuration | string | `"3h"` | The duration after which uploaded attachments will be deleted (e.g. 3h, 20h) |
+| configFiles.serverYAML.dynamicValues.attachments.fileSizeLimit | string | `"15M"` | The per-file attachment size limit (e.g. 300k, 2M, 100M) |
+| configFiles.serverYAML.dynamicValues.attachments.totalSizeLimit | string | `"5G"` | The limit of the on-disk attachment cache directory (total size) |
 | configFiles.serverYAML.dynamicValues.authAccess | list | `[]` | auth-access (Secret is recommended instead) |
 | configFiles.serverYAML.dynamicValues.authDefaultAccess | string | `"deny-all"` | auth-default-access |
 | configFiles.serverYAML.dynamicValues.authFile | string | `"/var/lib/ntfy/user.db"` | auth-file |
 | configFiles.serverYAML.dynamicValues.authTokens | list | `[]` | auth-tokens (Secret is recommended instead) |
 | configFiles.serverYAML.dynamicValues.authUsers | list | `[]` | auth-users (Secret is recommended instead) |
+| configFiles.serverYAML.dynamicValues.baseURL | string | `""` | Public facing base URL of the service |
 | configFiles.serverYAML.dynamicValues.behindProxy | bool | `false` | Whether NTFY is behind a Proxy |
 | configFiles.serverYAML.dynamicValues.cacheDuration | string | `"72h"` | cache-duration |
 | configFiles.serverYAML.dynamicValues.cacheFile | string | `"/var/lib/ntfy/cache.db"` | cache-file |
@@ -52,17 +58,25 @@ Custom Helm-Chart for NTFY
 | configFiles.serverYAML.dynamicValues.enableMetrics | bool | `false` | Whether to enable Prometheus-style metrics via a `/metrics` endpoint  or on a dedicated listen IP/port |
 | configFiles.serverYAML.dynamicValues.enableReservations | bool | `false` | Whether to allow users to reserve topics (if their tier allows it) |
 | configFiles.serverYAML.dynamicValues.enableSignup | bool | `false` | Whether to allow users to sign up via the web app, or API. `enableLogin` needs to be set when enabled. |
-| configFiles.serverYAML.dynamicValues.globalTopicLimit | int | `15000` | Total number of topics before the server rejects new topics |
 | configFiles.serverYAML.dynamicValues.logFile | string | `""` | Filename to write logs to. If this is not set, ntfy logs to stderr. |
 | configFiles.serverYAML.dynamicValues.logFormat | string | `"json"` | Defines the output format, can be "text" (default) or "json" |
 | configFiles.serverYAML.dynamicValues.logLevel | string | `"info"` | Defines the default log level |
 | configFiles.serverYAML.dynamicValues.logLevelOverrides | list | `[]` | Log-level-overrides (for debugging, only use temporarily) |
 | configFiles.serverYAML.dynamicValues.managerInterval | string | `"1m"` | Interval in which the manager prunes old messages, deletes topics and prints the stats |
-| configFiles.serverYAML.dynamicValues.messageDelayLimit | string | `"3d"` | The max delay of a message when using the "Delay" header |
-| configFiles.serverYAML.dynamicValues.messageSizeLimit | string | `"4k"` | The max size of a message body |
 | configFiles.serverYAML.dynamicValues.proxyForwardedHeader | string | `""` | Forwarded Proxy-Header (e.g. "X-Forwarded-For") |
+| configFiles.serverYAML.dynamicValues.proxyTrustedHosts | string | `""` | A comma-separated list of IP addresses, hostnames or CIDRs that are removed from  the forwarded header to determine the real IP address (e.g. "1.2.3.4, 5.6.7.8") |
+| configFiles.serverYAML.dynamicValues.rateLimits.globalTopicLimit | int | `15000` | Total number of topics before the server rejects new topics |
+| configFiles.serverYAML.dynamicValues.rateLimits.messageDelayLimit | string | `"3d"` | The max delay of a message when using the "Delay" header |
+| configFiles.serverYAML.dynamicValues.rateLimits.messageSizeLimit | string | `"4k"` | The max size of a message body |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorAttachmentDailyBandwidthLimit | string | `"500M"` | The total daily attachment download/upload traffic limit per visitor |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorAttachmentTotalSizeLimit | string | `"100M"` | The total storage limit used for attachments per visitor |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorMessageDailyLimit | int | `0` | Hard daily limit of messages per visitor and day. The limit is reset every day at midnight UTC. If the limit is not set (or set to zero), the request limit (see above) governs the upper limit. |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorRequestLimitBurst | int | `60` | The initial bucket of requests each visitor has |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorRequestLimitExemptHosts | string | `""` | A comma-separated list of hostnames, IPs or CIDRs to be exempt from request rate limiting. Hostnames are resolved at the time the server is started. Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24" |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorRequestLimitReplenish | string | `"5s"` | The rate at which the bucket is refilled |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorSubscriberRateLimiting | bool | `false` | Whether to enable subscriber-based rate limiting (mostly used for UnifiedPush) |
+| configFiles.serverYAML.dynamicValues.rateLimits.visitorSubscriptionLimit | int | `30` | Number of subscriptions per visitor (IP address) |
 | configFiles.serverYAML.dynamicValues.requireLogin | bool | `false` | Whether to redirect users to the login page if they are not logged in (disallows web app access without login). `enableLogin` needs to be set when enabled. |
-| configFiles.serverYAML.dynamicValues.visitorSubscriptionLimit | int | `30` | Number of subscriptions per visitor (IP address) |
 | configFiles.serverYAML.dynamicValues.webRoot | string | `"/"` | Defines the root path of the web app, or disables the web app entirely |
 | configFiles.serverYAML.ownConfigFileContent | string | `""` | Provide own 'server.yaml' file-content |
 | configFiles.serverYAML.useOwnConfigFileContent | bool | `false` | Whether to use your own 'server.yaml'-file |
