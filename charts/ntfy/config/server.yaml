@@ -447,10 +447,12 @@ enable-reservations: {{ $config.enableReservations }}
 #      - "visitor_ip=1.2.3.4 -> debug"
 #      - "time_taken_ms -> debug"
 #
-# log-level: info
-# log-level-overrides:
-# log-format: text
-# log-file:
+log-level: {{ $config.logLevel }}
+log-level-overrides: {{ toYaml $config.logLevelOverrides | nindent 2 }}
+log-format: {{ $config.logFormat }}
+{{- if $config.logFile }}
+log-file: {{ $config.logFile }}
+{{- end }}
 
 {{- if $config.additionalConfig }}
 {{ toYaml $config.additionalConfig }}

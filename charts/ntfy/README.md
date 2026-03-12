@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.2-alpha.2](https://img.shields.io/badge/Version-0.1.2--alpha.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
+![Version: 0.1.2-alpha.3](https://img.shields.io/badge/Version-0.1.2--alpha.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
 
 ## Values
 
@@ -51,6 +51,10 @@ Custom Helm-Chart for NTFY
 | configFiles.serverYAML.dynamicValues.enableLogin | bool | `false` | Whether to allow users to log in via the web app, or API |
 | configFiles.serverYAML.dynamicValues.enableReservations | bool | `false` | Whether to allow users to reserve topics (if their tier allows it) |
 | configFiles.serverYAML.dynamicValues.enableSignup | bool | `false` | Whether to allow users to sign up via the web app, or API. `enableLogin` needs to be set when enabled. |
+| configFiles.serverYAML.dynamicValues.logFile | string | `""` | Filename to write logs to. If this is not set, ntfy logs to stderr. |
+| configFiles.serverYAML.dynamicValues.logFormat | string | `"json"` | Defines the output format, can be "text" (default) or "json" |
+| configFiles.serverYAML.dynamicValues.logLevel | string | `"info"` | Defines the default log level |
+| configFiles.serverYAML.dynamicValues.logLevelOverrides | list | `[]` | Log-level-overrides (for debugging, only use temporarily) |
 | configFiles.serverYAML.dynamicValues.proxyForwardedHeader | string | `""` | Forwarded Proxy-Header (e.g. "X-Forwarded-For") |
 | configFiles.serverYAML.dynamicValues.requireLogin | bool | `false` | Whether to redirect users to the login page if they are not logged in (disallows web app access without login). `enableLogin` needs to be set when enabled. |
 | configFiles.serverYAML.dynamicValues.webRoot | string | `"/"` | Defines the root path of the web app, or disables the web app entirely |

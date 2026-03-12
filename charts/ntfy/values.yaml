@@ -358,6 +358,26 @@ configFiles:
       # -- Whether to allow users to reserve topics (if their tier allows it)
       # @section -- server.yaml Config-File
       enableReservations: false
+      #
+      # -- Defines the default log level
+      # @section -- server.yaml Config-File
+      logLevel: "info"
+      #
+      # -- Log-level-overrides (for debugging, only use temporarily)
+      # @section -- server.yaml Config-File
+      logLevelOverrides: []
+      #logLevelOverrides:
+      #  - "tag=manager -> trace"
+      #  - "visitor_ip=1.2.3.4 -> debug"
+      #  - "time_taken_ms -> debug"
+      #
+      # -- Defines the output format, can be "text" (default) or "json"
+      # @section -- server.yaml Config-File
+      logFormat: "json"
+      #
+      # -- Filename to write logs to. If this is not set, ntfy logs to stderr.
+      # @section -- server.yaml Config-File
+      logFile: ""
 
 
 # =================================================================
