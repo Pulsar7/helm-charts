@@ -328,6 +328,11 @@ configFiles:
       # @section -- server.yaml Config-File
       cacheDuration: "72h"
       #
+      # -- Interval in which the manager prunes old messages, deletes topics
+      # and prints the stats
+      # @section -- server.yaml Config-File
+      managerInterval: "1m"
+      #
       # -- Topic names that are not allowed
       # @section -- server.yaml Config-File
       disallowedTopics: []
@@ -358,6 +363,31 @@ configFiles:
       # -- Whether to allow users to reserve topics (if their tier allows it)
       # @section -- server.yaml Config-File
       enableReservations: false
+      #
+      # -- The max size of a message body
+      # @section -- server.yaml Config-File
+      messageSizeLimit: "4k"
+      #
+      # -- The max delay of a message when using the "Delay" header
+      # @section -- server.yaml Config-File
+      messageDelayLimit: "3d"
+      #
+      # -- Total number of topics before the server rejects new topics
+      # @section -- server.yaml Config-File
+      globalTopicLimit: 15000
+      #
+      # -- Number of subscriptions per visitor (IP address)
+      # @section -- server.yaml Config-File
+      visitorSubscriptionLimit: 30
+      #
+      # -- Whether to enable Prometheus-style metrics via a `/metrics` endpoint 
+      # or on a dedicated listen IP/port
+      # @section -- server.yaml Config-File
+      enableMetrics: false
+      #
+      # -- Exposes the metrics endpoint via a dedicated [IP]:port
+      # @section -- server.yaml Config-File
+      #metricsListenHttp: ":9090"
       #
       # -- Defines the default log level
       # @section -- server.yaml Config-File

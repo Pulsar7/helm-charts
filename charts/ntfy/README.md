@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.2-alpha.3](https://img.shields.io/badge/Version-0.1.2--alpha.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
+![Version: 0.1.2-alpha.4](https://img.shields.io/badge/Version-0.1.2--alpha.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
 
 ## Values
 
@@ -49,14 +49,20 @@ Custom Helm-Chart for NTFY
 | configFiles.serverYAML.dynamicValues.cacheFile | string | `"/var/lib/ntfy/cache.db"` | cache-file |
 | configFiles.serverYAML.dynamicValues.disallowedTopics | list | `[]` | Topic names that are not allowed |
 | configFiles.serverYAML.dynamicValues.enableLogin | bool | `false` | Whether to allow users to log in via the web app, or API |
+| configFiles.serverYAML.dynamicValues.enableMetrics | bool | `false` | Whether to enable Prometheus-style metrics via a `/metrics` endpoint  or on a dedicated listen IP/port |
 | configFiles.serverYAML.dynamicValues.enableReservations | bool | `false` | Whether to allow users to reserve topics (if their tier allows it) |
 | configFiles.serverYAML.dynamicValues.enableSignup | bool | `false` | Whether to allow users to sign up via the web app, or API. `enableLogin` needs to be set when enabled. |
+| configFiles.serverYAML.dynamicValues.globalTopicLimit | int | `15000` | Total number of topics before the server rejects new topics |
 | configFiles.serverYAML.dynamicValues.logFile | string | `""` | Filename to write logs to. If this is not set, ntfy logs to stderr. |
 | configFiles.serverYAML.dynamicValues.logFormat | string | `"json"` | Defines the output format, can be "text" (default) or "json" |
 | configFiles.serverYAML.dynamicValues.logLevel | string | `"info"` | Defines the default log level |
 | configFiles.serverYAML.dynamicValues.logLevelOverrides | list | `[]` | Log-level-overrides (for debugging, only use temporarily) |
+| configFiles.serverYAML.dynamicValues.managerInterval | string | `"1m"` | Interval in which the manager prunes old messages, deletes topics and prints the stats |
+| configFiles.serverYAML.dynamicValues.messageDelayLimit | string | `"3d"` | The max delay of a message when using the "Delay" header |
+| configFiles.serverYAML.dynamicValues.messageSizeLimit | string | `"4k"` | The max size of a message body |
 | configFiles.serverYAML.dynamicValues.proxyForwardedHeader | string | `""` | Forwarded Proxy-Header (e.g. "X-Forwarded-For") |
 | configFiles.serverYAML.dynamicValues.requireLogin | bool | `false` | Whether to redirect users to the login page if they are not logged in (disallows web app access without login). `enableLogin` needs to be set when enabled. |
+| configFiles.serverYAML.dynamicValues.visitorSubscriptionLimit | int | `30` | Number of subscriptions per visitor (IP address) |
 | configFiles.serverYAML.dynamicValues.webRoot | string | `"/"` | Defines the root path of the web app, or disables the web app entirely |
 | configFiles.serverYAML.ownConfigFileContent | string | `""` | Provide own 'server.yaml' file-content |
 | configFiles.serverYAML.useOwnConfigFileContent | bool | `false` | Whether to use your own 'server.yaml'-file |

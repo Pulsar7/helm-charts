@@ -254,7 +254,7 @@ proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
 # Interval in which the manager prunes old messages, deletes topics
 # and prints the stats.
 #
-# manager-interval: "1m"
+manager-interval: "{{ $config.managerInterval }}"
 
 # Defines topic names that are not allowed, because they are otherwise used. There are a few default topics
 # that cannot be used (e.g. app, account, settings, ...). To extend the default list, define them here.
@@ -312,16 +312,16 @@ enable-reservations: {{ $config.enableReservations }}
 #   If you increase this size limit regardless, FCM and APNS will NOT work for large messages.
 # - message-delay-limit defines the max delay of a message when using the "Delay" header.
 #
-# message-size-limit: "4k"
-# message-delay-limit: "3d"
+message-size-limit: "{{ $config.messageSizeLimit }}"
+message-delay-limit: "{{ $config.messageDelayLimit }}"
 
 # Rate limiting: Total number of topics before the server rejects new topics.
 #
-# global-topic-limit: 15000
+global-topic-limit: {{ $config.globalTopicLimit }}
 
 # Rate limiting: Number of subscriptions per visitor (IP address)
 #
-# visitor-subscription-limit: 30
+visitor-subscription-limit: {{ $config.visitorSubscriptionLimit }}
 
 # Rate limiting: Allowed GET/PUT/POST requests per second, per visitor:
 # - visitor-request-limit-burst is the initial bucket of requests each visitor has
@@ -403,8 +403,10 @@ enable-reservations: {{ $config.enableReservations }}
 # - metrics-listen-http exposes the metrics endpoint via a dedicated [IP]:port. If set, this option implicitly
 #   enables metrics as well, e.g. "10.0.1.1:9090" or ":9090"
 #
-# enable-metrics: false
-# metrics-listen-http:
+enable-metrics: {{ $config.enableMetrics }}
+{{- if and $config.enableMetrics $config.metricsListenHttp }}
+metrics-listen-http: "{{ $config.metricsListenHttp }}"
+{{- end }}
 
 # Profiling
 #
