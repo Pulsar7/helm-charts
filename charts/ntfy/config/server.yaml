@@ -265,7 +265,7 @@ proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
 #     - pricing
 #     - contact
 #
-# disallowed-topics:
+disallowed-topics: {{ toYaml $config.disallowedTopics | nindent 2 }}
 
 # Defines the root path of the web app, or disables the web app entirely.
 #
@@ -273,7 +273,7 @@ proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
 # the values "app" (maps to "/"), "home" (maps to "/app"), or "disable" (maps to "") to disable
 # the web app entirely.
 #
-# web-root: /
+web-root: {{ $config.webRoot }}
 
 # Various feature flags used to control the web app, and API access, mainly around user and
 # account management.
@@ -283,10 +283,10 @@ proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
 # - require-login redirects users to the login page if they are not logged in (disallows web app access without login)
 # - enable-reservations allows users to reserve topics (if their tier allows it)
 #
-# enable-signup: false
-# require-login: false
-# enable-login: false
-# enable-reservations: false
+enable-signup: {{ $config.enableSignup }}
+require-login: {{ $config.requireLogin }}
+enable-login: {{ $config.enableLogin }}
+enable-reservations: {{ $config.enableReservations }}
 
 # Server URL of a Firebase/APNS-connected ntfy server (likely "https://ntfy.sh").
 #
@@ -451,3 +451,7 @@ proxy-forwarded-header: "{{ $config.proxyForwardedHeader }}"
 # log-level-overrides:
 # log-format: text
 # log-file:
+
+{{- if $config.additionalConfig }}
+{{ toYaml $config.additionalConfig }}
+{{- end }}

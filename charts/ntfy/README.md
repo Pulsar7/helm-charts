@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.2-alpha.1](https://img.shields.io/badge/Version-0.1.2--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.2-alpha.2](https://img.shields.io/badge/Version-0.1.2--alpha.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
 
 ## Values
 
@@ -38,6 +38,7 @@ Custom Helm-Chart for NTFY
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| configFiles.serverYAML.dynamicValues.additionalConfig | object | `{}` | Additional NTFY-YAML-Configuration that gets appended to the YAML-config. |
 | configFiles.serverYAML.dynamicValues.authAccess | list | `[]` | auth-access (Secret is recommended instead) |
 | configFiles.serverYAML.dynamicValues.authDefaultAccess | string | `"deny-all"` | auth-default-access |
 | configFiles.serverYAML.dynamicValues.authFile | string | `"/var/lib/ntfy/user.db"` | auth-file |
@@ -46,7 +47,13 @@ Custom Helm-Chart for NTFY
 | configFiles.serverYAML.dynamicValues.behindProxy | bool | `false` | Whether NTFY is behind a Proxy |
 | configFiles.serverYAML.dynamicValues.cacheDuration | string | `"72h"` | cache-duration |
 | configFiles.serverYAML.dynamicValues.cacheFile | string | `"/var/lib/ntfy/cache.db"` | cache-file |
+| configFiles.serverYAML.dynamicValues.disallowedTopics | list | `[]` | Topic names that are not allowed |
+| configFiles.serverYAML.dynamicValues.enableLogin | bool | `false` | Whether to allow users to log in via the web app, or API |
+| configFiles.serverYAML.dynamicValues.enableReservations | bool | `false` | Whether to allow users to reserve topics (if their tier allows it) |
+| configFiles.serverYAML.dynamicValues.enableSignup | bool | `false` | Whether to allow users to sign up via the web app, or API. `enableLogin` needs to be set when enabled. |
 | configFiles.serverYAML.dynamicValues.proxyForwardedHeader | string | `""` | Forwarded Proxy-Header (e.g. "X-Forwarded-For") |
+| configFiles.serverYAML.dynamicValues.requireLogin | bool | `false` | Whether to redirect users to the login page if they are not logged in (disallows web app access without login). `enableLogin` needs to be set when enabled. |
+| configFiles.serverYAML.dynamicValues.webRoot | string | `"/"` | Defines the root path of the web app, or disables the web app entirely |
 | configFiles.serverYAML.ownConfigFileContent | string | `""` | Provide own 'server.yaml' file-content |
 | configFiles.serverYAML.useOwnConfigFileContent | bool | `false` | Whether to use your own 'server.yaml'-file |
 

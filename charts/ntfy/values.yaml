@@ -280,6 +280,11 @@ configFiles:
     # Configure existing 'server.yaml'-file (will be ignored, if `useOwnConfigFileContent: true`)
     dynamicValues:
       #
+      # -- Additional NTFY-YAML-Configuration that gets appended
+      # to the YAML-config.
+      # @section -- server.yaml Config-File
+      additionalConfig: {}
+      #
       # -- Whether NTFY is behind a Proxy
       # @section -- server.yaml Config-File
       behindProxy: false
@@ -322,6 +327,37 @@ configFiles:
       # -- cache-duration
       # @section -- server.yaml Config-File
       cacheDuration: "72h"
+      #
+      # -- Topic names that are not allowed
+      # @section -- server.yaml Config-File
+      disallowedTopics: []
+      #disallowedTopics:
+      #  - Test
+      #  - Not-Allowed
+      #  - NotAllowed
+      #  - Invalid
+      # 
+      # -- Defines the root path of the web app, or disables the web app entirely
+      # @section -- server.yaml Config-File
+      webRoot: /
+      #
+      # -- Whether to allow users to sign up via the web app, or API.
+      # `enableLogin` needs to be set when enabled.
+      # @section -- server.yaml Config-File
+      enableSignup: false
+      #
+      # -- Whether to redirect users to the login page if they are not logged in (disallows web app access without login).
+      # `enableLogin` needs to be set when enabled.
+      # @section -- server.yaml Config-File
+      requireLogin: false
+      #
+      # -- Whether to allow users to log in via the web app, or API
+      # @section -- server.yaml Config-File
+      enableLogin: false
+      #
+      # -- Whether to allow users to reserve topics (if their tier allows it)
+      # @section -- server.yaml Config-File
+      enableReservations: false
 
 
 # =================================================================
