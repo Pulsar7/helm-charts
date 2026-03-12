@@ -100,9 +100,11 @@ listen-http: ":{{ index $ntfyContainer.service.ports 0 "containerPort" }}"
 #
 cache-file: "{{ $config.cacheFile }}"
 cache-duration: "{{ $config.cacheDuration }}"
-# cache-startup-queries:
-# cache-batch-size: 0
-# cache-batch-timeout: "0ms"
+{{- if $config.cacheStartupQueries }}
+cache-startup-queries: {{ $config.cacheStartupQueries }}
+{{- end }}
+cache-batch-size: {{ $config.cacheBatchSize }}
+cache-batch-timeout: "{{ $config.cacheBatchTimeout }}"
 
 # If set, access to the ntfy server and API can be controlled on a granular level using
 # the 'ntfy user' and 'ntfy access' commands. See the --help pages for details, or check the docs.

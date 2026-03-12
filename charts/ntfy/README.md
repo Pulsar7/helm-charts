@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.2-alpha.5](https://img.shields.io/badge/Version-0.1.2--alpha.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
+![Version: 0.1.2-alpha.6](https://img.shields.io/badge/Version-0.1.2--alpha.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
 
 ## Values
 
@@ -51,8 +51,11 @@ Custom Helm-Chart for NTFY
 | configFiles.serverYAML.dynamicValues.authUsers | list | `[]` | auth-users (Secret is recommended instead) |
 | configFiles.serverYAML.dynamicValues.baseURL | string | `""` | Public facing base URL of the service |
 | configFiles.serverYAML.dynamicValues.behindProxy | bool | `false` | Whether NTFY is behind a Proxy |
-| configFiles.serverYAML.dynamicValues.cacheDuration | string | `"72h"` | cache-duration |
-| configFiles.serverYAML.dynamicValues.cacheFile | string | `"/var/lib/ntfy/cache.db"` | cache-file |
+| configFiles.serverYAML.dynamicValues.cacheBatchSize | int | `0` | Allow enabling async batch writing of messages. If set, messages will be queued and written to the database in batches of the given size, or after the given timeout. This is only required for high volume servers. |
+| configFiles.serverYAML.dynamicValues.cacheBatchTimeout | string | `"0ms"` | Allow enabling async batch writing of messages. If set, messages will be queued and written to the database in batches of the given size, or after the given timeout. This is only required for high volume servers. |
+| configFiles.serverYAML.dynamicValues.cacheDuration | string | `"72h"` | Defines the duration for which messages will be buffered before they are deleted |
+| configFiles.serverYAML.dynamicValues.cacheFile | string | `"/var/lib/ntfy/cache.db"` | Messages are cached in a local SQLite database instead of only in-memory |
+| configFiles.serverYAML.dynamicValues.cacheStartupQueries | string | `""` | Allows to run commands when the database is initialized |
 | configFiles.serverYAML.dynamicValues.disallowedTopics | list | `[]` | Topic names that are not allowed |
 | configFiles.serverYAML.dynamicValues.enableLogin | bool | `false` | Whether to allow users to log in via the web app, or API |
 | configFiles.serverYAML.dynamicValues.enableMetrics | bool | `false` | Whether to enable Prometheus-style metrics via a `/metrics` endpoint  or on a dedicated listen IP/port |
