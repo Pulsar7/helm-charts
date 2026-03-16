@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.2-alpha.6](https://img.shields.io/badge/Version-0.1.2--alpha.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
+![Version: 0.1.2-alpha.7](https://img.shields.io/badge/Version-0.1.2--alpha.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
 
 ## Values
 

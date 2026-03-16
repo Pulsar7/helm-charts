@@ -33,7 +33,7 @@ tests:
       - isKind:
           of: Deployment
       - notExists:
-          path: spec.template.metadata.annotations.checksum/pvc
+          path: spec.template.metadata.annotations["checksum/pvc"]
   
   - it: should pass with persistence
     #
@@ -46,7 +46,7 @@ tests:
       - isKind:
           of: Deployment
       - exists:
-          path: spec.template.metadata.annotations.checksum/pvc
+          path: spec.template.metadata.annotations["checksum/pvc"]
   
   - it: should pass with IngressRoute
     #
@@ -59,7 +59,7 @@ tests:
       - isKind:
           of: Deployment
       - exists:
-          path: spec.template.metadata.annotations.checksum/ingress-route
+          path: spec.template.metadata.annotations["checksum/ingress-route"]
   
   - it: should pass without IngressRoute
     #
@@ -72,4 +72,4 @@ tests:
       - isKind:
           of: Deployment
       - notExists:
-          path: spec.template.metadata.annotations.checksum/ingress-route
+          path: spec.template.metadata.annotations["checksum/ingress-route"]
