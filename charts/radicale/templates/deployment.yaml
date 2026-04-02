@@ -1,5 +1,5 @@
 {{ include "radicale.validateValues" . }}
-{{- $radicaleContainer := .Values.containers.ntfy -}}
+{{- $radicaleContainer := .Values.containers.radicale -}}
 {{- $radicaleContainerLivenessProbe := $radicaleContainer.probes.livenessProbe -}}
 {{- $radicaleContainerReadinessProbe := $radicaleContainer.probes.readinessProbe -}}
 {{- $persistence := .Values.persistence -}}
@@ -63,20 +63,12 @@ spec:
             - name: {{ .name }}
               containerPort: {{ .containerPort }}
             {{- end }}
-          {{- if $radicaleContainer.additionalEnv }}
+          {{- if $radicaleContainer.environmentVariables }}
           env:
-            {{- with $radicaleContainer.additionalEnv }}
+            {{- with $radicaleContainer.environmentVariables }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- end }}
-          command: # TODO
-          args:
-            #
-            # TODO
-            #
-            {{- with $radicaleContainer.additionalArgs }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
           {{- with $radicaleContainerLivenessProbe }}
           {{- if .enabled }}
           livenessProbe:
@@ -101,7 +93,7 @@ spec:
             successThreshold: {{ .successThreshold }}
           {{- end }}
           {{- end }}
-          {{- with $ntfyContainer.resources }}
+          {{- with $radicaleContainer.resources }}
           resources: {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
@@ -110,7 +102,7 @@ spec:
               readOnly: true
             - name: data
               mountPath: /data
-            {{- with $ntfyContainer.additionalVolumeMounts }}
+            {{- with $radicaleContainer.additionalVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:

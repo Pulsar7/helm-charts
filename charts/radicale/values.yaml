@@ -121,9 +121,11 @@ containers:
     # @section -- Radicale-Container specifications
     additionalVolumeMounts: {}
     #
-    # -- Additional Environment-variables
+    # -- Environment variables for the Container
     # @section -- Radicale-Container specifications
-    additionalEnv: {}
+    environmentVariables:
+      - name: "TAKE_FILE_OWNERSHIP"
+        value: false
     #
     # -- Additional Arguments
     # @section -- Radicale-Container specifications
@@ -253,14 +255,27 @@ configFiles:
     # -- Provide own 'config' file-content
     # @section -- config Config-File
     ownConfigFileContent: ""
-    #ownConfigFileContent: |
     #
     # Configure existing 'config'-file (will be ignored, if `useOwnConfigFileContent: true`)
     dynamicValues:
       #
-      # -- Additional Radicale-Configuration that gets appended
+      # -- `[server]`-Section
       # @section -- config Config-File
-      additionalConfig: {}
+      serverSection: |-
+        hosts: 0.0.0.0:5232
+      #
+      # -- `[auth]`-Section
+      # @section -- config Config-File
+      authSection: |-
+        type = htpasswd
+        htpasswd_filename = /config/users
+        htpasswd_encryption = bcrypt
+      #
+      # -- `[storage]`-Section
+      # @section -- config Config-File
+      storageSection: |-
+        type = multifilesystem
+        filesystem_folder = /data/collections
 
 
 # =================================================================
