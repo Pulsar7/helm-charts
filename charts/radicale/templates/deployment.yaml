@@ -100,22 +100,28 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+            - name: users-secret
+              mountPath: /config/users
+              readOnly: true
             - name: data
               mountPath: /data
             {{- with $radicaleContainer.additionalVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
+        - name: users-secret
+          secret:
+            secretName: {{ include "radicale.secret" . }}
         - name: config
           configMap:
-            name: {{ include "radicale.configMap" }}
+            name: {{ include "radicale.configMap" . }}
             items:
               - key: config
                 path: config
         {{- if and $persistence.enabled $persistence.createNewPVC }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ $persistence.claimName }}
+            claimName: {{ include "radicale.pvc" . }}
         {{- else }}
         - name: data
           emptyDir:
