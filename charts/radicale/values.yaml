@@ -1,6 +1,6 @@
 #------------------------------------------------------------------
 #
-# Values for the Custom Radicale-Helm-Chart
+# Values for the Custom Radicale Helm-Chart
 #
 #------------------------------------------------------------------
 
@@ -261,3 +261,29 @@ configFiles:
       # -- Additional Radicale-Configuration that gets appended
       # @section -- config Config-File
       additionalConfig: {}
+
+
+# =================================================================
+# IngressRoute specifications
+# =================================================================
+#
+ingressRoute:
+  #
+  # -- Whether to enable the IngressRoute for NTFY
+  # @section -- IngressRoute specifications
+  enabled: false
+  #
+  # -- Listening for Incoming Connections/Requests
+  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
+  # @section -- IngressRoute specifications
+  entryPoints:
+    - websecure
+  #
+  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
+  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
+  # @section -- IngressRoute specifications
+  certResolver: ""
+  #
+  # -- Hostname
+  # @section -- IngressRoute specifications
+  host: ""

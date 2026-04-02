@@ -94,9 +94,31 @@ Create the Radicale-Container-Image-URL
 {{- end }}
 
 {{/*
-Create Users Secret-Name
+Create Secret-Name
 */}}
-{{- define "radicale.secretName" -}}
+{{- define "radicale.secret" -}}
+{{- $name := .Values.authentication.existingSecretName | default (include "radicale.fullname" .) -}}
+{{- printf "%s" $name }}
+{{- end }}
+
+{{/*
+Create IngressRoute-Name
+*/}}
+{{- define "radicale.ingressRoute" -}}
+{{- printf "%s" (include "radicale.fullname" .) }}
+{{- end }}
+
+{{/*
+Create ConfigMap-Name
+*/}}
+{{- define "radicale.configMap" -}}
+{{- printf "%s" (include "radicale.fullname" .) }}
+{{- end }}
+
+{{/*
+Create Service-Name
+*/}}
+{{- define "radicale.service" -}}
 {{- printf "%s" (include "radicale.fullname" .) }}
 {{- end }}
 
