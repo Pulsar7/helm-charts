@@ -1,3 +1,4 @@
+{{ include "ntfy.validateValues" . }}
 {{- $ntfyContainer := .Values.containers.ntfy -}}
 {{- $ntfyContainerLivenessProbe := $ntfyContainer.probes.livenessProbe -}}
 {{- $ntfyContainerReadinessProbe := $ntfyContainer.probes.readinessProbe -}}

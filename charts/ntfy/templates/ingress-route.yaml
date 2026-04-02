@@ -1,3 +1,4 @@
+{{ include "ntfy.validateValues" . }}
 {{- $ingressRoute := .Values.ingressRoute -}}
 {{- if $ingressRoute.enabled }}
 {{- $ntfyContainer := .Values.containers.ntfy -}}

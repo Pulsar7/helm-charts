@@ -1,9 +1,10 @@
+{{ include "ntfy.validateValues" . }}
 {{- $persistence := .Values.persistence -}}
 {{- if and $persistence.enabled $persistence.createNewPVC }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ $persistence.claimName }}
+  name: {{ include "ntfy.pvc" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "ntfy.labels" . | nindent 4 }}

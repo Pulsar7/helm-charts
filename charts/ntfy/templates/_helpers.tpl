@@ -78,6 +78,14 @@ Create Authentication-Users Secret-Name
 {{- end }}
 
 {{/*
+Create PVC-Name for NTFY
+*/}}
+{{- define "ntfy.pvc" -}}
+{{- $claimName := .Values.persistence.claimName | default (include "ntfy.fullname" .) -}}
+{{- printf "%s" $claimName }}
+{{- end -}}
+
+{{/*
 Create Authentication-Access Secret-Name
 */}}
 {{- define "ntfy.authAccessSecretName" -}}
@@ -85,3 +93,61 @@ Create Authentication-Access Secret-Name
 {{- $authAccessSecretName := $authentication.authAccess.existingSecretName | default (include "ntfy.fullname" .) -}}
 {{- printf "%s" $authAccessSecretName }}
 {{- end }}
+
+{{/*
+Compile all warnings into a single message, and call fail.
+See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f70476529e720/bitnami/airflow/templates/_helpers.tpl#L434
+*/}}
+{{- define "ntfy.validateValues" -}}
+{{- $messages := list -}}
+{{- $messages := append $messages (include "ntfy.validateValues.persistence" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.authentication" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.containers" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.configFiles.serverYAML" .) -}}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n" $messages -}}
+
+{{- if $message -}}
+{{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Validate values of NTFY - PVC-specification has to be set when persistence in enabled
+*/}}
+{{- define "ntfy.validateValues.persistence" -}}
+{{- $persistence := .Values.persistence -}}
+
+{{- end -}}
+
+{{/*
+Validate values of NTFY - Authentication
+*/}}
+{{- define "ntfy.validateValues.authentication" -}}
+{{- $auth := .Values.authentication -}}
+
+{{- end -}}
+
+{{/*
+Validate values of NTFY - Containers
+*/}}
+{{- define "ntfy.validateValues.containers" -}}
+{{- $containers := .Values.containers -}}
+
+{{- end -}}
+
+{{/*
+Validate values of NTFY - PVC-specification has to be set when persistence in enabled
+*/}}
+{{- define "ntfy.validateValues.configFiles.serverYAML" -}}
+{{- $conf := .Values.configFiles.serverYAML.dynamicValues -}}
+{{/* `enableLogin` needs to be set when `enableSignup` enabled */}}
+{{- if and $conf.enableSignup (not $conf.enableLogin) -}}
+ntfy: configFiles.serverYAML
+    `enableLogin` has to be enabled too when `enableSignup` is enabled
+{{/* `enableLogin` needs to be set when `requireLogin` enabled */}}
+{{- else if and $conf.requireLogin (not $conf.enableLogin) -}}
+ntfy: configFiles.serverYAML
+    `enableLogin` has to be enabled too when `requireLogin` is enabled
+{{- end -}}
+{{- end -}}
