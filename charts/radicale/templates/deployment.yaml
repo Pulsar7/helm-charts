@@ -1,0 +1,6 @@
+{{ include "radicale.validateValues" . }}
+{{- $radicaleContainer := .Values.containers.ntfy -}}
+{{- $radicaleContainerLivenessProbe := $radicaleContainer.probes.livenessProbe -}}
+{{- $radicaleContainerReadinessProbe := $radicaleContainer.probes.readinessProbe -}}
+{{- $persistence := .Values.persistence -}}
+{{- $authentication := .Values.authentication -}}
