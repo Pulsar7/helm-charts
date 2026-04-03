@@ -101,4 +101,15 @@ entries:
     urls:
     - https://github.com/Pulsar7/helm-charts/releases/download/ntfy-0.1.1/ntfy-0.1.1.tgz
     version: 0.1.1
-generated: "2026-04-02T16:34:11.270440989Z"
+  radicale:
+  - apiVersion: v2
+    appVersion: 3.6.1.0
+    created: "2026-04-03T09:40:02.052044974Z"
+    description: Custom Helm-Chart for Radicale
+    digest: fae0f095a7bf43fcde03b477a7416817f5724959a4f5c1824aed82a7f18563ef
+    name: radicale
+    type: application
+    urls:
+    - https://github.com/Pulsar7/helm-charts/releases/download/radicale-0.1.6-alpha/radicale-0.1.6-alpha.tgz
+    version: 0.1.6-alpha
+generated: "2026-04-03T09:40:02.052079689Z"
