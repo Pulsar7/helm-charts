@@ -62,27 +62,8 @@
     "authentication": {
         "type": "object",
         "properties": {
-            "authTokens": {
-                "type": "object",
-                "properties": {
-                    "existingSecretName": {"type": "string"},
-                    "secretKey": {"type": "string"}
-                }
-            },
-            "authUsers": {
-                "type": "object",
-                "properties": {
-                    "existingSecretName": {"type": "string"},
-                    "secretKey": {"type": "string"}
-                }
-            },
-            "authAccess": {
-                "type": "object",
-                "properties": {
-                    "existingSecretName": {"type": "string"},
-                    "secretKey": {"type": "string"}
-                }
-            }
+            "existingSecretName": {"type": "string"},
+            "secretKey": {"type": "string"}
         }
     },
 
