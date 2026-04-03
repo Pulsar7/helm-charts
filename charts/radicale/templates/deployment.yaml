@@ -115,7 +115,7 @@ spec:
                   name: {{ include "radicale.secret" . }}
               - configMap:
                   name: {{ include "radicale.configMap" . }}
-        {{- if and $persistence.enabled $persistence.createNewPVC }}
+        {{- if $persistence.enabled }}
         - name: data
           persistentVolumeClaim:
             claimName: {{ include "radicale.pvc" . }}
