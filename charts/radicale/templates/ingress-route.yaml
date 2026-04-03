@@ -1,0 +1,22 @@
+{{ include "radicale.validateValues" . }}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- if $ingressRoute.enabled }}
+{{- $radicaleContainer := .Values.containers.radicale -}}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "radicale.ingressRoute" . }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  entryPoints:
+    {{- toYaml $ingressRoute.entryPoints | nindent 4 }}
+  routes:
+    - match: Host(`{{ .Values.ingressRoute.host }}`)
+      kind: Rule
+      services:
+        - name: {{ include "radicale.service" . }}
+          port: {{ index $radicaleContainer.service.ports 0 "port" }}
+          scheme: http
+  tls:
+    certResolver: {{ .Values.ingressRoute.certResolver }}
+{{- end }}

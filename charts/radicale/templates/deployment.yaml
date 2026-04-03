@@ -1,0 +1,141 @@
+{{ include "radicale.validateValues" . }}
+{{- $radicaleContainer := .Values.containers.radicale -}}
+{{- $radicaleContainerLivenessProbe := $radicaleContainer.probes.livenessProbe -}}
+{{- $radicaleContainerReadinessProbe := $radicaleContainer.probes.readinessProbe -}}
+{{- $persistence := .Values.persistence -}}
+{{- $authentication := .Values.authentication -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "radicale.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "radicale.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy: {{ toYaml .Values.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "radicale.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        #
+        # https://helm.sh/docs/howto/charts_tips_and_tricks/#automatically-roll-deployments
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if and $persistence.enabled $persistence.createNewPVC }}
+        checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
+        {{- end }}
+        checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
+        {{- if .Values.ingressRoute.enabled }}
+        checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if not $authentication.existingSecretName }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "radicale.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with $radicaleContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "radicale.containerImage" . }}
+          imagePullPolicy: {{ $radicaleContainer.image.pullPolicy }}
+          ports:
+            {{- range $radicaleContainer.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+            {{- end }}
+          {{- if $radicaleContainer.environmentVariables }}
+          env:
+            {{- with $radicaleContainer.environmentVariables }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- with $radicaleContainerLivenessProbe }}
+          {{- if .enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ index $radicaleContainer.service.ports 0 "name" }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+          {{- end }}
+          {{- end }}
+          {{- with $radicaleContainerReadinessProbe }}
+          {{- if .enabled }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ index $radicaleContainer.service.ports 0 "name" }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+          {{- end }}
+          {{- end }}
+          {{- with $radicaleContainer.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: data
+              mountPath: /data
+            {{- with $radicaleContainer.additionalVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+          #
+          # > https://kubernetes.io/docs/concepts/storage/projected-volumes/
+          projected:
+            sources:
+              - secret:
+                  name: {{ include "radicale.secret" . }}
+              - configMap:
+                  name: {{ include "radicale.configMap" . }}
+        {{- if and $persistence.enabled $persistence.createNewPVC }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "radicale.pvc" . }}
+        {{- else }}
+        - name: data
+          emptyDir:
+            sizeLimit: {{ $persistence.emptyDirSizeLimit }}
+        {{- end }}
+        {{- with .Values.additionalVolumes }}
+        {{- toYaml . | nindent 12 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
