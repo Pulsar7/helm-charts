@@ -6,7 +6,7 @@
     "containers": {
         "type": "object",
         "properties": {
-            "ntfy": {
+            "radicale": {
                 "type": "object",
                 "properties": {
                     "image": {
@@ -26,8 +26,7 @@
                         }
                     },
                     "additionalVolumeMounts": {"type": "object"},
-                    "additionalEnv": {"type": "object"},
-                    "additionalArgs": {"type": "object"},
+                    "environmentVariables": {"type": "array"},
                     "probes": {
                         "type": "object",
                         "properties": {
@@ -102,7 +101,7 @@
     "configFiles": {
         "type": "object",
         "properties": {
-            "serverYAML": {
+            "config": {
                 "type": "object",
                 "properties": {
                     "useOwnConfigFileContent": {"type": "boolean"},
@@ -110,7 +109,9 @@
                     "dynamicValues": {
                         "type": "object",
                         "properties": {
-                            "additionalConfig": {"type": "string"}
+                            "serverSection": {"type": "string"},
+                            "authSection": {"type": "string"},
+                            "storageSection": {"type": "string"}
                         }
                     }
                 }

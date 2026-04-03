@@ -127,10 +127,6 @@ containers:
       - name: "TAKE_FILE_OWNERSHIP"
         value: false
     #
-    # -- Additional Arguments
-    # @section -- Radicale-Container specifications
-    additionalArgs: {}
-    #
     probes:
       #
       livenessProbe:
