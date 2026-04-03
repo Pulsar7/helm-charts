@@ -67,7 +67,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 */}}
 {{- define "radicale.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "radicale.validateValues.persistence" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.configFiles.config" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
@@ -77,11 +77,14 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- end -}}
 
 {{/*
-Validate values of Radicale - PVC-specification has to be set when persistence in enabled
+Validate values of Radicale - configFile.config
 */}}
-{{- define "radicale.validateValues.persistence" -}}
-{{- $persistence := .Values.persistence -}}
-
+{{- define "radicale.validateValues.configFiles.config" -}}
+{{- $config := .Values.configFiles.config -}}
+{{- if and $config.useOwnConfigFileContent (not $config.ownConfigFileContent) -}}
+radicale: configFiles.config
+    You have to provide your own config-file content when enabling `.Values.configFiles.config.useOwnConfigFileContent`
+{{- end -}}
 {{- end -}}
 
 {{/*
