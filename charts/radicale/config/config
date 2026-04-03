@@ -1,9 +1,9 @@
 {{- $config := .Values.configFiles.config.dynamicValues -}}
 [server]
-{{ $config.serverSection -}}
+{{ $config.serverSection }}
 
 [auth]
-{{ $config.authSection -}}
+{{ $config.authSection }}
 
 [storage]
-{{ $config.storageSection -}}
+{{ $config.storageSection }}

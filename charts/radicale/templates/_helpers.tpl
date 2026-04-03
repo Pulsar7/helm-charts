@@ -79,7 +79,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{/*
 Validate values of Radicale - PVC-specification has to be set when persistence in enabled
 */}}
-{{- define "ntfy.validateValues.persistence" -}}
+{{- define "radicale.validateValues.persistence" -}}
 {{- $persistence := .Values.persistence -}}
 
 {{- end -}}

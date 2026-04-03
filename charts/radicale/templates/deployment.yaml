@@ -100,24 +100,21 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
-            - name: users-secret
-              mountPath: /config/users
-              readOnly: true
             - name: data
               mountPath: /data
             {{- with $radicaleContainer.additionalVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
-        - name: users-secret
-          secret:
-            secretName: {{ include "radicale.secret" . }}
         - name: config
-          configMap:
-            name: {{ include "radicale.configMap" . }}
-            items:
-              - key: config
-                path: config
+          #
+          # > https://kubernetes.io/docs/concepts/storage/projected-volumes/
+          projected:
+            sources:
+              - secret:
+                  name: {{ include "radicale.secret" . }}
+              - configMap:
+                  name: {{ include "radicale.configMap" . }}
         {{- if and $persistence.enabled $persistence.createNewPVC }}
         - name: data
           persistentVolumeClaim:
