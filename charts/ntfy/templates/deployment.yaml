@@ -128,14 +128,14 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "ntfy.fullname" . }}-cm
+            name: {{ include "ntfy.fullname" . }}
             items:
               - key: server.yaml
                 path: server.yaml
-        {{- if and $persistence.enabled $persistence.createNewPVC }}
+        {{- if $persistence.enabled }}
         - name: data
           persistentVolumeClaim:
-            claimName: {{ $persistence.claimName }}
+            claimName: {{ include "ntfy.pvc" . }}
         {{- else }}
         - name: data
           emptyDir:
