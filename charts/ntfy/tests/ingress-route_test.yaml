@@ -36,7 +36,7 @@ tests:
             match: Host(`test-host`)
             kind: Rule
             services:
-              - name: RELEASE-NAME-ntfy-service
+              - name: RELEASE-NAME-ntfy
                 port: 5000
                 scheme: http
       - equal:
