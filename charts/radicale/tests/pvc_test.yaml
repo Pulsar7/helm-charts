@@ -29,3 +29,15 @@ tests:
       - equal:
           path: spec.resources.requests.storage
           value: "17Gi"
+  
+  - it: should render PVC with enabled and new PVC with adjusted name
+    #
+    set:
+      persistence.enabled: true
+      persistence.createNewPVC: true
+      persistence.claimName: "my-test-name-pvc"
+    #
+    asserts:
+      - equal:
+          path: metadata.name
+          value: "my-test-name-pvc"
