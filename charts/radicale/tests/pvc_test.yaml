@@ -1,0 +1,31 @@
+#------------------------------------------------------------------------------
+#
+# PVC-Unittests Test-Suite for Radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+suite: Test PVC
+#
+templates:
+  - templates/pvc.yaml
+#
+tests:
+  - it: should render PVC with enabled and new PVC
+    #
+    set:
+      persistence.enabled: true
+      persistence.createNewPVC: true
+      persistence.accessModes: ["readWriteMany"]
+      persistence.storageRequest: "17Gi"
+    #
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.accessModes
+          value: ["readWriteMany"]
+      - equal:
+          path: spec.resources.requests.storage
+          value: "17Gi"

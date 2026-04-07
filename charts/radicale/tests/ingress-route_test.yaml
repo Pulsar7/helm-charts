@@ -1,0 +1,34 @@
+#------------------------------------------------------------------------------
+#
+# IngressRoute-Unittests Test-Suite for Radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+suite: Test IngressRoute
+#
+templates:
+  - templates/ingress-route.yaml
+#
+tests:
+  - it: should render enabled ingressroute with test values
+    #
+    set:
+      ingressRoute.enabled: true
+      ingressRoute.entryPoints: ["websecure", "test"]
+      ingressRoute.certResolver: "test-resolver"
+      ingressRoute.host: "test.invalid"
+    #
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - equal:
+          path: spec.entryPoints
+          value: ["websecure", "test"]
+      - equal:
+          path: spec.routes[?(@.kind=="Rule")].match
+          value: Host(`test.invalid`)
+      - equal:
+          path: spec.tls.certResolver
+          value: "test-resolver"

@@ -1,0 +1,35 @@
+#------------------------------------------------------------------------------
+#
+# Service-Unittests Test-Suite for Radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+suite: Test Service
+#
+templates:
+  - templates/service.yaml
+#
+tests:
+  - it: should render service with type ClusterIP
+    #
+    set:
+      containers.radicale.service.type: "ClusterIP"
+    #
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: "ClusterIP"
+  
+  - it: should render service with different exposed port
+    #
+    set:
+      containers.radicale.service.ports[0].port: 1337
+    #
+    asserts:
+      - equal:
+          path: spec.ports[0].port
+          value: 1337
