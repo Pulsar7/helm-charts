@@ -104,6 +104,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- $messages := append $messages (include "ntfy.validateValues.authentication" .) -}}
 {{- $messages := append $messages (include "ntfy.validateValues.containers" .) -}}
 {{- $messages := append $messages (include "ntfy.validateValues.configFiles.serverYAML" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.configFiles.serverYAML.dynamicValues" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 
@@ -113,7 +114,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- end -}}
 
 {{/*
-Validate values of NTFY - PVC-specification has to be set when persistence in enabled
+Validate values of NTFY
 */}}
 {{- define "ntfy.validateValues.persistence" -}}
 {{- $persistence := .Values.persistence -}}
@@ -137,15 +138,29 @@ Validate values of NTFY - Containers
 {{- end -}}
 
 {{/*
-Validate values of NTFY - PVC-specification has to be set when persistence in enabled
+Validate values of NTFY - 'server.yaml'
+
+> `ownConfigFileContent` needs to be set when `useOwnConfigFileContent` is enabled
 */}}
 {{- define "ntfy.validateValues.configFiles.serverYAML" -}}
+{{- $conf := .Values.configFiles.serverYAML -}}
+{{- if and $conf.useOwnConfigFileContent (not $conf.ownConfigFileContent) -}}
+ntfy: configFiles.serverYAML
+    When `useOwnConfigFileContent` is set `true`, you have to provide your `ownConfigFileContent`
+{{- end -}}
+{{- end -}}
+
+{{/*
+Validate values of NTFY - 'server.yaml'-authentication
+
+> `enableLogin` needs to be set when `enableSignup` enabled
+> `enableLogin` needs to be set when `requireLogin` enabled
+*/}}
+{{- define "ntfy.validateValues.configFiles.serverYAML.dynamicValues" -}}
 {{- $conf := .Values.configFiles.serverYAML.dynamicValues -}}
-{{/* `enableLogin` needs to be set when `enableSignup` enabled */}}
 {{- if and $conf.enableSignup (not $conf.enableLogin) -}}
 ntfy: configFiles.serverYAML
     `enableLogin` has to be enabled too when `enableSignup` is enabled
-{{/* `enableLogin` needs to be set when `requireLogin` enabled */}}
 {{- else if and $conf.requireLogin (not $conf.enableLogin) -}}
 ntfy: configFiles.serverYAML
     `enableLogin` has to be enabled too when `requireLogin` is enabled

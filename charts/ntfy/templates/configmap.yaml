@@ -1,3 +1,4 @@
+{{ include "ntfy.validateValues" . }}
 {{- $serverYAML := .Values.configFiles.serverYAML -}}
 apiVersion: v1
 kind: ConfigMap
