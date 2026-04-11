@@ -267,11 +267,26 @@ configFiles:
         htpasswd_filename = /config/users
         htpasswd_encryption = bcrypt
       #
+      # -- `[rights]`-Section
+      # @section -- config Config-File
+      rightsSection: |-
+        type = owner_only
+      #
       # -- `[storage]`-Section
       # @section -- config Config-File
       storageSection: |-
         type = multifilesystem
         filesystem_folder = /data/collections
+      #
+      # -- `[web]`-Section
+      # @section -- config Config-File
+      webSection: |-
+        type = internal
+      #
+      # -- `[logging]`-Section
+      # @section -- config Config-File
+      loggingSection: |-
+        level = info
 
 
 # =================================================================

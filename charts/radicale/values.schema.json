@@ -92,7 +92,10 @@
                         "properties": {
                             "serverSection": {"type": "string"},
                             "authSection": {"type": "string"},
-                            "storageSection": {"type": "string"}
+                            "rightsSection": {"type": "string"},
+                            "storageSection": {"type": "string"},
+                            "webSection": {"type": "string"},
+                            "loggingSection": {"type": "string"}
                         }
                     }
                 }

@@ -5,7 +5,7 @@ Custom Helm-Chart for Radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.9-alpha](https://img.shields.io/badge/Version-0.1.9--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.1.0](https://img.shields.io/badge/AppVersion-3.6.1.0-informational?style=flat-square)
+![Version: 0.1.10-alpha](https://img.shields.io/badge/Version-0.1.10--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.1.0](https://img.shields.io/badge/AppVersion-3.6.1.0-informational?style=flat-square)
 
 ## Values
 
@@ -35,8 +35,11 @@ Custom Helm-Chart for Radicale
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | configFiles.config.dynamicValues.authSection | string | `"type = htpasswd\nhtpasswd_filename = /config/users\nhtpasswd_encryption = bcrypt"` | `[auth]`-Section |
+| configFiles.config.dynamicValues.loggingSection | string | `"level = info"` | `[logging]`-Section |
+| configFiles.config.dynamicValues.rightsSection | string | `"type = owner_only"` | `[rights]`-Section |
 | configFiles.config.dynamicValues.serverSection | string | `"hosts: 0.0.0.0:5232"` | `[server]`-Section |
 | configFiles.config.dynamicValues.storageSection | string | `"type = multifilesystem\nfilesystem_folder = /data/collections"` | `[storage]`-Section |
+| configFiles.config.dynamicValues.webSection | string | `"type = internal"` | `[web]`-Section |
 | configFiles.config.ownConfigFileContent | string | `""` | Provide own 'config' file-content |
 | configFiles.config.useOwnConfigFileContent | bool | `false` | Whether to use your own 'config'-file |
 

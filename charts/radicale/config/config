@@ -7,3 +7,9 @@
 
 [storage]
 {{ $config.storageSection }}
+
+[web]
+{{ $config.webSection }}
+
+[logging]
+{{ $config.loggingSection }}
