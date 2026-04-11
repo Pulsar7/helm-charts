@@ -275,7 +275,7 @@ configFiles:
 
 
 # =================================================================
-# IngressRoute specifications
+# Ingress specifications
 # =================================================================
 #
 ingressRoute:
@@ -287,8 +287,7 @@ ingressRoute:
   # -- Listening for Incoming Connections/Requests
   # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
   # @section -- IngressRoute specifications
-  entryPoints:
-    - websecure
+  entryPoints: ["websecure"]
   #
   # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
   # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
@@ -298,3 +297,14 @@ ingressRoute:
   # -- Hostname
   # @section -- IngressRoute specifications
   host: ""
+#
+# -- Traefik Middlewares that should be used by the IngressRoute-rule
+# @section -- IngressRoute specifications
+middlewares: []
+# e.g.:
+#  - name: radicale-headers
+#    spec:
+#      rateLimit:
+#        average: 100
+#        period: 1s
+#        burst: 200

@@ -1,5 +1,7 @@
 {{ include "radicale.validateValues" . }}
 {{- $ingressRoute := .Values.ingressRoute -}}
+{{- $middlewares := .Values.middlewares -}}
+{{- $middlewareNamespace := (.Release.Namespace | quote) -}}
 {{- if $ingressRoute.enabled }}
 {{- $radicaleContainer := .Values.containers.radicale -}}
 apiVersion: traefik.io/v1alpha1
@@ -17,6 +19,13 @@ spec:
         - name: {{ include "radicale.service" . }}
           port: {{ index $radicaleContainer.service.ports 0 "port" }}
           scheme: http
+      {{- if $middlewares }}
+      middlewares:
+      {{- range $middlewares }}
+      - name: {{ .name | quote }}
+        namespace: {{ $middlewareNamespace }}
+      {{- end }}
+      {{- end }}
   tls:
     certResolver: {{ .Values.ingressRoute.certResolver }}
 {{- end }}

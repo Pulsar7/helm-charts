@@ -108,6 +108,10 @@
             "certResolver": {"type": "string"},
             "host": {"type": "string"}
         }
+    },
+
+    "middlewares": {
+        "type": "array"
     }
   },
 
@@ -117,7 +121,8 @@
     "persistence",
     "authentication",
     "configFiles",
-    "ingressRoute"
+    "ingressRoute",
+    "middlewares"
   ],
 
   "title": "Values",
