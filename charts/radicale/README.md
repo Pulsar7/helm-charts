@@ -5,7 +5,7 @@ Custom Helm-Chart for Radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.10-alpha](https://img.shields.io/badge/Version-0.1.10--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.1.0](https://img.shields.io/badge/AppVersion-3.6.1.0-informational?style=flat-square)
+![Version: 0.1.10-alpha.1](https://img.shields.io/badge/Version-0.1.10--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.1.0](https://img.shields.io/badge/AppVersion-3.6.1.0-informational?style=flat-square)
 
 ## Values
 
@@ -78,7 +78,7 @@ Custom Helm-Chart for Radicale
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | ingressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
-| ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for NTFY |
+| ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for Radicale |
 | ingressRoute.entryPoints | list | `["websecure"]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
 | ingressRoute.host | string | `""` | Hostname |
 | middlewares | list | `[]` | Traefik Middlewares that should be used by the IngressRoute-rule |

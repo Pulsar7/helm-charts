@@ -58,7 +58,7 @@ tolerations: {}
 containers:
   radicale:
     #
-    # Image specifications of the NTFY-Container
+    # Image specifications of the Radicale-Container
     image:
       #
       # -- Container-Image-Repository
@@ -108,7 +108,7 @@ containers:
           containerPort: 5232
           #
           # -- Exposed Container-Port
-          # @section -- NTFY-Container-Port
+          # @section -- Radicale-Container-Port
           port: 5232
           #
           # reference containerPort by name
@@ -295,7 +295,7 @@ configFiles:
 #
 ingressRoute:
   #
-  # -- Whether to enable the IngressRoute for NTFY
+  # -- Whether to enable the IngressRoute for Radicale
   # @section -- IngressRoute specifications
   enabled: false
   #
