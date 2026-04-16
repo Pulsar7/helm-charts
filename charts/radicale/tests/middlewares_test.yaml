@@ -1,0 +1,37 @@
+#------------------------------------------------------------------------------
+#
+# Middlewares-Unittests Test-Suite for Radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+suite: Test Middlewares
+#
+templates:
+  - templates/middlewares.yaml
+#
+tests:
+  - it: should render enabled middlewares with test values
+    #
+    set:
+      ingressRoute.enabled: true
+      middlewares:
+        - name: test-radicale-middleware
+          spec:
+            average: 999
+            period: 777s
+            burst: 333
+    #
+    asserts:
+      - isKind:
+          of: Middleware
+      - equal:
+          path: spec.average
+          value: 999
+      - equal:
+          path: spec.period
+          value: 777s
+      - equal:
+          path: spec.burst
+          value: 333
