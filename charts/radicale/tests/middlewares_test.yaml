@@ -35,3 +35,12 @@ tests:
       - equal:
           path: spec.burst
           value: 333
+  
+  - it: should render disabled middlewares-resources with disabled ingressRoute
+    #
+    set:
+      ingressRoute.enabled: false
+    #
+    asserts:
+      - notExists:
+          path: spec
