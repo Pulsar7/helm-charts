@@ -5,7 +5,7 @@ Custom Helm-Chart for NTFY
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.4-alpha](https://img.shields.io/badge/Version-0.1.4--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.18](https://img.shields.io/badge/AppVersion-v2.18-informational?style=flat-square)
+![Version: 0.1.5-alpha](https://img.shields.io/badge/Version-0.1.5--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.21.0](https://img.shields.io/badge/AppVersion-v2.21.0-informational?style=flat-square)
 
 ## Values
 
@@ -93,7 +93,7 @@ Custom Helm-Chart for NTFY
 | containers.ntfy.additionalVolumeMounts | object | `{}` | Additional Volume-Mounts for Container |
 | containers.ntfy.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | containers.ntfy.image.repository | string | `"docker.io/binwiederhier/ntfy"` | Container-Image-Repository |
-| containers.ntfy.image.tag | string | `"v2.18"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
+| containers.ntfy.image.tag | string | `"v2.21.0"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.ntfy.resources | object | `{}` | Container Resources |
 | containers.ntfy.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Container Security Context |
 | containers.ntfy.service.type | string | `"ClusterIP"` | Service Type |
