@@ -5,6 +5,9 @@
 [auth]
 {{ $config.authSection }}
 
+[rights]
+{{ $config.rightsSection }}
+
 [storage]
 {{ $config.storageSection }}
 
