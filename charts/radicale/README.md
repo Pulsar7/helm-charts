@@ -5,7 +5,7 @@ Custom Helm-Chart for Radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.10-alpha.4](https://img.shields.io/badge/Version-0.1.10--alpha.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.6.1.0](https://img.shields.io/badge/AppVersion-3.6.1.0-informational?style=flat-square)
+![Version: 0.1.11-alpha](https://img.shields.io/badge/Version-0.1.11--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.7.1.0](https://img.shields.io/badge/AppVersion-3.7.1.0-informational?style=flat-square)
 
 ## Values
 
@@ -51,7 +51,7 @@ Custom Helm-Chart for Radicale
 | containers.radicale.environmentVariables | list | `[{"name":"TAKE_FILE_OWNERSHIP","value":"false"}]` | Environment variables for the Container |
 | containers.radicale.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | containers.radicale.image.repository | string | `"tomsquest/docker-radicale"` | Container-Image-Repository |
-| containers.radicale.image.tag | string | `"3.6.1.0"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
+| containers.radicale.image.tag | string | `"3.7.1.0"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.radicale.resources | object | `{}` | Container Resources |
 | containers.radicale.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":2999,"runAsNonRoot":true,"runAsUser":2999}` | Container Security Context |
 | containers.radicale.service.type | string | `"ClusterIP"` | Service Type |

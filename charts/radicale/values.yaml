@@ -67,7 +67,7 @@ containers:
       #
       # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
       # @section -- Radicale-Container specifications
-      tag: "3.6.1.0"
+      tag: "3.7.1.0"
       #
       # -- Container-Image pull-policy
       # @section -- Radicale-Container specifications
