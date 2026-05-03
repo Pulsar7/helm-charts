@@ -55,6 +55,8 @@ tolerations: {}
 # Container specifications
 # =================================================================
 #
+# -- Librefront Init-Containers
+# @section -- Init-Containers
 initContainers: []
 #
 containers:
@@ -88,7 +90,7 @@ containers:
     #  allowPrivilegeEscalation: false
     #  privileged: false
     #
-    # -- Container R# Service configurationesources
+    # -- Container resource requests and limits
     # @section -- Librefrontier-Container specifications
     resources: {}
     #resources:
