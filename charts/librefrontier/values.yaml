@@ -55,7 +55,7 @@ tolerations: {}
 # Container specifications
 # =================================================================
 #
-# -- Librefront Init-Containers
+# -- Librefrontier Init-Containers
 # @section -- Init-Containers
 initContainers: []
 #
