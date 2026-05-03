@@ -1,0 +1,110 @@
+{{ include "librefrontier.validateValues" . }}
+{{- $librefrontierContainer := .Values.containers.librefrontier -}}
+{{- $librefrontierConfig := $librefrontierContainer.config -}}
+{{- $librefrontierContainerLivenessProbe := $librefrontierContainer.probes.livenessProbe -}}
+{{- $librefrontierContainerReadinessProbe := $librefrontierContainer.probes.readinessProbe -}}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- $initContainers := .Values.initContainers -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "librefrontier.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "librefrontier.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy: {{ toYaml .Values.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "librefrontier.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
+        {{- if $ingressRoute.enabled }}
+        checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "librefrontier.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with $librefrontierContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "librefrontier.containerImage" . }}
+          imagePullPolicy: {{ $librefrontierContainer.image.pullPolicy }}
+          ports:
+            {{- range $librefrontierContainer.service.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+            {{- end }}
+          env:
+            - name: GIN_MODE
+              value: {{ $librefrontierConfig.ginMode }}
+            - name: LF_API_BASE_URL
+              value: {{ $librefrontierConfig.LFAPIBaseURL }}
+            - name: LF_DB_CONN_STRING
+              value: {{ $librefrontierConfig.lfDatabaseConnectionString }}
+            {{- with $librefrontierContainer.additionalEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $librefrontierContainer.resources }}
+          resources: {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $librefrontierContainerLivenessProbe }}
+          {{- if .enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ index $librefrontierContainer.service.ports 0 "name" }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+          {{- end }}
+          {{- end }}
+          {{- with $librefrontierContainerReadinessProbe }}
+          {{- if .enabled }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ index $librefrontierContainer.service.ports 0 "name" }}
+            initialDelaySeconds: {{ .initialDelaySeconds }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+          {{- end }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

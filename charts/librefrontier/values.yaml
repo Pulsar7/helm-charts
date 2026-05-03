@@ -1,0 +1,251 @@
+#------------------------------------------------------------------
+#
+# Values for the Custom Librefrontier-Helm-Chart
+#
+#------------------------------------------------------------------
+
+# =================================================================
+# Pod specifications
+# =================================================================
+#
+# -- Number of Pods
+# @section -- Pod specifications
+replicaCount: 1
+#
+# -- The strategy used to replace old Pods by new ones
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+# @section -- Pod specifications
+strategy:
+  type: RollingUpdate
+#
+# -- Pod Security Context
+# @section -- Pod specifications
+podSecurityContext: {}
+#  runAsUser: 10000
+#  runAsGroup: 10000
+#  fsGroup: 10000
+#  runAsNonRoot: true
+#
+# -- Additional Pod-annotations
+# @section -- Pod specifications
+podAnnotations: {}
+#
+# -- Additional Pod-Labels
+# @section -- Pod specifications
+podLabels: {}
+#
+# -- Additional Volumes
+# @section -- Pod specifications
+additionalVolumes: {}
+#
+# -- Kubernetes only schedules the Pod onto nodes that have each of the labels you specify
+# @section -- Pod specifications
+nodeSelector: {}
+#
+# -- Affinity expand the types of constraints you can define
+# @section -- Pod specifications
+affinity: {}
+#
+# -- Tolerations allow the scheduler to schedule pods with matching taints
+# @section -- Pod specifications
+tolerations: {}
+
+
+# =================================================================
+# Container specifications
+# =================================================================
+#
+initContainers: []
+#
+containers:
+  librefrontier:
+    #
+    # Image specifications of the Librefrontier-Container
+    image:
+      #
+      # -- Container-Image-Repository
+      # @section -- Librefrontier-Container specifications
+      repository: ghcr.io/lukas-fichtner/librefrontier
+      #
+      # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
+      # @section -- Librefrontier-Container specifications
+      tag: v0.0.1-dev
+      #
+      # -- Container-Image pull-policy
+      # @section -- Librefrontier-Container specifications
+      pullPolicy: IfNotPresent
+    #
+    # -- Container Security Context
+    # @section -- Librefrontier-Container specifications
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
+      allowPrivilegeEscalation: false
+      privileged: false
+    #  runAsUser: 10000
+    #  runAsGroup: 10000
+    #  runAsNonRoot: true
+    #  allowPrivilegeEscalation: false
+    #  privileged: false
+    #
+    # -- Container R# Service configurationesources
+    # @section -- Librefrontier-Container specifications
+    resources: {}
+    #resources:
+    #  requests:
+    #    memory: 200Mi
+    #    cpu: 100m
+    #  limits:
+    #    memory: 500Mi
+    #    cpu: 500m
+    #
+    service:
+      # -- Service Type
+      # @section -- Librefrontier-Container specifications
+      type: ClusterIP
+      #
+      # @ignored
+      ports:
+        # @ignored
+        - name: http-api
+          #
+          # reference containerPort
+          # @ignored 
+          containerPort: 80
+          #
+          # -- Exposed API-Container-Port
+          # @section -- Librefrontier-Container-Port
+          port: 80
+          #
+          # reference containerPort by name
+          # @ignored
+          targetPort: http-api
+          #
+          protocol: TCP
+        #
+        # @ignored
+        - name: web-ui
+          #
+          # reference containerPort
+          # @ignored 
+          containerPort: 8080
+          #
+          # -- Exposed Web-UI-Container-Port
+          # @section -- Librefrontier-Container-Port
+          port: 8080
+          #
+          # reference containerPort by name
+          # @ignored
+          targetPort: web-ui
+          #
+          protocol: TCP
+    #
+    # Librefrontier configuration - passed as environment variables
+    config:
+      #
+      # -- GIN_MODE
+      # @section -- Librefrontier-Configuration
+      ginMode: "release"
+      #
+      # -- LF_API_BASE_URL
+      # @section -- Librefrontier-Configuration
+      LFAPIBaseURL: "http://teufel.wifiradiofrontier.com"
+      #
+      # -- LF_DB_CONN_STRING
+      # @section -- Librefrontier-Configuration
+      lfDatabaseConnectionString: ""
+    #
+    # -- Additional Volume-Mounts for Container
+    # @section -- Librefrontier-Container specifications
+    additionalVolumeMounts: {}
+    #
+    # -- Additional Environment-variables
+    # @section -- Librefrontier-Container specifications
+    additionalEnv: {}
+    #
+    # -- Additional Arguments
+    # @section -- Librefrontier-Container specifications
+    additionalArgs: {}
+    #
+    probes:
+      #
+      livenessProbe:
+        #
+        # -- Whether to enable the Liveness-Probe
+        # @section -- Librefrontier-Container-Probes specifications
+        enabled: true
+        #
+        # -- Initial Delay in Seconds
+        # @section -- Librefrontier-Container-Probes specifications
+        initialDelaySeconds: 30
+        #
+        # -- How often to perform the liveness checks
+        # @section -- Librefrontier-Container-Probes specifications
+        periodSeconds: 10
+        #
+        # -- Time to wait for a response from the database
+        # @section -- Librefrontier-Container-Probes specifications
+        timeoutSeconds: 5
+        #
+        # -- Number of consecutive failures before restarting the Pod
+        # @section -- Librefrontier-Container-Probes specifications
+        failureThreshold: 3
+        #
+        # -- Number of successful checks before considering the Pod healthy (again)
+        # @section -- Librefrontier-Container-Probes specifications
+        successThreshold: 1
+      #
+      readinessProbe:
+        #
+        # -- Whether to enable the Readiness-Probe
+        # @section -- Librefrontier-Container-Probes specifications
+        enabled: true
+        #
+        # -- How long to wait before starting the first readiness Probe after the container starts
+        # @section -- Librefrontier-Container-Probes specifications
+        initialDelaySeconds: 30
+        #
+        # -- How often to perform the readiness checks after the initial delay
+        # @section -- Librefrontier-Container-Probes specifications
+        periodSeconds: 5
+        #
+        # -- The maximum amount of time the probe will wait for a response from the application
+        # @section -- Librefrontier-Container-Probes specifications
+        timeoutSeconds: 2
+        #
+        # -- Number of consecutive failures before restarting the Pod
+        # @section -- Librefrontier-Container-Probes specifications
+        failureThreshold: 3
+        #
+        # -- Number of successful checks before considering the Pod healthy
+        # @section -- Librefrontier-Container-Probes specifications
+        successThreshold: 1
+
+
+# =================================================================
+# IngressRoute specifications
+# =================================================================
+#
+ingressRoute:
+  #
+  # -- Whether to enable the IngressRoute for Librefrontier
+  # @section -- IngressRoute specifications
+  enabled: false
+  #
+  # -- Listening for Incoming Connections/Requests
+  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
+  # @section -- IngressRoute specifications
+  entryPoints: []
+  #
+  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
+  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
+  # @section -- IngressRoute specifications
+  certResolver: ""
+  #
+  # -- Hostname for the API-Service
+  # @section -- IngressRoute specifications
+  APIhost: ""
+  #
+  # -- Hostname for the Web-UI-Service
+  # @section -- IngressRoute specifications
+  webUIHost: ""

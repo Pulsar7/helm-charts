@@ -1,0 +1,21 @@
+{{ include "librefrontier.validateValues" . }}
+{{- $librefrontierContainer := .Values.containers.librefrontier -}}
+{{- $librefrontierContainerService := $librefrontierContainer.service -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "librefrontier.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "librefrontier.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "librefrontier.selectorLabels" . | nindent 6 }}
+  type: {{ $librefrontierContainerService.type }}
+  ports:
+    {{- range $librefrontierContainerService.ports }}
+    - protocol: {{ .protocol }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      name: {{ .name }}
+    {{- end }}
