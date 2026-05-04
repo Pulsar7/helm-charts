@@ -234,10 +234,13 @@ ingressRoute:
   # @section -- IngressRoute specifications
   enabled: false
   #
-  # -- Listening for Incoming Connections/Requests
-  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
+  # -- (HTTP-only)-Entrypoints for API-Service
   # @section -- IngressRoute specifications
-  entryPoints: []
+  APIEntryPoints: []
+  #
+  # -- (HTTPS)-Entrypoints for Web-UI-Service
+  # @section -- IngressRoute specifications
+  webUIentryPoints: []
   #
   # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
   # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
@@ -246,7 +249,7 @@ ingressRoute:
   #
   # -- Hostname for the API-Service
   # @section -- IngressRoute specifications
-  APIhost: ""
+  APIHost: ""
   #
   # -- Hostname for the Web-UI-Service
   # @section -- IngressRoute specifications

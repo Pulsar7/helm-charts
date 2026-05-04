@@ -5,18 +5,12 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ include "librefrontier.fullname" . }}
+  name: {{ include "librefrontier.fullname" . }}-webui
   namespace: {{ .Release.Namespace | quote }}
 spec:
   entryPoints:
-    {{- toYaml $ingressRoute.entryPoints | nindent 4 }}
+    {{- toYaml $ingressRoute.webUIentryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $ingressRoute.APIHost }}`)
-      kind: Rule
-      services:
-        - name: {{ include "librefrontier.fullname" . }}
-          port: {{ index $librefrontierContainer.service.ports 0 "port" }}
-          scheme: http
     - match: Host(`{{ $ingressRoute.webUIHost }}`)
       kind: Rule
       services:
@@ -25,4 +19,20 @@ spec:
           scheme: http
   tls:
     certResolver: {{ $ingressRoute.certResolver }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "librefrontier.fullname" . }}-api
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  entryPoints:
+    {{- toYaml $ingressRoute.APIEntryPoints | nindent 4 }}
+  routes:
+    - match: Host(`{{ $ingressRoute.APIHost }}`)
+      kind: Rule
+      services:
+        - name: {{ include "librefrontier.fullname" . }}
+          port: {{ index $librefrontierContainer.service.ports 0 "port" }}
+          scheme: http
 {{- end }}

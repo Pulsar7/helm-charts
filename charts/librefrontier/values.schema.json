@@ -74,7 +74,8 @@
         "type": "object",
         "properties": {
             "enabled": {"type": "boolean"},
-            "entryPoints": {"type": "array"},
+            "APIEntryPoints": {"type": "array"},
+            "webUIentryPoints": {"type": "array"},
             "certResolver": {"type": "string"},
             "APIhost": {"type": "string"},
             "webUIHost": {"type": "string"}

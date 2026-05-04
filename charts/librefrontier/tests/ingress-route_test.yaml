@@ -1,0 +1,71 @@
+#------------------------------------------------------------------------------
+#
+# IngressRoute-Unittests Test-Suite for Librefrontier
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test IngressRoute
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/ingress-route.yaml
+#
+tests:
+  - it: should render with enabled and configured Web-UI-IngressRoute
+    #
+    documentIndex: 0
+    #
+    set:
+      ingressRoute.enabled: true
+      ingressRoute.webUIentryPoints: ["test-web-ui-entrypoint"]
+      ingressRoute.certResolver: "test-cert-resolver"
+      ingressRoute.webUIHost: "web-ui-test-host"
+    #
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - contains:
+          path: spec.entryPoints
+          content: "test-web-ui-entrypoint"
+      - contains:
+          path: spec.routes
+          content:
+            match: Host(`web-ui-test-host`)
+            kind: Rule
+            services:
+              - name: RELEASE-NAME-librefrontier
+                port: 8080
+                scheme: http
+      - equal:
+          path: spec.tls.certResolver
+          value: "test-cert-resolver"
+
+  - it: should render with enabled and configured API-IngressRoute
+    #
+    documentIndex: 1
+    #
+    set:
+      ingressRoute.enabled: true
+      ingressRoute.APIEntryPoints: ["test-api-entrypoint"]
+      ingressRoute.certResolver: "test-cert-resolver"
+      ingressRoute.APIHost: "api-test-host"
+    #
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - contains:
+          path: spec.entryPoints
+          content: "test-api-entrypoint"
+      - contains:
+          path: spec.routes
+          content:
+            match: Host(`api-test-host`)
+            kind: Rule
+            services:
+              - name: RELEASE-NAME-librefrontier
+                port: 80
+                scheme: http

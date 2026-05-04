@@ -3,7 +3,7 @@
 set -euo pipefail
 
 #
-staged_files=$(git diff --name-only)
+staged_files=$(git diff --name-only --staged)
 
 #
 # If nothing is staged, exit success
@@ -71,6 +71,84 @@ for f in "${chart_changes[@]}"; do
   else
     version_head=""
   fi
+  #
+  # Extract version from stated Chart.yaml
+  version_staged=$(cat "${chart_yaml}" | awk -F': ' '/^version:/ { print $2; exit }' | tr -d '[:space:]')
+  #
+  # Check if versions are even different
+  if [[ "${version_head}" == "${version_staged}" ]]; then
+    echo "ERROR: You forgot to bump the '${chart_yaml}' Chart-Version!"
+    exit 1
+  fi
+  #
+  # Check if staged-version is bigger
+  # Split versions in `Major.Minor.Patch`
+  # e.g.: 1.2.3
+  IFS='.' read -r major_staged minor_staged patch_staged <<< "${version_staged}"
+  IFS='.' read -r major_head minor_head patch_head <<< "${version_head}"
+  #
+  # Whether the staged major/minor version is smaller than the HEAD-one
+  if [[ $major_staged -lt $major_head ]]; then
+    echo "ERROR: Decremented Major Chart-Version at '${chart_yaml}'!"
+    exit 1
+  else if [[ "${major_staged}" == "${major_head}" ]] && [[ $minor_staged -lt $minor_head ]]; then
+    echo "ERROR: Decremented Minor Chart-Version at '${chart_yaml}'!"
+    exit 1
+  fi
+  fi
+  #
+  # Get staged pre-release version - if it exists
+  pre_release_staged=""
+  patch_patch_staged=${patch_staged%%[-+]*}
+  pre_release_suffix_staged=${patch_staged#"${patch_patch_staged}"}
+  if [[ "${pre_release_suffix_staged}" == -* ]]; then
+    #
+    # Remove "+" from suffix (e.g.: '+build')
+    pre_release_staged=${pre_release_suffix_staged%%+*}
+    #
+    # Remove "-" from suffix (e.g.: '-alpha')
+    pre_release_staged=${pre_release_suffix_staged#-}
+  fi
+  #
+  # Get HEAD pre-release version - if it exists
+  pre_release_head=""
+  patch_patch_head=${patch_head%%[-+]*}
+  pre_release_suffix_head=${patch_staged#"${patch_patch_head}"}
+  if [[ "${pre_release_suffix_head}" == -* ]]; then
+    #
+    # Remove "+" from suffix (e.g.: '+build')
+    pre_release_head=${pre_release_suffix_head%%+*}
+    #
+    # Remove "-" from suffix (e.g.: '-alpha')
+    pre_release_head=${pre_release_suffix_head#-}
+  fi
+  #
+  # Whether staged-version is a pre-release, but head-version not
+  # It's possible that the HEAD-Version isn't a pre-release and the
+  # staged now is.
+  # e.g.: HEAD=1.0.0 and STAGED=2.0.0-alpha
+  # But this is invalid: HEAD=1.0.0 and STAGED=1.0.0-alpha
+  if [[ "${pre_release_staged}" ]] && [[ ! "${pre_release_head}" ]]; then
+    #
+    # Whether its major, minor or patch isn't incremented
+    if [[ $major_staged -eq $major_head ]] && [[ $minor_staged -eq $minor_head ]] && [[ $patch_patch_staged -eq $patch_patch_head ]]; then
+      echo "ERROR: You forgot to version bump '${chart_yaml}'!"
+      exit 1
+    fi
+  fi
+  #
+  # Whether staged-version is not a pre-release, but head-version is.
+  # e.g.: HEAD=1.0.0-alpha and STAGED=1.0.0
+  # But this is invalid: HEAD=1.0.0-alpha
+  # TODO?
+  #
+  # Compare pre-release-versions of staged and HEAD if exists
+  # TODO
+  #if [[ "${pre_release_staged}" && "${pre_release_head}" ]]; then
+  #  alpha_build_version_staged=${BASH_REMATCH[0]}
+  #  IDF='.' read -r _ alpha_build_version_head <<< "${pre_release_head}"
+  #  echo "alpha_build_version_head=${alpha_build_version_head} alpha_build_version_staged=${alpha_build_version_staged}"
+  #fi
 done
 
 echo "INFO: Checked ${#checked_charts[@]} chart(s)"

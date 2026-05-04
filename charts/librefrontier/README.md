@@ -5,7 +5,7 @@ Custom Helm-Chart for Librefrontier
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.0-alpha.2](https://img.shields.io/badge/Version-0.1.0--alpha.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
+![Version: 0.1.0-alpha.3](https://img.shields.io/badge/Version-0.1.0--alpha.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
 
 ## Values
 
@@ -66,11 +66,12 @@ Custom Helm-Chart for Librefrontier
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ingressRoute.APIhost | string | `""` | Hostname for the API-Service |
+| ingressRoute.APIEntryPoints | HTTP-only | `[]` | -Entrypoints for API-Service |
+| ingressRoute.APIHost | string | `""` | Hostname for the API-Service |
 | ingressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
 | ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for Librefrontier |
-| ingressRoute.entryPoints | list | `[]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
 | ingressRoute.webUIHost | string | `""` | Hostname for the Web-UI-Service |
+| ingressRoute.webUIentryPoints | HTTPS | `[]` | -Entrypoints for Web-UI-Service |
 
 ### Init-Containers
 
