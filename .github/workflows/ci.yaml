@@ -56,7 +56,7 @@ jobs:
       - name: Unittest Helm-Charts
         run: |
           set -euo pipefail
-          helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git --verify=false --version v1.0.3
           helm unittest ./charts/* --strict
       #
       - name: Configure Git
