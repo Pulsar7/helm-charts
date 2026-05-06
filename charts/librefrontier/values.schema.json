@@ -70,15 +70,21 @@
         }
     },
 
-    "ingressRoute": {
+    "APIingressRoute": {
         "type": "object",
         "properties": {
             "enabled": {"type": "boolean"},
-            "APIEntryPoints": {"type": "array"},
-            "webUIentryPoints": {"type": "array"},
+            "entryPoints": {"type": "array"},
+            "host": {"type": "string"}
+        }
+    },
+    "webUIingressRoute": {
+        "type": "object",
+        "properties": {
+            "enabled": {"type": "boolean"},
+            "entryPoints": {"type": "array"},
             "certResolver": {"type": "string"},
-            "APIhost": {"type": "string"},
-            "webUIHost": {"type": "string"}
+            "host": {"type": "string"}
         }
     }
   },
@@ -87,7 +93,8 @@
     "replicaCount",
     "initContainers",
     "containers",
-    "ingressRoute"
+    "APIingressRoute",
+    "webUIingressRoute"
   ],
 
   "title": "Values",

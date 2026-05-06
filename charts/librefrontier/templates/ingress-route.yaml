@@ -1,38 +1,45 @@
 {{ include "librefrontier.validateValues" . }}
-{{- $ingressRoute := .Values.ingressRoute -}}
-{{- if $ingressRoute.enabled }}
+{{- $APIingressRoute := .Values.APIingressRoute -}}
+{{- $webUIingressRoute := .Values.webUIingressRoute -}}
 {{- $librefrontierContainer := .Values.containers.librefrontier -}}
+{{- if $webUIingressRoute.enabled }}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: {{ include "librefrontier.fullname" . }}-webui
   namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "librefrontier.labels" . | nindent 4 }}
 spec:
   entryPoints:
-    {{- toYaml $ingressRoute.webUIentryPoints | nindent 4 }}
+    {{- toYaml $webUIingressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $ingressRoute.webUIHost }}`)
+    - match: Host(`{{ $webUIingressRoute.host }}`)
       kind: Rule
       services:
         - name: {{ include "librefrontier.fullname" . }}
           port: {{ index $librefrontierContainer.service.ports 1 "port" }}
           scheme: http
   tls:
-    certResolver: {{ $ingressRoute.certResolver }}
+    certResolver: {{ $webUIingressRoute.certResolver }}
+{{- end }}
+{{- if $APIingressRoute.enabled }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: {{ include "librefrontier.fullname" . }}-api
   namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "librefrontier.labels" . | nindent 4 }}
 spec:
   entryPoints:
-    {{- toYaml $ingressRoute.APIEntryPoints | nindent 4 }}
+    {{- toYaml $APIingressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $ingressRoute.APIHost }}`)
+    - match: Host(`{{ $APIingressRoute.host }}`)
       kind: Rule
       services:
         - name: {{ include "librefrontier.fullname" . }}
           port: {{ index $librefrontierContainer.service.ports 0 "port" }}
           scheme: http
-{{- end }}
+{{- end -}}

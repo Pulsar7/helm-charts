@@ -3,7 +3,8 @@
 {{- $librefrontierConfig := $librefrontierContainer.config -}}
 {{- $librefrontierContainerLivenessProbe := $librefrontierContainer.probes.livenessProbe -}}
 {{- $librefrontierContainerReadinessProbe := $librefrontierContainer.probes.readinessProbe -}}
-{{- $ingressRoute := .Values.ingressRoute -}}
+{{- $APIingressRoute := .Values.APIingressRoute -}}
+{{- $webUIingressRoute := .Values.webUIingressRoute -}}
 {{- $initContainers := .Values.initContainers -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -22,7 +23,7 @@ spec:
     metadata:
       annotations:
         checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
-        {{- if $ingressRoute.enabled }}
+        {{- if or $webUIingressRoute.enabled $APIingressRoute.enabled }}
         checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}

@@ -15,15 +15,15 @@ templates:
   - templates/ingress-route.yaml
 #
 tests:
-  - it: should render with enabled and configured Web-UI-IngressRoute
+  - it: should render only with enabled and configured Web-UI-IngressRoute
     #
-    documentIndex: 0
+    #documentIndex: 0
     #
     set:
-      ingressRoute.enabled: true
-      ingressRoute.webUIentryPoints: ["test-web-ui-entrypoint"]
-      ingressRoute.certResolver: "test-cert-resolver"
-      ingressRoute.webUIHost: "web-ui-test-host"
+      webUIingressRoute.enabled: true
+      webUIingressRoute.entryPoints: ["test-web-ui-entrypoint"]
+      webUIingressRoute.certResolver: "test-cert-resolver"
+      webUIingressRoute.host: "web-ui-test-host"
     #
     asserts:
       - isKind:
@@ -44,15 +44,12 @@ tests:
           path: spec.tls.certResolver
           value: "test-cert-resolver"
 
-  - it: should render with enabled and configured API-IngressRoute
-    #
-    documentIndex: 1
+  - it: should render only with enabled and configured API-IngressRoute
     #
     set:
-      ingressRoute.enabled: true
-      ingressRoute.APIEntryPoints: ["test-api-entrypoint"]
-      ingressRoute.certResolver: "test-cert-resolver"
-      ingressRoute.APIHost: "api-test-host"
+      APIingressRoute.enabled: true
+      APIingressRoute.entryPoints: ["test-api-entrypoint"]
+      APIingressRoute.host: "api-test-host"
     #
     asserts:
       - isKind:
@@ -69,3 +66,13 @@ tests:
               - name: RELEASE-NAME-librefrontier
                 port: 80
                 scheme: http
+  
+  - it: should render with disabled IngressRoute-Resources
+    #
+    set:
+      APIingressRoute.enabled: false
+      webUIingressRoute.enabled: false
+    #
+    asserts:
+      - notExists:
+          path: spec

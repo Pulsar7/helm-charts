@@ -19,12 +19,12 @@ templates:
   - templates/ingress-route.yaml
 #
 tests:
-  - it: should render with IngressRoute
+  - it: should render with enabled API-IngressRoute-Resource
     #
     template: templates/deployment.yaml
     #
     set:
-      ingressRoute.enabled: true
+      APIingressRoute.enabled: true
     #
     asserts:
       - isKind:
@@ -32,12 +32,25 @@ tests:
       - exists:
           path: spec.template.metadata.annotations["checksum/ingress-route"]
   
-  - it: should render without IngressRoute
+  - it: should render with enabled Web-UI-IngressRoute-Resource
     #
     template: templates/deployment.yaml
     #
     set:
-      ingressRoute.enabled: false
+      webUIingressRoute.enabled: true
+    #
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/ingress-route"]
+  
+  - it: should render without any IngressRoute-Resource
+    #
+    template: templates/deployment.yaml
+    #
+    set:
+      APIingressRoute.enabled: false
     #
     asserts:
       - isKind:

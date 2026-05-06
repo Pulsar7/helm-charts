@@ -225,32 +225,38 @@ containers:
 
 
 # =================================================================
-# IngressRoute specifications
+# IngressRoutes specifications
 # =================================================================
 #
-ingressRoute:
+APIingressRoute:
   #
-  # -- Whether to enable the IngressRoute for Librefrontier
-  # @section -- IngressRoute specifications
+  # -- Whether to enable the API-IngressRoute for Librefrontier
+  # @section -- API-IngressRoute specifications
   enabled: false
   #
   # -- (HTTP-only)-Entrypoints for API-Service
-  # @section -- IngressRoute specifications
-  APIEntryPoints: []
+  # @section -- API-IngressRoute specifications
+  entryPoints: []
   #
-  # -- (HTTPS)-Entrypoints for Web-UI-Service
-  # @section -- IngressRoute specifications
-  webUIentryPoints: []
+  # -- Hostname for the API-Service
+  # @section -- API-IngressRoute specifications
+  host: ""
+#
+webUIingressRoute:
+  #
+  # -- Whether to enable the IngressRoute for Librefrontier
+  # @section -- Web-UI IngressRoute specifications
+  enabled: false
+  #
+  # -- (HTTP-only)-Entrypoints for Web-UI-Service
+  # @section -- Web-UI IngressRoute specifications
+  entryPoints: []
   #
   # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
   # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
-  # @section -- IngressRoute specifications
+  # @section -- Web-UI IngressRoute specifications
   certResolver: ""
   #
   # -- Hostname for the API-Service
-  # @section -- IngressRoute specifications
-  APIHost: ""
-  #
-  # -- Hostname for the Web-UI-Service
-  # @section -- IngressRoute specifications
-  webUIHost: ""
+  # @section -- Web-UI IngressRoute specifications
+  host: ""
