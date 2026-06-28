@@ -24,7 +24,7 @@ tests:
       containers.librefrontier.services.webUI.enabled: true
       webUIIngressRoute.entryPoints: ["test-web-ui-entrypoint"]
       webUIIngressRoute.certResolver: "test-cert-resolver"
-      webUIIngressRoute.host: "web-ui-test-host"
+      webUIIngressRoute.routeMatch: Host(`web-ui-test-host`)
     #
     asserts:
       - isKind:
@@ -50,7 +50,7 @@ tests:
     set:
       httpAPIIngressRoute.enabled: true
       httpAPIIngressRoute.entryPoints: ["test-api-entrypoint"]
-      httpAPIIngressRoute.host: "api-test-host"
+      httpAPIIngressRoute.routeMatch: Host(`api-test-host`)
     #
     asserts:
       - isKind:
