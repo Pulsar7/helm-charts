@@ -48,7 +48,7 @@ affinity: {}
 #
 # -- Tolerations allow the scheduler to schedule pods with matching taints
 # @section -- Pod specifications
-tolerations: {}
+tolerations: []
 
 
 # =================================================================
@@ -80,15 +80,10 @@ containers:
     # -- Container Security Context
     # @section -- Librefrontier-Container specifications
     securityContext:
-      runAsUser: 0
-      runAsGroup: 0
+      runAsUser: 10000
+      runAsGroup: 10000
       allowPrivilegeEscalation: false
       privileged: false
-    #  runAsUser: 10000
-    #  runAsGroup: 10000
-    #  runAsNonRoot: true
-    #  allowPrivilegeEscalation: false
-    #  privileged: false
     #
     # -- Container resource requests and limits
     # @section -- Librefrontier-Container specifications
@@ -101,46 +96,46 @@ containers:
     #    memory: 500Mi
     #    cpu: 500m
     #
-    service:
-      # -- Service Type
-      # @section -- Librefrontier-Container specifications
-      type: ClusterIP
-      #
-      # @ignored
-      ports:
-        # @ignored
-        - name: http-api
-          #
-          # reference containerPort
-          # @ignored 
-          containerPort: 80
-          #
-          # -- Exposed API-Container-Port
-          # @section -- Librefrontier-Container-Port
-          port: 80
-          #
-          # reference containerPort by name
-          # @ignored
-          targetPort: http-api
-          #
-          protocol: TCP
+    services:
+      httpAPI:
         #
-        # @ignored
-        - name: web-ui
-          #
-          # reference containerPort
-          # @ignored 
-          containerPort: 8080
-          #
-          # -- Exposed Web-UI-Container-Port
-          # @section -- Librefrontier-Container-Port
-          port: 8080
-          #
-          # reference containerPort by name
-          # @ignored
-          targetPort: web-ui
-          #
-          protocol: TCP
+        # -- HTTP-API Service-type
+        # @section -- Librefrontier-Container HTTP-API-Service specifications
+        type: ClusterIP
+        #
+        # -- HTTP-API Container-Port
+        # @section -- Librefrontier-Container HTTP-API-Service specifications
+        containerPort: 80
+        #
+        # -- HTTP-API internal exposed Port
+        # @section -- Librefrontier-Container HTTP-API-Service specifications
+        port: 80
+        #
+        # -- HTTP-API NodePort (if `services.httpAPI.type: NodePort`)
+        # @section -- Librefrontier-Container HTTP-API-Service specifications
+        nodePort:
+
+      webUI:
+        #
+        # -- Whether to enable the Web-UI Service
+        # @section -- Librefrontier-Container Web-UI-Service specifications
+        enabled: false
+        #
+        # -- Web-UI Service-type
+        # @section -- Librefrontier-Container Web-UI-Service specifications
+        type: ClusterIP
+        #
+        # -- Web-UI Container-Port
+        # @section -- Librefrontier-Container Web-UI-Service specifications
+        containerPort: 8080
+        #
+        # -- Web-UI internal exposed port
+        # @section -- Librefrontier-Container Web-UI-Service specifications
+        port: 8080
+        #
+        # -- Web-UI NodePort (if `services.httpAPI.type: NodePort`)
+        # @section -- Librefrontier-Container Web-UI-Service specifications
+        nodePort:
     #
     # Librefrontier configuration - passed as environment variables
     config:
@@ -155,7 +150,7 @@ containers:
       #
       # -- LF_DB_CONN_STRING
       # @section -- Librefrontier-Configuration
-      lfDatabaseConnectionString: ""
+      lfDatabaseConnectionString: "testschinken"
     #
     # -- Additional Volume-Mounts for Container
     # @section -- Librefrontier-Container specifications
@@ -228,23 +223,24 @@ containers:
 # IngressRoutes specifications
 # =================================================================
 #
-APIingressRoute:
+httpAPIIngressRoute:
   #
-  # -- Whether to enable the API-IngressRoute for Librefrontier
-  # @section -- API-IngressRoute specifications
+  # -- Whether to enable the HTTP-API-IngressRoute
+  # @section -- HTTP-API-IngressRoute specifications
   enabled: false
   #
   # -- (HTTP-only)-Entrypoints for API-Service
-  # @section -- API-IngressRoute specifications
+  # @section -- HTTP-API-IngressRoute specifications
   entryPoints: []
   #
   # -- Hostname for the API-Service
-  # @section -- API-IngressRoute specifications
+  # @section -- HTTP-API-IngressRoute specifications
   host: ""
 #
-webUIingressRoute:
+webUIIngressRoute:
   #
-  # -- Whether to enable the IngressRoute for Librefrontier
+  # -- Whether to enable the Web-UI-IngressRoute.
+  # requires `services.webUI.enabled: true` otherwise this gets ignored!
   # @section -- Web-UI IngressRoute specifications
   enabled: false
   #

@@ -2,7 +2,16 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "properties": {
     "replicaCount": {"type": "integer", "minimum": 1},
-
+    "strategy": {
+      "type": "object"
+    },
+    "podSecurityContext": {"type": "object"},
+    "podAnnotations": {"type": "object"},
+    "podLabels": {"type": "object"},
+    "additionalVolumes": {"type": "object"},
+    "nodeSelector": {"type": "object"},
+    "affinity": {"type": "object"},
+    "tolerations": {"type": "array"},
     "initContainers": {"type": "array"},
 
     "containers": {
@@ -20,11 +29,26 @@
                         }
                     },
                     "resources": {"type": "object"},
-                    "service": {
+                    "services": {
                         "type": "object",
                         "properties": {
-                            "type": {"type": "string"},
-                            "ports": {"type": "array"}
+                            "httpAPI": {
+                              "type": "object",
+                              "properties": {
+                                "type": {"type": "string", "enum": ["ClusterIP", "NodePort"]},
+                                "containerPort": {"type": "integer", "minimum": 1},
+                                "port": {"type": "integer", "minimum": 1}
+                              }
+                            },
+                            "webUI": {
+                              "type": "object",
+                              "properties": {
+                                "enabled": {"type": "boolean"},
+                                "type": {"type": "string", "enum": ["ClusterIP", "NodePort"]},
+                                "containerPort": {"type": "integer", "minimum": 1},
+                                "port": {"type": "integer", "minimum": 1}
+                            }
+                          }
                         }
                     },
                     "config": {
@@ -70,7 +94,7 @@
         }
     },
 
-    "APIingressRoute": {
+    "httpAPIIngressRoute": {
         "type": "object",
         "properties": {
             "enabled": {"type": "boolean"},
@@ -78,7 +102,7 @@
             "host": {"type": "string"}
         }
     },
-    "webUIingressRoute": {
+    "webUIIngressRoute": {
         "type": "object",
         "properties": {
             "enabled": {"type": "boolean"},
@@ -93,8 +117,8 @@
     "replicaCount",
     "initContainers",
     "containers",
-    "APIingressRoute",
-    "webUIingressRoute"
+    "httpAPIIngressRoute",
+    "webUIIngressRoute"
   ],
 
   "title": "Values",

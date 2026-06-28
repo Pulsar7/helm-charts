@@ -73,3 +73,17 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create service-name for the http-API-Service.
+*/}}
+{{- define "librefrontier.serviceName.httpAPI" -}}
+{{- printf "%s-http-api" (include "librefrontier.fullname" .) }}
+{{- end }}
+
+{{/*
+Create service-name for the web-UI-Service.
+*/}}
+{{- define "librefrontier.serviceName.webUI" -}}
+{{- printf "%s-web-ui" (include "librefrontier.fullname" .) }}
+{{- end }}

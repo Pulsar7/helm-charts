@@ -19,38 +19,36 @@ templates:
   - templates/ingress-route.yaml
 #
 tests:
-  - it: should render with enabled API-IngressRoute-Resource
+  - it: should render with enabled HTTP-API-IngressRoute-Resource
     #
     template: templates/deployment.yaml
     #
     set:
-      APIingressRoute.enabled: true
+      httpAPIIngressRoute.enabled: true
     #
     asserts:
       - isKind:
           of: Deployment
       - exists:
           path: spec.template.metadata.annotations["checksum/ingress-route"]
-  
+
   - it: should render with enabled Web-UI-IngressRoute-Resource
     #
     template: templates/deployment.yaml
     #
     set:
-      webUIingressRoute.enabled: true
+      webUIIngressRoute.enabled: true
+      containers.librefrontier.services.webUI.enabled: true
     #
     asserts:
       - isKind:
           of: Deployment
       - exists:
           path: spec.template.metadata.annotations["checksum/ingress-route"]
-  
+
   - it: should render without any IngressRoute-Resource
     #
     template: templates/deployment.yaml
-    #
-    set:
-      APIingressRoute.enabled: false
     #
     asserts:
       - isKind:

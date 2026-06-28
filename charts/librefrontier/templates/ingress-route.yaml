@@ -1,8 +1,11 @@
 {{ include "librefrontier.validateValues" . }}
-{{- $APIingressRoute := .Values.APIingressRoute -}}
-{{- $webUIingressRoute := .Values.webUIingressRoute -}}
+{{- $httpAPIIngressRoute := .Values.httpAPIIngressRoute -}}
+{{- $webUIIngressRoute := .Values.webUIIngressRoute -}}
 {{- $librefrontierContainer := .Values.containers.librefrontier -}}
-{{- if $webUIingressRoute.enabled }}
+{{- $services := $librefrontierContainer.services -}}
+{{- $httpAPIService := $services.httpAPI -}}
+{{- $webUIService := $services.webUI -}}
+{{- if and $webUIService.enabled $webUIIngressRoute.enabled }}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -12,34 +15,34 @@ metadata:
     {{- include "librefrontier.labels" . | nindent 4 }}
 spec:
   entryPoints:
-    {{- toYaml $webUIingressRoute.entryPoints | nindent 4 }}
+    {{- toYaml $webUIIngressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $webUIingressRoute.host }}`)
+    - match: Host(`{{ $webUIIngressRoute.host }}`)
       kind: Rule
       services:
-        - name: {{ include "librefrontier.fullname" . }}
-          port: {{ index $librefrontierContainer.service.ports 1 "port" }}
+        - name: {{ include "librefrontier.serviceName.webUI" . }}
+          port: {{ $webUIService.port }}
           scheme: http
   tls:
-    certResolver: {{ $webUIingressRoute.certResolver }}
+    certResolver: {{ $webUIIngressRoute.certResolver }}
 {{- end }}
-{{- if $APIingressRoute.enabled }}
+{{- if $httpAPIIngressRoute.enabled }}
 ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ include "librefrontier.fullname" . }}-api
+  name: {{ include "librefrontier.fullname" . }}-http-api
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "librefrontier.labels" . | nindent 4 }}
 spec:
   entryPoints:
-    {{- toYaml $APIingressRoute.entryPoints | nindent 4 }}
+    {{- toYaml $httpAPIIngressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $APIingressRoute.host }}`)
+    - match: Host(`{{ $httpAPIIngressRoute.host }}`)
       kind: Rule
       services:
-        - name: {{ include "librefrontier.fullname" . }}
-          port: {{ index $librefrontierContainer.service.ports 0 "port" }}
+        - name: {{ include "librefrontier.serviceName.httpAPI" . }}
+          port: {{ $httpAPIService.port }}
           scheme: http
 {{- end -}}

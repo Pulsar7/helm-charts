@@ -20,10 +20,11 @@ tests:
     #documentIndex: 0
     #
     set:
-      webUIingressRoute.enabled: true
-      webUIingressRoute.entryPoints: ["test-web-ui-entrypoint"]
-      webUIingressRoute.certResolver: "test-cert-resolver"
-      webUIingressRoute.host: "web-ui-test-host"
+      webUIIngressRoute.enabled: true
+      containers.librefrontier.services.webUI.enabled: true
+      webUIIngressRoute.entryPoints: ["test-web-ui-entrypoint"]
+      webUIIngressRoute.certResolver: "test-cert-resolver"
+      webUIIngressRoute.host: "web-ui-test-host"
     #
     asserts:
       - isKind:
@@ -37,7 +38,7 @@ tests:
             match: Host(`web-ui-test-host`)
             kind: Rule
             services:
-              - name: RELEASE-NAME-librefrontier
+              - name: RELEASE-NAME-librefrontier-web-ui
                 port: 8080
                 scheme: http
       - equal:
@@ -47,9 +48,9 @@ tests:
   - it: should render only with enabled and configured API-IngressRoute
     #
     set:
-      APIingressRoute.enabled: true
-      APIingressRoute.entryPoints: ["test-api-entrypoint"]
-      APIingressRoute.host: "api-test-host"
+      httpAPIIngressRoute.enabled: true
+      httpAPIIngressRoute.entryPoints: ["test-api-entrypoint"]
+      httpAPIIngressRoute.host: "api-test-host"
     #
     asserts:
       - isKind:
@@ -63,15 +64,11 @@ tests:
             match: Host(`api-test-host`)
             kind: Rule
             services:
-              - name: RELEASE-NAME-librefrontier
+              - name: RELEASE-NAME-librefrontier-http-api
                 port: 80
                 scheme: http
-  
+
   - it: should render with disabled IngressRoute-Resources
-    #
-    set:
-      APIingressRoute.enabled: false
-      webUIingressRoute.enabled: false
     #
     asserts:
       - notExists:

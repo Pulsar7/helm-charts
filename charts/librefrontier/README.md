@@ -5,17 +5,9 @@ Custom Helm-Chart for Librefrontier
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.1.0-alpha.4](https://img.shields.io/badge/Version-0.1.0--alpha.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
+![Version: 0.2.0-alpha.1](https://img.shields.io/badge/Version-0.2.0--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
 
 ## Values
-
-### API-IngressRoute specifications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| APIingressRoute.enabled | bool | `false` | Whether to enable the API-IngressRoute for Librefrontier |
-| APIingressRoute.entryPoints | HTTP-only | `[]` | -Entrypoints for API-Service |
-| APIingressRoute.host | string | `""` | Hostname for the API-Service |
 
 ### Pod specifications
 
@@ -29,7 +21,7 @@ Custom Helm-Chart for Librefrontier
 | podSecurityContext | object | `{}` | Pod Security Context |
 | replicaCount | int | `1` | Number of Pods |
 | strategy | object | `{"type":"RollingUpdate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
-| tolerations | object | `{}` | Tolerations allow the scheduler to schedule pods with matching taints |
+| tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
 
 ### Librefrontier-Container specifications
 
@@ -42,8 +34,7 @@ Custom Helm-Chart for Librefrontier
 | containers.librefrontier.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
 | containers.librefrontier.image.tag | string | `"v0.0.1-dev"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
-| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":0,"runAsUser":0}` | Container Security Context |
-| containers.librefrontier.service.type | string | `"ClusterIP"` | Service Type |
+| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":10000,"runAsUser":10000}` | Container Security Context |
 
 ### Librefrontier-Configuration
 
@@ -51,7 +42,7 @@ Custom Helm-Chart for Librefrontier
 |-----|------|---------|-------------|
 | containers.librefrontier.config.LFAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
 | containers.librefrontier.config.ginMode | string | `"release"` | GIN_MODE |
-| containers.librefrontier.config.lfDatabaseConnectionString | string | `""` | LF_DB_CONN_STRING |
+| containers.librefrontier.config.lfDatabaseConnectionString | string | `"testschinken"` | LF_DB_CONN_STRING |
 
 ### Librefrontier-Container-Probes specifications
 
@@ -70,6 +61,33 @@ Custom Helm-Chart for Librefrontier
 | containers.librefrontier.probes.readinessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy |
 | containers.librefrontier.probes.readinessProbe.timeoutSeconds | int | `2` | The maximum amount of time the probe will wait for a response from the application |
 
+### Librefrontier-Container HTTP-API-Service specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| containers.librefrontier.services.httpAPI.containerPort | int | `80` | HTTP-API Container-Port |
+| containers.librefrontier.services.httpAPI.nodePort | string | `nil` | HTTP-API NodePort (if `services.httpAPI.type: NodePort`) |
+| containers.librefrontier.services.httpAPI.port | int | `80` | HTTP-API internal exposed Port |
+| containers.librefrontier.services.httpAPI.type | string | `"ClusterIP"` | HTTP-API Service-type |
+
+### Librefrontier-Container Web-UI-Service specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| containers.librefrontier.services.webUI.containerPort | int | `8080` | Web-UI Container-Port |
+| containers.librefrontier.services.webUI.enabled | bool | `false` | Whether to enable the Web-UI Service |
+| containers.librefrontier.services.webUI.nodePort | string | `nil` | Web-UI NodePort (if `services.httpAPI.type: NodePort`) |
+| containers.librefrontier.services.webUI.port | int | `8080` | Web-UI internal exposed port |
+| containers.librefrontier.services.webUI.type | string | `"ClusterIP"` | Web-UI Service-type |
+
+### HTTP-API-IngressRoute specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| httpAPIIngressRoute.enabled | bool | `false` | Whether to enable the HTTP-API-IngressRoute |
+| httpAPIIngressRoute.entryPoints | HTTP-only | `[]` | -Entrypoints for API-Service |
+| httpAPIIngressRoute.host | string | `""` | Hostname for the API-Service |
+
 ### Init-Containers
 
 | Key | Type | Default | Description |
@@ -80,10 +98,10 @@ Custom Helm-Chart for Librefrontier
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| webUIingressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
-| webUIingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for Librefrontier |
-| webUIingressRoute.entryPoints | HTTP-only | `[]` | -Entrypoints for Web-UI-Service |
-| webUIingressRoute.host | string | `""` | Hostname for the API-Service |
+| webUIIngressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
+| webUIIngressRoute.enabled | bool | `false` | Whether to enable the Web-UI-IngressRoute. requires `services.webUI.enabled: true` otherwise this gets ignored! |
+| webUIIngressRoute.entryPoints | HTTP-only | `[]` | -Entrypoints for Web-UI-Service |
+| webUIIngressRoute.host | string | `""` | Hostname for the API-Service |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
