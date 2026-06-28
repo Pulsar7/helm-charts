@@ -5,7 +5,7 @@ Custom Helm-Chart for Librefrontier
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.2.1-alpha.2](https://img.shields.io/badge/Version-0.2.1--alpha.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
+![Version: 0.3.1-alpha.1](https://img.shields.io/badge/Version-0.3.1--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
 
 ## Values
 
@@ -35,14 +35,6 @@ Custom Helm-Chart for Librefrontier
 | containers.librefrontier.image.tag | string | `"v0.0.1-dev"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
 | containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":0,"runAsUser":0}` | Container Security Context |
-
-### Librefrontier-Configuration
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| containers.librefrontier.config.LFAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
-| containers.librefrontier.config.ginMode | string | `"release"` | GIN_MODE |
-| containers.librefrontier.config.lfDatabaseConnectionString | string | `""` | LF_DB_CONN_STRING |
 
 ### Librefrontier-Container-Probes specifications
 
@@ -93,6 +85,16 @@ Custom Helm-Chart for Librefrontier
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | initContainers | list | `[]` | Librefrontier Init-Containers |
+
+### Librefrontier-Configuration
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| librefrontierConfig.LFAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
+| librefrontierConfig.databaseConnectionString.existingSecret | bool | `false` | Whether to use an existing Secret or a default Secret should be generated storing a default database-connection-string. |
+| librefrontierConfig.databaseConnectionString.secretName | string | `"librefrontier-secret"` | Name of the Secret, storing the database-connection-string. Secret-Key is 'database-connection-string' |
+| librefrontierConfig.databaseConnectionString.stringData | string | `""` | When not using an existing-Secret, enter the database-connection-string. |
+| librefrontierConfig.ginMode | string | `"release"` | GIN_MODE |
 
 ### Web-UI IngressRoute specifications
 

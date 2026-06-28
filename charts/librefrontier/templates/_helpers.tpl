@@ -87,3 +87,11 @@ Create service-name for the web-UI-Service.
 {{- define "librefrontier.serviceName.webUI" -}}
 {{- printf "%s-web-ui" (include "librefrontier.fullname" .) }}
 {{- end }}
+
+{{/*
+Create database-connection-string SecretName.
+*/}}
+{{- define "librefrontier.databaseConnectionString.secretName" -}}
+{{- $secretName := .Values.librefrontierConfig.databaseConnectionString.secretName -}}
+{{- printf "%s" $secretName }}
+{{- end }}

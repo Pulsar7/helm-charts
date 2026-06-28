@@ -1,6 +1,6 @@
 {{ include "librefrontier.validateValues" . }}
 {{- $librefrontierContainer := .Values.containers.librefrontier -}}
-{{- $librefrontierConfig := $librefrontierContainer.config -}}
+{{- $librefrontierConfig := .Values.librefrontierConfig -}}
 {{- $librefrontierContainerLivenessProbe := $librefrontierContainer.probes.livenessProbe -}}
 {{- $librefrontierContainerReadinessProbe := $librefrontierContainer.probes.readinessProbe -}}
 {{- $httpAPIIngressRoute := .Values.httpAPIIngressRoute -}}
@@ -71,7 +71,10 @@ spec:
             - name: LF_API_BASE_URL
               value: {{ $librefrontierConfig.LFAPIBaseURL }}
             - name: LF_DB_CONN_STRING
-              value: {{ required "Please provide a database connection string" $librefrontierConfig.lfDatabaseConnectionString }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "librefrontier.databaseConnectionString.secretName" . }}
+                  key: "database-connection-string"
             {{- with $librefrontierContainer.additionalEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

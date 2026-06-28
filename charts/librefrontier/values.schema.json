@@ -51,14 +51,6 @@
                           }
                         }
                     },
-                    "config": {
-                        "type": "object",
-                        "properties": {
-                            "ginMode": {"type": "string", "enum": ["release", "debug"]},
-                            "LFAPIBaseURL": {"type": "string"},
-                            "lfDatabaseConnectionString": {"type": "string"}
-                        }
-                    },
                     "additionalVolumeMounts": {"type": "object"},
                     "additionalEnv": {"type": "object"},
                     "additionalArgs": {"type": "object"},
@@ -92,6 +84,22 @@
                 }
             }
         }
+    },
+
+    "librefrontierConfig": {
+      "type": "object",
+      "properties": {
+        "ginMode": {"type": "string", "enum": ["release", "debug"]},
+        "LFAPIBaseURL": {"type": "string"},
+        "databaseConnectionString": {
+          "type": "object",
+          "properties": {
+            "secretName": {"type": "string"},
+            "existingSecret": {"type": "boolean"},
+            "stringData": {"type": "string"}
+          }
+        }
+      }
     },
 
     "httpAPIIngressRoute": {

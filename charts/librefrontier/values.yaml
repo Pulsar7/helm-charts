@@ -137,21 +137,6 @@ containers:
         # @section -- Librefrontier-Container Web-UI-Service specifications
         nodePort:
     #
-    # Librefrontier configuration - passed as environment variables
-    config:
-      #
-      # -- GIN_MODE
-      # @section -- Librefrontier-Configuration
-      ginMode: "release"
-      #
-      # -- LF_API_BASE_URL
-      # @section -- Librefrontier-Configuration
-      LFAPIBaseURL: "http://teufel.wifiradiofrontier.com"
-      #
-      # -- LF_DB_CONN_STRING
-      # @section -- Librefrontier-Configuration
-      lfDatabaseConnectionString: ""
-    #
     # -- Additional Volume-Mounts for Container
     # @section -- Librefrontier-Container specifications
     additionalVolumeMounts: {}
@@ -217,6 +202,36 @@ containers:
         # -- Number of successful checks before considering the Pod healthy
         # @section -- Librefrontier-Container-Probes specifications
         successThreshold: 1
+
+
+# =================================================================
+# Librefrontier Configuration
+# =================================================================
+librefrontierConfig:
+  #
+  # -- GIN_MODE
+  # @section -- Librefrontier-Configuration
+  ginMode: "release"
+  #
+  # -- LF_API_BASE_URL
+  # @section -- Librefrontier-Configuration
+  LFAPIBaseURL: "http://teufel.wifiradiofrontier.com"
+  #
+  databaseConnectionString:
+    #
+    # -- Name of the Secret, storing the database-connection-string.
+    # Secret-Key is 'database-connection-string'
+    # @section -- Librefrontier-Configuration
+    secretName: librefrontier-secret
+    #
+    # -- Whether to use an existing Secret or a default Secret
+    # should be generated storing a default database-connection-string.
+    # @section -- Librefrontier-Configuration
+    existingSecret: false
+    #
+    # -- When not using an existing-Secret, enter the database-connection-string.
+    # @section -- Librefrontier-Configuration
+    stringData: ""
 
 
 # =================================================================
