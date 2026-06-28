@@ -5,7 +5,7 @@ Custom Helm-Chart for Librefrontier
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.2.0-alpha.1](https://img.shields.io/badge/Version-0.2.0--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
+![Version: 0.2.1-alpha.1](https://img.shields.io/badge/Version-0.2.1--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
 
 ## Values
 
@@ -34,7 +34,7 @@ Custom Helm-Chart for Librefrontier
 | containers.librefrontier.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
 | containers.librefrontier.image.tag | string | `"v0.0.1-dev"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
-| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":10000,"runAsUser":10000}` | Container Security Context |
+| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":0,"runAsUser":0}` | Container Security Context |
 
 ### Librefrontier-Configuration
 

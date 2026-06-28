@@ -80,8 +80,8 @@ containers:
     # -- Container Security Context
     # @section -- Librefrontier-Container specifications
     securityContext:
-      runAsUser: 10000
-      runAsGroup: 10000
+      runAsUser: 0
+      runAsGroup: 0
       allowPrivilegeEscalation: false
       privileged: false
     #
