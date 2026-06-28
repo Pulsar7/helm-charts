@@ -17,7 +17,7 @@ spec:
   entryPoints:
     {{- toYaml $webUIIngressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $webUIIngressRoute.host }}`)
+    - match: {{ $webUIIngressRoute.routeMatch | quote }}
       kind: Rule
       services:
         - name: {{ include "librefrontier.serviceName.webUI" . }}
@@ -39,7 +39,7 @@ spec:
   entryPoints:
     {{- toYaml $httpAPIIngressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ $httpAPIIngressRoute.host }}`)
+    - match: {{ $httpAPIIngressRoute.routeMatch | quote }}
       kind: Rule
       services:
         - name: {{ include "librefrontier.serviceName.httpAPI" . }}

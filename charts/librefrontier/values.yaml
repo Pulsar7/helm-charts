@@ -244,13 +244,13 @@ httpAPIIngressRoute:
   # @section -- HTTP-API-IngressRoute specifications
   enabled: false
   #
-  # -- (HTTP-only)-Entrypoints for API-Service
+  # -- Entrypoints for HTTP-API-Service
   # @section -- HTTP-API-IngressRoute specifications
-  entryPoints: []
+  entryPoints: ["web"]
   #
-  # -- Hostname for the API-Service
+  # -- Match for HTTP-API-Route
   # @section -- HTTP-API-IngressRoute specifications
-  host: ""
+  routeMatch: "PathPrefix(`/`)"
 #
 webUIIngressRoute:
   #
@@ -259,7 +259,7 @@ webUIIngressRoute:
   # @section -- Web-UI IngressRoute specifications
   enabled: false
   #
-  # -- (HTTP-only)-Entrypoints for Web-UI-Service
+  # -- Entrypoints for Web-UI-Service
   # @section -- Web-UI IngressRoute specifications
   entryPoints: []
   #
@@ -268,6 +268,6 @@ webUIIngressRoute:
   # @section -- Web-UI IngressRoute specifications
   certResolver: ""
   #
-  # -- Hostname for the API-Service
+  # -- Match for Web-UI-Route
   # @section -- Web-UI IngressRoute specifications
-  host: ""
+  routeMatch: "Host(``)"
