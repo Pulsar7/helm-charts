@@ -503,7 +503,7 @@ ingressRoute:
   # @section -- IngressRoute specifications
   enabled: false
   #
-  # -- Listening for Incoming Connections/Requests
+  # -- Traefik EntryPoints
   # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
   # @section -- IngressRoute specifications
   entryPoints:

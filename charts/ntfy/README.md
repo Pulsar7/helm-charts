@@ -121,7 +121,7 @@ Custom Helm-Chart for NTFY
 |-----|------|---------|-------------|
 | ingressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
 | ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for NTFY |
-| ingressRoute.entryPoints | list | `["websecure"]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
+| ingressRoute.entryPoints | list | `["websecure"]` | Traefik EntryPoints https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
 | ingressRoute.host | string | `""` | Hostname |
 
 ### NTFY-Persistence specifications
