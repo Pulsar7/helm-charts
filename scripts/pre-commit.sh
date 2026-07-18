@@ -53,6 +53,12 @@ for f in "${chart_changes[@]}"; do
   if printf '%s\n' "${checked_charts[@]}" | grep -qx "$chart_dir"; then
     continue
   fi
+  #
+  # Skip version-comparison between HEAD and STAGED when current branch is not 'main'
+  if [[ $(git branch --show-current) != "main" ]]; then
+    echo "INFO: Skip since current branch is not 'main'"
+    continue
+  fi
   echo "[*] chart_dir=${chart_dir}"
   checked_charts+=("$chart_dir")
   chart_yaml="$chart_dir/Chart.yaml"
