@@ -15,25 +15,18 @@ templates:
   - templates/service.yaml
 #
 tests:
-  - it: should render with different service-type and port
+  - it: should render with NodePort as http-API-Service type and specific ports
+    #
+    documentIndex: 0
     #
     set:
-      containers.librefrontier.service.type: NodePort
-      values: |
       containers:
         librefrontier:
-          service:
-            ports:
-              - name: http-api
-                containerPort: 80
-                port: 1337
-                targetPort: http-api
-                protocol: TCP
-              - name: web-ui
-                containerPort: 8080
-                port: 1338
-                targetPort: web-ui
-                protocol: TCP
+          services:
+            httpAPI:
+              type: NodePort
+              port: 7331
+              nodePort: 18181
     #
     asserts:
       - isKind:
@@ -43,7 +36,35 @@ tests:
           value: NodePort
       - equal:
           path: spec.ports[0].port
-          value: 1337
+          value: 7331
       - equal:
-          path: spec.ports[1].port
-          value: 1338
+          path: spec.ports[0].nodePort
+          value: 18181
+
+  - it: should render with NodePort as web-UI-Service type and specific ports
+    #
+    documentIndex: 1
+    #
+    set:
+      containers:
+        librefrontier:
+          services:
+            webUI:
+              enabled: true
+              type: NodePort
+              port: 7331
+              nodePort: 18181
+    #
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: NodePort
+      - equal:
+          path: spec.ports[0].port
+          value: 7331
+      - equal:
+          path: spec.ports[0].nodePort
+          value: 18181
+

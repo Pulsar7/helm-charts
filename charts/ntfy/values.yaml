@@ -67,7 +67,7 @@ containers:
       #
       # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
       # @section -- NTFY-Container specifications
-      tag: "v2.21.0"
+      tag: "v2.26.0"
       #
       # -- Container-Image pull-policy
       # @section -- NTFY-Container specifications
@@ -503,7 +503,7 @@ ingressRoute:
   # @section -- IngressRoute specifications
   enabled: false
   #
-  # -- Listening for Incoming Connections/Requests
+  # -- Traefik EntryPoints
   # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
   # @section -- IngressRoute specifications
   entryPoints:

@@ -1,21 +1,41 @@
 {{ include "librefrontier.validateValues" . }}
 {{- $librefrontierContainer := .Values.containers.librefrontier -}}
-{{- $librefrontierContainerService := $librefrontierContainer.service -}}
+{{- $services := $librefrontierContainer.services -}}
+{{- $httpAPIService := $services.httpAPI -}}
+{{- $webUIService := $services.webUI -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "librefrontier.fullname" . }}
+  name: {{ include "librefrontier.serviceName.httpAPI" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "librefrontier.labels" . | nindent 4 }}
 spec:
   selector:
     {{- include "librefrontier.selectorLabels" . | nindent 6 }}
-  type: {{ $librefrontierContainerService.type }}
+  type: {{ $httpAPIService.type }}
   ports:
-    {{- range $librefrontierContainerService.ports }}
-    - protocol: {{ .protocol }}
-      port: {{ .port }}
-      targetPort: {{ .targetPort }}
-      name: {{ .name }}
-    {{- end }}
+    - name: http-api
+      port: {{ $httpAPIService.port }}
+      targetPort: http-api
+      protocol: TCP
+      nodePort: {{ $httpAPIService.nodePort }}
+---
+{{- if $webUIService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+   name: {{ include "librefrontier.serviceName.webUI" . }}
+   namespace: {{ .Release.Namespace | quote }}
+   labels:
+     {{- include "librefrontier.selectorLabels" . | nindent 4 }}
+spec:
+   selector: {{- include "librefrontier.selectorLabels" . | nindent 6 }}
+   type: {{ $webUIService.type }}
+   ports:
+     - name: web-ui
+       port: {{ $webUIService.port }}
+       targetPort: web-ui
+       protocol: TCP
+       nodePort: {{ $webUIService.nodePort }}
+{{- end -}}
