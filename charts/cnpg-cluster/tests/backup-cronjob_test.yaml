@@ -45,11 +45,12 @@ tests:
         cnpgSuperUserSecretName: "test-cnpg-superuser-secret"
       backupCronjob:
         enabled: true
+        persistentVolumeClaim:
+          claimName: "1337-test-cronjob-pvc"
         schedule: "1337 1337 1337"
         timeZone: "EARTH"
         restartPolicy: OnFailure
         containerImage: "postgres:1337-alpine"
-        persistentVolumeClaimName: "test-cronjob-backup-pvc"
         targetDatabaseHost: "cnpg-db.1337-db-host"
         targetDatabasePort: 1337
     #
@@ -93,6 +94,11 @@ tests:
                 -p 1337 \
                 > /backup/cnpg-sqlbkp.sql
               ls -lah /backup/cnpg-sqlbkp.sql
+      
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.volumes[?(@.name=="backup-volume")].persistentVolumeClaim.claimName
+          value: "1337-test-cronjob-pvc"
+
       
 
       

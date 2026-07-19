@@ -27,9 +27,18 @@
         "timeZone": {"type": "string"},
         "restartPolicy": {"type": "string"},
         "containerImage": {"type": "string"},
-        "persistentVolumeClaimName": {"type": "string"},
         "targetDatabaseHost": {"type": "string"},
-        "targetDatabasePort": {"type": "integer"}
+        "targetDatabasePort": {"type": "integer"},
+        "persistentVolumeClaim": {
+          "type": "object",
+          "properties": {
+            "useExisting": {"type": "boolean"},
+            "claimName": {"type": "string"},
+            "storageRequest": {"type": "string"},
+            "storageClassName": {"type": "string"},
+            "accessModes": {"type": "array"}
+          }
+        }
       }
     }
   },
