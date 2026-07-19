@@ -1,0 +1,45 @@
+{{ include "cnpgdb.validateValues" . }}
+{{- $postgres := .Values.postgresCluster -}}
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "cnpgdb.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- with $postgres.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "cnpgdb.labels" . }}
+spec:
+  instances: {{ $postgres.instances }}
+  storage:
+    size: {{ $postgres.storageSize }}
+    storageClass: {{ $postgres.storageClass }}
+  imageName: {{ $postgres.imageName }}
+  imagePullPolicy: {{ $postgres.imagePullPolicy }}
+  enableSuperuserAccess: {{ $postgres.enableSuperuserAccess }}
+  {{- if $postgres.cnpgSuperUserSecretName }}
+  superuserSecret:
+    name: {{ $postgres.cnpgSuperUserSecretName }}
+  {{- end }}
+  {{- if $postgres.managedRoles }}
+  managed:
+    roles:
+      {{- toYaml $postgres.managedRoles | nindent 6 }}
+  {{- end }}
+  {{- if or $postgres.postgresqlParameters $postgres.sharedPreloadLibraries }}
+  postgresql:
+    {{- if $postgres.postgresqlParameters }}
+    parameters:
+      {{- toYaml $postgres.postgresqlParameters | nindent 6 }}
+    {{- end }}
+    {{- if $postgres.sharedPreloadLibraries }}
+    shared_preload_libraries:
+      {{- toYaml $postgres.sharedPreloadLibraries | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  {{- if $postgres.resources }}
+  resources:
+    {{- toYaml $postgres.resources | nindent 4 }}
+  {{- end }}

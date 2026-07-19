@@ -1,0 +1,98 @@
+#------------------------------------------------------------------------------
+#
+# CronJob-Unittests Test-Suite for CNPG-Cluster
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test CronJob
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/backup-cronjob.yaml
+#
+tests:
+  - it: should not render enabled CronJob with disabled superUserAccess
+    #
+    set:
+      backupCronjob.enabled: true
+      postgresCluster.enableSuperuserAccess: false
+    #
+    asserts:
+      - failedTemplate:
+          errorMessage: "VALUES VALIDATION:\ncnpgdb: enableSuperuserAccess\n    You have to enable external superUserAccess when enabling Backups"
+  
+  - it: should render enabled CronJob with enabled superUserAccess
+    #
+    set:
+      postgresCluster:
+        enableSuperuserAccess: true
+        cnpgSuperUserSecretName: "test-cnpg-superuser-secret"
+      backupCronjob.enabled: true
+    #
+    asserts:
+      - isKind:
+         of: CronJob
+      
+  - it: should render enabled CronJob and superUserAccess with adjusted specs
+    #
+    set:
+      postgresCluster:
+        enableSuperuserAccess: true
+        cnpgSuperUserSecretName: "test-cnpg-superuser-secret"
+      backupCronjob:
+        enabled: true
+        schedule: "1337 1337 1337"
+        timeZone: "EARTH"
+        restartPolicy: OnFailure
+        containerImage: "postgres:1337-alpine"
+        persistentVolumeClaimName: "test-cronjob-backup-pvc"
+        targetDatabaseHost: "cnpg-db.1337-db-host"
+        targetDatabasePort: 1337
+    #
+    asserts:
+      - isKind:
+         of: CronJob
+      
+      - equal:
+          path: spec.schedule
+          value: "1337 1337 1337"
+      
+      - equal:
+          path: spec.timeZone
+          value: "EARTH"
+      
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: "OnFailure"
+      
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: "postgres:1337-alpine"
+      
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: "test-cnpg-superuser-secret"
+      
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+          value: "test-cnpg-superuser-secret"
+    
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].command
+          value:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail;
+              pg_dumpall \
+                -h cnpg-db.1337-db-host \
+                -p 1337 \
+                > /backup/cnpg-sqlbkp.sql
+              ls -lah /backup/cnpg-sqlbkp.sql
+      
+
+      

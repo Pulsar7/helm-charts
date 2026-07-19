@@ -1,0 +1,4 @@
+apiVersion: v2
+name: cnpg-cluster
+description: Custom Helm-Chart for our CNPG-Cluster
+version: 0.1.0

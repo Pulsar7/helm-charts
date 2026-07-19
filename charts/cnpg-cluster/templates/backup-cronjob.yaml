@@ -1,0 +1,50 @@
+{{ include "cnpgdb.validateValues" . }}
+{{- $cronjob := .Values.backupCronjob -}}
+{{- $postgres := .Values.postgresCluster -}}
+{{- if and $cronjob.enabled $postgres.enableSuperuserAccess }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "cnpgdb.fullname" . }}-backup-dump
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  schedule: "{{ $cronjob.schedule }}"
+  timeZone: "{{ $cronjob.timeZone }}"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: {{ $cronjob.restartPolicy }}
+          containers:
+          - name: postgres-backup
+            image: {{ $cronjob.containerImage }}
+            env:
+              - name: PGUSER
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ $postgres.cnpgSuperUserSecretName }}
+                    key: username
+              - name: PGPASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ $postgres.cnpgSuperUserSecretName }}
+                    key: password
+            command:
+            - /bin/bash
+            - -c
+            - |
+              set -euo pipefail;
+              pg_dumpall \
+                -h {{ $cronjob.targetDatabaseHost }} \
+                -p {{ $cronjob.targetDatabasePort }} \
+                > /backup/cnpg-sqlbkp.sql
+              ls -lah /backup/cnpg-sqlbkp.sql
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: {{ $cronjob.persistentVolumeClaimName }}
+{{- end -}}
