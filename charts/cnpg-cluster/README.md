@@ -24,7 +24,7 @@ Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
 | backupCronjob.schedule | string | `"10 * * * *"` | Schedule of the Cronjob (NOTE: Align with the actual PV-Backup-Schedule) |
 | backupCronjob.targetDatabaseHost | string | `"cnpg-cluster-app-rw.cnpg-system"` | Target CNPG-database Host |
 | backupCronjob.targetDatabasePort | int | `5432` | Target CNPG-database Port |
-| backupCronjob.timeZone | string | `"Europe/"` | Timezone of Cronjob-Schedule |
+| backupCronjob.timeZone | string | `"Europe/Brussels"` | Timezone of Cronjob-Schedule |
 
 ### CNPG-Cluster specifications
 

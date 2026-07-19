@@ -77,7 +77,7 @@ backupCronjob:
   #
   # -- Timezone of Cronjob-Schedule
   # @section -- Backup-Cronjob specifications
-  timeZone: "Europe/"
+  timeZone: "Europe/Brussels"
   #
   # -- Policy to restart Backup-Cronjob
   # @section -- Backup-Cronjob specifications
