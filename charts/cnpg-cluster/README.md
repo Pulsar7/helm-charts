@@ -1,6 +1,6 @@
 # cnpg-cluster
 
-Custom Helm-Chart for our CNPG-Cluster
+Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
 
 [!IMPORTANT]
 > This Helm chart assumes that the required CNPG Custom Resource Definitions (CRDs) are already installed in the target Kubernetes cluster.
