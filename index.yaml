@@ -2,6 +2,14 @@ apiVersion: v1
 entries:
   cnpg-cluster:
   - apiVersion: v2
+    created: "2026-07-19T20:18:50.128617909Z"
+    description: Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
+    digest: 2513d7d4daacb2e286162d3e8a60fbcf23910c3c3c8469f5ceef4af95f465746
+    name: cnpg-cluster
+    urls:
+    - https://github.com/Pulsar7/helm-charts/releases/download/cnpg-cluster-0.2.0/cnpg-cluster-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2026-07-19T13:05:14.599759066Z"
     description: Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
     digest: c715dd8d4293b7f1319e065fa86106ca843f78f6785d1494d4dfa45542cbe156
@@ -392,4 +400,4 @@ entries:
     urls:
     - https://github.com/Pulsar7/helm-charts/releases/download/radicale-0.1.6-alpha/radicale-0.1.6-alpha.tgz
     version: 0.1.6-alpha
-generated: "2026-07-19T13:05:14.599923886Z"
+generated: "2026-07-19T20:18:50.128717295Z"
