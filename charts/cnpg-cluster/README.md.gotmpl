@@ -1,0 +1,15 @@
+{{ template "chart.header" . }}
+{{ template "chart.description" . }}
+
+[!IMPORTANT]
+> This Helm chart assumes that the required CNPG Custom Resource Definitions (CRDs) are already installed in the target Kubernetes cluster.
+> It deploys a CronJob that performs full database dumps for the configured CNPG Database.
+> The dumped data is written to a Persistent Volume (PV), and your PV must be backed up using your chosen backup solution (for example, Velero with a remote S3 destination). 
+> The chart does not configure or guarantee the backup of the PV - this responsibility remains with the user.
+> This chart is tailored to a specific CNPG backup use case. If you try to use it in your cluster, please verify that it fits your environment and requirements (including PV provisioning and backup/retention setup).
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

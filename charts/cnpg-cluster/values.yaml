@@ -1,8 +1,7 @@
 #-----------------------------------------------------------------------
 #
-# Default Helm-Values for this custom CNPG-Cluster Helm-Chart
-# 
-# > This Helm-Chart is specifically designed for our use-case <
+# Default Helm-Values for custom CNPG-Cluster Helm-Chart with
+# integrated db-dump CronJob-Resource for backups
 #
 #-----------------------------------------------------------------------
 
@@ -72,7 +71,7 @@ backupCronjob:
   enabled: false
   #
   # -- Schedule of the Cronjob
-  # (NOTE: Align with Velero Backup-Schedule)
+  # (NOTE: Align with the actual PV-Backup-Schedule)
   # @section -- Backup-Cronjob specifications
   schedule: "10 * * * *"
   #
