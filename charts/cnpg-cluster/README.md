@@ -2,7 +2,7 @@
 
 Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
 
-[!IMPORTANT]
+> [!IMPORTANT]
 > This Helm chart assumes that the required CNPG Custom Resource Definitions (CRDs) are already installed in the target Kubernetes cluster.
 > It deploys a CronJob that performs full database dumps for the configured CNPG Database.
 > The dumped data is written to a Persistent Volume (PV), and your PV must be backed up using your chosen backup solution (for example, Velero with a remote S3 destination).
