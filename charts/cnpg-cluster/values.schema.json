@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "properties": {
+    "postgresCluster": {
+        "type": "object",
+        "properties": {
+            "annotations": {"type": "object"},
+            "instances": {"type": "integer", "minimum": 1},
+            "storageSize": {"type": "string"},
+            "storageClass": {"type": "string"},
+            "imageName": {"type": "string"},
+            "imagePullPolicy": {"type": "string"},
+            "enableSuperuserAccess": {"type": "boolean"},
+            "cnpgSuperUserSecretName": {"type": "string"},
+            "managedRoles": {"type": "array"},
+            "postgresqlParameters": {"type": "object"},
+            "sharedPreloadLibraries": {"type": "array"},
+            "resources": {"type": "object"}
+        }
+    },
+
+    "backupCronjob": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "schedule": {"type": "string"},
+        "timeZone": {"type": "string"},
+        "restartPolicy": {"type": "string"},
+        "containerImage": {"type": "string"},
+        "persistentVolumeClaimName": {"type": "string"},
+        "targetDatabaseHost": {"type": "string"},
+        "targetDatabasePort": {"type": "integer"}
+      }
+    }
+  },
+
+  "required": [
+    "postgresCluster",
+    "backupCronjob"
+  ],
+
+  "title": "Values",
+  "type": "object"
+}

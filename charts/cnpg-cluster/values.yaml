@@ -1,0 +1,100 @@
+#-----------------------------------------------------------------------
+#
+# Default Helm-Values for custom CNPG-Cluster Helm-Chart with
+# integrated db-dump CronJob-Resource for backups
+#
+#-----------------------------------------------------------------------
+
+
+# ======================================================================
+# CNPG-Cluster specifications
+# ======================================================================
+postgresCluster:
+  #
+  # -- Annotations
+  # @section -- CNPG-Cluster specifications
+  annotations: {}
+  #
+  # -- Number of CNPG-Cluster instances
+  # @section -- CNPG-Cluster specifications
+  instances: 1
+  #
+  # -- Storage-Size of requested PVC
+  # @section -- CNPG-Cluster specifications
+  storageSize: 10Gi
+  #
+  # -- StorageClass of requested PVC
+  # @section -- CNPG-Cluster specifications
+  storageClass: local-path
+  #
+  # -- Container-Image
+  # @section -- CNPG-Cluster specifications
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+  #
+  # -- When to pull Container-Image
+  # @section -- CNPG-Cluster specifications
+  imagePullPolicy: IfNotPresent
+  #
+  # -- Whether to allow superuser-access
+  # (NOTE: Required to be set 'true' for backups)
+  # @section -- CNPG-Cluster specifications
+  enableSuperuserAccess: false
+  #
+  # -- Name of the Secret for the superUser of the CNPG-Cluster
+  # @section -- CNPG-Cluster specifications
+  cnpgSuperUserSecretName: ""
+  #
+  # -- Add managed Roles to database
+  # @section -- CNPG-Cluster specifications
+  managedRoles: []
+  #
+  # -- Additional parameters for the postgres-database
+  # @section -- CNPG-Cluster specifications
+  postgresqlParameters: {}
+  #
+  # -- Preload additional libraries
+  # @section -- CNPG-Cluster specifications
+  sharedPreloadLibraries: []
+  #
+  # -- Resource requests and limits
+  # @section -- CNPG-Cluster specifications
+  resources: {}
+
+
+# ======================================================================
+# Backup-Cronjob specifications
+# ======================================================================
+backupCronjob:
+  #
+  # -- Whether to enable backups
+  # @section -- Backup-Cronjob specifications
+  enabled: false
+  #
+  # -- Schedule of the Cronjob
+  # (NOTE: Align with the actual PV-Backup-Schedule)
+  # @section -- Backup-Cronjob specifications
+  schedule: "10 * * * *"
+  #
+  # -- Timezone of Cronjob-Schedule
+  # @section -- Backup-Cronjob specifications
+  timeZone: "Europe/Brussels"
+  #
+  # -- Policy to restart Backup-Cronjob
+  # @section -- Backup-Cronjob specifications
+  restartPolicy: OnFailure
+  #
+  # -- Container-Image with 'pg_dumpall'-binary at PATH
+  # @section -- Backup-Cronjob specifications
+  containerImage: "postgres:16-alpine"
+  #
+  # -- Name of existing PVC where the database-dump is being stored at
+  # @section -- Backup-Cronjob specifications
+  persistentVolumeClaimName: "cnpg-db-backup-pvc"
+  #
+  # -- Target CNPG-database Host
+  # @section -- Backup-Cronjob specifications
+  targetDatabaseHost: "cnpg-cluster-app-rw.cnpg-system"
+  #
+  # -- Target CNPG-database Port
+  # @section -- Backup-Cronjob specifications
+  targetDatabasePort: 5432

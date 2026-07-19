@@ -1,0 +1,113 @@
+#------------------------------------------------------------------------------
+#
+# Cluster-Unittests Test-Suite for CNPG-Cluster
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test Cluster
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/cnpg-cluster.yaml
+#
+tests:
+  - it: should render Cluster with enabled superUserAccess
+    #
+    set:
+      postgresCluster.enableSuperuserAccess: true
+      postgresCluster.cnpgSuperUserSecretName: "test-cnpg-db-superuser-secret"
+    #
+    asserts:
+      - isKind:
+          of: Cluster
+
+      - equal:
+          path: spec.enableSuperuserAccess
+          value: true
+          
+      - equal:
+          path: spec.superuserSecret.name
+          value: "test-cnpg-db-superuser-secret"
+  
+  - it: should render Cluster with disabled superUserAccess
+    #
+    # Use default Helm Values (superUserAccess is disabled)
+    #
+    asserts:
+      - isKind:
+          of: Cluster
+
+      - equal:
+          path: spec.enableSuperuserAccess
+          value: false
+
+      - notExists:
+          path: spec.superuserSecret.name
+
+  - it: should render Cluster with custom app-user managedRoles
+    #
+    set:
+      postgresCluster.managedRoles:
+        - name: testuser1
+          superuser: false
+          login: true
+          inherit: true
+          connectionLimit: -1
+          ensure: present
+          passwordSecret:
+            name: cnpg-appuser-test1-secret
+            key: password
+
+        - name: testuser2
+          superuser: false
+          login: true
+          createdb: true
+          inherit: true
+          ensure: present
+          connectionLimit: -1
+          passwordSecret:
+            name: cnpg-appuser-test2-secret
+            key: password
+    #
+    asserts:
+      - isKind:
+          of: Cluster
+      - equal:
+          path: spec.managed.roles
+          value:
+            - name: testuser1
+              superuser: false
+              login: true
+              inherit: true
+              connectionLimit: -1
+              ensure: present
+              passwordSecret:
+                name: cnpg-appuser-test1-secret
+                key: password
+
+            - name: testuser2
+              superuser: false
+              login: true
+              createdb: true
+              inherit: true
+              ensure: present
+              connectionLimit: -1
+              passwordSecret:
+                name: cnpg-appuser-test2-secret
+                key: password
+
+  - it: should render without any managedRoles
+    #
+    set:
+      managedRoles: []
+    #
+    asserts:
+      - isKind:
+          of: Cluster
+
+      - notExists:
+          path: spec.managed.roles
