@@ -46,5 +46,5 @@ spec:
           volumes:
           - name: backup-volume
             persistentVolumeClaim:
-              claimName: {{ $cronjob.persistentVolumeClaimName }}
+              claimName: {{ $cronjob.persistentVolumeClaim.claimName }}
 {{- end -}}

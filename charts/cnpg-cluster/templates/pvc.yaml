@@ -1,0 +1,18 @@
+{{ include "cnpgdb.validateValues" . }}
+{{- $postgresCluster := .Values.postgresCluster -}}
+{{- $backupCronjob := .Values.backupCronjob -}}
+{{- $pvc := $backupCronjob.persistentVolumeClaim -}}
+{{- if and $postgresCluster.enableSuperuserAccess $backupCronjob.enabled (not $pvc.useExisting) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $pvc.claimName }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "cnpgdb.labels" . }}
+spec:
+  storageClassName: {{ $pvc.storageClassName }}
+  accessModes: {{- toYaml $pvc.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ $pvc.storageRequest | quote }}
+{{- end -}}

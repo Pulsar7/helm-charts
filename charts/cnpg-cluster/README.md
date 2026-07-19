@@ -9,7 +9,7 @@ Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
 > The chart does not configure or guarantee the backup of the PV - this responsibility remains with the user.
 > This chart is tailored to a specific CNPG backup use case. If you try to use it in your cluster, please verify that it fits your environment and requirements (including PV provisioning and backup/retention setup).
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square)
 
 ## Values
 
@@ -19,7 +19,11 @@ Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
 |-----|------|---------|-------------|
 | backupCronjob.containerImage | string | `"postgres:16-alpine"` | Container-Image with 'pg_dumpall'-binary at PATH |
 | backupCronjob.enabled | bool | `false` | Whether to enable backups |
-| backupCronjob.persistentVolumeClaimName | string | `"cnpg-db-backup-pvc"` | Name of existing PVC where the database-dump is being stored at |
+| backupCronjob.persistentVolumeClaim.accessModes | list | `["ReadWriteOnce"]` | Access-modes for new created PVC. Gets ignored when `useExistingPVC: true` |
+| backupCronjob.persistentVolumeClaim.claimName | string | `"cnpg-db-backup-pvc"` | Name of PVC where the database-dump is being stored at |
+| backupCronjob.persistentVolumeClaim.storageClassName | string | `"local-path"` | Storage request for new created PVC. Gets ignored when `useExistingPVC: true` |
+| backupCronjob.persistentVolumeClaim.storageRequest | string | `"10Gi"` | Storage request for new created PVC. Gets ignored when `useExistingPVC: true` |
+| backupCronjob.persistentVolumeClaim.useExisting | bool | `false` | Use existing PVC and don't create new PVC-resource with the given `persistentVolumeClaimName`. |
 | backupCronjob.restartPolicy | string | `"OnFailure"` | Policy to restart Backup-Cronjob |
 | backupCronjob.schedule | string | `"10 * * * *"` | Schedule of the Cronjob (NOTE: Align with the actual PV-Backup-Schedule) |
 | backupCronjob.targetDatabaseHost | string | `"cnpg-cluster-app-rw.cnpg-system"` | Target CNPG-database Host |

@@ -87,10 +87,6 @@ backupCronjob:
   # @section -- Backup-Cronjob specifications
   containerImage: "postgres:16-alpine"
   #
-  # -- Name of existing PVC where the database-dump is being stored at
-  # @section -- Backup-Cronjob specifications
-  persistentVolumeClaimName: "cnpg-db-backup-pvc"
-  #
   # -- Target CNPG-database Host
   # @section -- Backup-Cronjob specifications
   targetDatabaseHost: "cnpg-cluster-app-rw.cnpg-system"
@@ -98,3 +94,29 @@ backupCronjob:
   # -- Target CNPG-database Port
   # @section -- Backup-Cronjob specifications
   targetDatabasePort: 5432
+  #
+  persistentVolumeClaim:
+    #
+    # -- Use existing PVC and don't create new PVC-resource with the given
+    # `persistentVolumeClaimName`.
+    # @section -- Backup-Cronjob specifications
+    useExisting: false
+    #
+    # -- Name of PVC where the database-dump is being stored at
+    # @section -- Backup-Cronjob specifications
+    claimName: "cnpg-db-backup-pvc"
+    #
+    # -- Storage request for new created PVC.
+    # Gets ignored when `useExistingPVC: true`
+    # @section -- Backup-Cronjob specifications
+    storageRequest: "10Gi"
+    #
+    # -- Storage request for new created PVC.
+    # Gets ignored when `useExistingPVC: true`
+    # @section -- Backup-Cronjob specifications
+    storageClassName: "local-path"
+    #
+    # -- Access-modes for new created PVC.
+    # Gets ignored when `useExistingPVC: true`
+    # @section -- Backup-Cronjob specifications
+    accessModes: ["ReadWriteOnce"]
