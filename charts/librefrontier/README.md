@@ -5,7 +5,7 @@ Custom Helm-Chart for Librefrontier
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.3.3-alpha.1](https://img.shields.io/badge/Version-0.3.3--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
+![Version: 0.3.4-alpha.1](https://img.shields.io/badge/Version-0.3.4--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.2-dev](https://img.shields.io/badge/AppVersion-0.0.2--dev-informational?style=flat-square)
 
 ## Values
 
@@ -32,7 +32,7 @@ Custom Helm-Chart for Librefrontier
 | containers.librefrontier.additionalVolumeMounts | object | `{}` | Additional Volume-Mounts for Container |
 | containers.librefrontier.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | containers.librefrontier.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
-| containers.librefrontier.image.tag | string | `"v0.0.1-dev"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
+| containers.librefrontier.image.tag | string | `""` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
 | containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":0,"runAsUser":0}` | Container Security Context |
 

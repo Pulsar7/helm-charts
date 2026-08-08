@@ -71,7 +71,7 @@ containers:
       #
       # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
       # @section -- Librefrontier-Container specifications
-      tag: v0.0.1-dev
+      tag: ''
       #
       # -- Container-Image pull-policy
       # @section -- Librefrontier-Container specifications
