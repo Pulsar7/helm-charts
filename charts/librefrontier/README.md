@@ -5,7 +5,7 @@ Custom Helm-Chart for Librefrontier
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.3.3-alpha.1](https://img.shields.io/badge/Version-0.3.3--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.0.1-dev](https://img.shields.io/badge/AppVersion-0.0.1--dev-informational?style=flat-square)
+![Version: 0.4.0-alpha.1](https://img.shields.io/badge/Version-0.4.0--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.2-dev](https://img.shields.io/badge/AppVersion-v0.0.2--dev-informational?style=flat-square)
 
 ## Values
 
@@ -18,7 +18,7 @@ Custom Helm-Chart for Librefrontier
 | nodeSelector | object | `{}` | Kubernetes only schedules the Pod onto nodes that have each of the labels you specify |
 | podAnnotations | object | `{}` | Additional Pod-annotations |
 | podLabels | object | `{}` | Additional Pod-Labels |
-| podSecurityContext | object | `{}` | Pod Security Context |
+| podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsNonRoot":true,"runAsUser":100}` | Pod Security Context |
 | replicaCount | int | `1` | Number of Pods |
 | strategy | object | `{"type":"RollingUpdate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
@@ -32,9 +32,9 @@ Custom Helm-Chart for Librefrontier
 | containers.librefrontier.additionalVolumeMounts | object | `{}` | Additional Volume-Mounts for Container |
 | containers.librefrontier.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | containers.librefrontier.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
-| containers.librefrontier.image.tag | string | `"v0.0.1-dev"` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
+| containers.librefrontier.image.tag | string | `""` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
 | containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
-| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":0,"runAsUser":0}` | Container Security Context |
+| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":101,"runAsUser":100}` | Container Security Context |
 
 ### Librefrontier-Container-Probes specifications
 

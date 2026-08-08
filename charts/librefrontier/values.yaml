@@ -20,11 +20,12 @@ strategy:
 #
 # -- Pod Security Context
 # @section -- Pod specifications
-podSecurityContext: {}
-#  runAsUser: 10000
-#  runAsGroup: 10000
-#  fsGroup: 10000
-#  runAsNonRoot: true
+podSecurityContext:
+  runAsUser: 100
+  runAsGroup: 101
+  fsGroup: 101
+  runAsNonRoot: true
+  fsGroupChangePolicy: "OnRootMismatch"
 #
 # -- Additional Pod-annotations
 # @section -- Pod specifications
@@ -71,7 +72,7 @@ containers:
       #
       # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
       # @section -- Librefrontier-Container specifications
-      tag: v0.0.1-dev
+      tag: ''
       #
       # -- Container-Image pull-policy
       # @section -- Librefrontier-Container specifications
@@ -80,10 +81,12 @@ containers:
     # -- Container Security Context
     # @section -- Librefrontier-Container specifications
     securityContext:
-      runAsUser: 0
-      runAsGroup: 0
+      runAsUser: 100
+      runAsGroup: 101
       allowPrivilegeEscalation: false
       privileged: false
+      capabilities:
+        drop: ["ALL"]
     #
     # -- Container resource requests and limits
     # @section -- Librefrontier-Container specifications
