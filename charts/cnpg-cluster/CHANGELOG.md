@@ -1,5 +1,9 @@
 # Changelog for the 'cnpg-cluster' Helm-Chart
 
+# v0.2.1
+
+* Fix indentation of labels-object in cnpg-cluster-manifest template
+
 # v0.2.0
 
 > [!CAUTION]

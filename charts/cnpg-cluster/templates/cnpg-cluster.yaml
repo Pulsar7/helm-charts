@@ -6,11 +6,9 @@ metadata:
   name: {{ include "cnpgdb.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   {{- with $postgres.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
+  annotations: {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels:
-    {{- include "cnpgdb.labels" . }}
+  labels: {{- include "cnpgdb.labels" . | nindent 4 }}
 spec:
   instances: {{ $postgres.instances }}
   storage:

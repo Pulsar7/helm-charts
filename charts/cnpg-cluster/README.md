@@ -9,7 +9,7 @@ Custom Helm-Chart for a CNPG-Cluster with db-dump CronJob functionality
 > The chart does not configure or guarantee the backup of the PV - this responsibility remains with the user.
 > This chart is tailored to a specific CNPG backup use case. If you try to use it in your cluster, please verify that it fits your environment and requirements (including PV provisioning and backup/retention setup).
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square)
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square)
 
 ## Values
 
