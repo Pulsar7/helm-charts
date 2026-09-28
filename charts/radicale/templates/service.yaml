@@ -1,20 +1,19 @@
 {{ include "radicale.validateValues" . }}
-{{- $radicaleContainerServce := .Values.containers.radicale.service -}}
+{{- $radicaleContainer := .Values.radicaleContainer -}}
+{{- $service := $radicaleContainer.service -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "radicale.service" . }}
+  name: {{ include "radicale.serviceName" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels:
-    {{- include "radicale.labels" . | nindent 4 }}
+  labels: {{- include "radicale.labels" . | nindent 4 }}
 spec:
-  selector:
-    {{- include "radicale.selectorLabels" . | nindent 6 }}
-  type: {{ $radicaleContainerServce.type }}
+  selector: {{- include "radicale.selectorLabels" . | nindent 4 }}
+  type: {{ $service.type }}
   ports:
-    {{- range $radicaleContainerServce.ports }}
-    - protocol: {{ .protocol }}
-      port: {{ .port }}
-      targetPort: {{ .targetPort }}
-      name: {{ .name }}
-    {{- end }}
+  {{- range $service.ports }}
+  - protocol: {{ .protocol }}
+    port: {{ .port }}
+    targetPort: {{ .targetPort }}
+    name: {{ .name }}
+  {{- end }}

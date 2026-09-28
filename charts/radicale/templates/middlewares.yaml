@@ -3,13 +3,15 @@
 {{- if $ingressRoute.enabled }}
 {{- $middlewares := .Values.middlewares -}}
 {{- if $middlewares }}
-{{- $namespace := (.Release.Namespace | quote) -}}
+{{- $namespace := .Release.Namespace | quote -}}
+{{- $labels := include "radicale.labels" . -}}
 {{- range $middlewares }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: {{ .name | quote }}
   namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
 spec:
   {{- toYaml .spec | nindent 2 }}
 ---

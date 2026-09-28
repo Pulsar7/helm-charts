@@ -1,13 +1,12 @@
 {{ include "radicale.validateValues" . }}
 {{- $persistence := .Values.persistence -}}
-{{- if and $persistence.enabled $persistence.createNewPVC }}
+{{- if (include "radicale.createPVC" .) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "radicale.pvc" . }}
+  name: {{ include "radicale.pvcName" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels:
-    {{- include "radicale.labels" . | nindent 4 }}
+  labels: {{- include "radicale.labels" . | nindent 4 }}
 spec:
   storageClassName: {{ $persistence.storageClassName }}
   accessModes: {{ toYaml $persistence.accessModes | nindent 2 }}

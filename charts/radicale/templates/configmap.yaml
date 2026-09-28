@@ -1,17 +1,13 @@
 {{ include "radicale.validateValues" . }}
-{{- $config := .Values.configFiles.config -}}
+{{- $config := .Values.configFile -}}
+{{- if (include "radicale.createConfigMap" .) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "radicale.configMap" . }}
+  name: {{ include "radicale.configMapName" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels:
-    {{- include "radicale.labels" . | nindent 4 }}
+  labels: {{- include "radicale.labels" . | nindent 4 }}
 data:
-  {{- if $config.useOwnConfigFileContent }}
-  config: |-
-    {{ toYaml $config.ownConfigFileContent | indent 4 }}
-  {{- else }}
-  config: |-
-    {{- tpl ($.Files.Get "config/config") . | nindent 4 }}
-  {{- end }}
+  {{ $config.configMapKey }}: |-
+    {{- tpl (.Files.Get "config/config.conf") . | nindent 4 }}
+{{- end }}

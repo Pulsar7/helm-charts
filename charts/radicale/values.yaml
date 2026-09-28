@@ -36,7 +36,7 @@ podLabels: {}
 #
 # -- Additional Volumes
 # @section -- Pod specifications
-additionalVolumes: {}
+extraVolumes: []
 #
 # -- Kubernetes only schedules the Pod onto nodes that have each of the labels you specify
 # @section -- Pod specifications
@@ -48,138 +48,139 @@ affinity: {}
 #
 # -- Tolerations allow the scheduler to schedule pods with matching taints
 # @section -- Pod specifications
-tolerations: {}
+tolerations: []
 
 
 # =================================================================
 # Container specifications
 # =================================================================
 #
-containers:
-  radicale:
+# -- List of sidecar-Containers
+# @section -- Extra-Containers specifications
+extraContainers: []
+#
+radicaleContainer:
+  #
+  # Image specifications of the Radicale-Container
+  image:
     #
-    # Image specifications of the Radicale-Container
-    image:
-      #
-      # -- Container-Image-Repository
-      # @section -- Radicale-Container specifications
-      repository: "tomsquest/docker-radicale"
-      #
-      # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
-      # @section -- Radicale-Container specifications
-      tag: "3.7.6.0"
-      #
-      # -- Container-Image pull-policy
-      # @section -- Radicale-Container specifications
-      pullPolicy: IfNotPresent
-    #
-    # -- Container Security Context
+    # -- Container-Image-Repository
     # @section -- Radicale-Container specifications
-    securityContext:
-      runAsUser: 2999
-      runAsGroup: 2999
-      runAsNonRoot: true
-      allowPrivilegeEscalation: false
-      privileged: false
+    repository: "tomsquest/docker-radicale"
     #
-    # -- Container Resources
+    # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
     # @section -- Radicale-Container specifications
-    resources: {}
-    #resources:
-    #  requests:
-    #    memory: 200Mi
-    #    cpu: 100m
-    #  limits:
-    #    memory: 500Mi
-    #    cpu: 500m
+    tag: ""
     #
-    service:
-      # -- Service Type
-      # @section -- Radicale-Container specifications
-      type: ClusterIP
-      #
+    # -- Container-Image pull-policy
+    # @section -- Radicale-Container specifications
+    pullPolicy: IfNotPresent
+  #
+  # -- Container Security Context
+  # @section -- Radicale-Container specifications
+  securityContext:
+    runAsUser: 2999
+    runAsGroup: 2999
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    privileged: false
+  #
+  # -- Container Resources
+  # @section -- Radicale-Container specifications
+  resources: {}
+  #resources:
+  #  requests:
+  #    memory: 200Mi
+  #    cpu: 100m
+  #  limits:
+  #    memory: 500Mi
+  #    cpu: 500m
+  #
+  service:
+    # -- Service Type
+    # @section -- Radicale-Container specifications
+    type: ClusterIP
+    #
+    # @ignored
+    ports:
       # @ignored
-      ports:
+      - name: http
+        #
+        # reference containerPort
         # @ignored
-        - name: http
-          #
-          # reference containerPort
-          # @ignored 
-          containerPort: 5232
-          #
-          # -- Exposed Container-Port
-          # @section -- Radicale-Container-Port
-          port: 5232
-          #
-          # reference containerPort by name
-          # @ignored
-          targetPort: http
-          #
-          protocol: TCP
+        containerPort: 5232
+        #
+        # -- Exposed Container-Port
+        # @section -- Radicale-Container specifications
+        port: 5232
+        #
+        # reference containerPort by name
+        # @ignored
+        targetPort: http
+        #
+        protocol: TCP
+  #
+  # -- Additional Volume-Mounts for Container
+  # @section -- Radicale-Container specifications
+  extraVolumeMounts: []
+  #
+  # -- Environment variables for the Container
+  # @section -- Radicale-Container specifications
+  environmentVariables:
+    - name: "TAKE_FILE_OWNERSHIP"
+      value: "false"
+  #
+  livenessProbe:
     #
-    # -- Additional Volume-Mounts for Container
-    # @section -- Radicale-Container specifications
-    additionalVolumeMounts: {}
+    # -- Whether to enable the Liveness-Probe
+    # @section -- Radicale-Container-Probes specifications
+    enabled: true
     #
-    # -- Environment variables for the Container
-    # @section -- Radicale-Container specifications
-    environmentVariables:
-      - name: "TAKE_FILE_OWNERSHIP"
-        value: "false"
+    # -- Initial Delay in Seconds
+    # @section -- Radicale-Container-Probes specifications
+    initialDelaySeconds: 30
     #
-    probes:
-      #
-      livenessProbe:
-        #
-        # -- Whether to enable the Liveness-Probe
-        # @section -- Radicale-Container-Probes specifications
-        enabled: true
-        #
-        # -- Initial Delay in Seconds
-        # @section -- Radicale-Container-Probes specifications
-        initialDelaySeconds: 30
-        #
-        # -- How often to perform the liveness checks
-        # @section -- Radicale-Container-Probes specifications
-        periodSeconds: 10
-        #
-        # -- Time to wait for a response from the database
-        # @section -- Radicale-Container-Probes specifications
-        timeoutSeconds: 5
-        #
-        # -- Number of consecutive failures before restarting the Pod
-        # @section -- Radicale-Container-Probes specifications
-        failureThreshold: 3
-        #
-        # -- Number of successful checks before considering the Pod healthy (again)
-        # @section -- Radicale-Container-Probes specifications
-        successThreshold: 1
-      #
-      readinessProbe:
-        #
-        # -- Whether to enable the Readiness-Probe
-        # @section -- Radicale-Container-Probes specifications
-        enabled: true
-        #
-        # -- How long to wait before starting the first readiness Probe after the container starts
-        # @section -- Radicale-Container-Probes specifications
-        initialDelaySeconds: 30
-        #
-        # -- How often to perform the readiness checks after the initial delay
-        # @section -- Radicale-Container-Probes specifications
-        periodSeconds: 5
-        #
-        # -- The maximum amount of time the probe will wait for a response from the application
-        # @section -- Radicale-Container-Probes specifications
-        timeoutSeconds: 2
-        #
-        # -- Number of consecutive failures before restarting the Pod
-        # @section -- Radicale-Container-Probes specifications
-        failureThreshold: 3
-        #
-        # -- Number of successful checks before considering the Pod healthy
-        # @section -- Radicale-Container-Probes specifications
-        successThreshold: 1
+    # -- How often to perform the liveness checks
+    # @section -- Radicale-Container-Probes specifications
+    periodSeconds: 10
+    #
+    # -- Time to wait for a response from the database
+    # @section -- Radicale-Container-Probes specifications
+    timeoutSeconds: 5
+    #
+    # -- Number of consecutive failures before restarting the Pod
+    # @section -- Radicale-Container-Probes specifications
+    failureThreshold: 3
+    #
+    # -- Number of successful checks before considering the Pod healthy (again)
+    # @section -- Radicale-Container-Probes specifications
+    successThreshold: 1
+  #
+  readinessProbe:
+    #
+    # -- Whether to enable the Readiness-Probe
+    # @section -- Radicale-Container-Probes specifications
+    enabled: true
+    #
+    # -- How long to wait before starting the first readiness Probe after the container starts
+    # @section -- Radicale-Container-Probes specifications
+    initialDelaySeconds: 30
+    #
+    # -- How often to perform the readiness checks after the initial delay
+    # @section -- Radicale-Container-Probes specifications
+    periodSeconds: 5
+    #
+    # -- The maximum amount of time the probe will wait for a response from the application
+    # @section -- Radicale-Container-Probes specifications
+    timeoutSeconds: 2
+    #
+    # -- Number of consecutive failures before restarting the Pod
+    # @section -- Radicale-Container-Probes specifications
+    failureThreshold: 3
+    #
+    # -- Number of successful checks before considering the Pod healthy
+    # @section -- Radicale-Container-Probes specifications
+    successThreshold: 1
 
 
 # =================================================================
@@ -188,10 +189,13 @@ containers:
 #
 authentication:
   #
-  # -- Name of an existing Secret for Users.
-  # A Secret will be created if not set.
+  # -- Whether to use an existing Secret instead
   # @section -- Radicale-Authentication specifications
-  existingSecretName: ""
+  useExistingSecret: false
+  #
+  # -- Name of the Secret (overrides the default Name)
+  # @section -- Radicale-Authentication specifications
+  secretName: ""
   #
   # -- Secret-Key Name for Users
   # @section -- Radicale-Authentication specifications
@@ -215,7 +219,7 @@ persistence:
   #
   # -- Whether to create a new PVC
   # @section -- Radicale-Persistence specifications
-  createNewPVC: true
+  createPVC: true
   #
   # -- StorageClassName of the PVC
   # @section -- Radicale-Persistence specifications
@@ -227,8 +231,7 @@ persistence:
   #
   # -- Access-Modes of the PVC
   # @section -- Radicale-Persistence specifications
-  accessModes:
-    - ReadWriteOnce
+  accessModes: ["ReadWriteOnce"]
   #
   # -- storage-request for the PVC
   # @section -- Radicale-Persistence specifications
@@ -239,54 +242,55 @@ persistence:
 # Config specifications
 # =================================================================
 #
-configFiles:
+configFile:
   #
-  # 'config'
-  config:
+  # -- Whether to use an existing ConfigMap instead
+  # @section -- Config specifications
+  useExistingConfigMap: false
+  #
+  # -- Name of the existing ConfigMap
+  # @section -- Config specifications
+  configMapName: ""
+  #
+  # -- Key to the ConfigMap-item
+  # @section -- Config specifications
+  configMapKey: "config.conf"
+  #
+  # Configure existing 'config'-file (will be ignored, if `useExistingConfigMap: true`)
+  dynamicValues:
     #
-    # -- Whether to use your own 'config'-file
-    # @section -- config Config-File
-    useOwnConfigFileContent: false
+    # -- `[server]`-Section
+    # @section -- Config specifications
+    serverSection: |-
+      hosts: 0.0.0.0:5232
     #
-    # -- Provide own 'config' file-content
-    # @section -- config Config-File
-    ownConfigFileContent: ""
+    # -- `[auth]`-Section
+    # @section -- Config specifications
+    authSection: |-
+      type = htpasswd
+      htpasswd_filename = /config/users
+      htpasswd_encryption = bcrypt
     #
-    # Configure existing 'config'-file (will be ignored, if `useOwnConfigFileContent: true`)
-    dynamicValues:
-      #
-      # -- `[server]`-Section
-      # @section -- config Config-File
-      serverSection: |-
-        hosts: 0.0.0.0:5232
-      #
-      # -- `[auth]`-Section
-      # @section -- config Config-File
-      authSection: |-
-        type = htpasswd
-        htpasswd_filename = /config/users
-        htpasswd_encryption = bcrypt
-      #
-      # -- `[rights]`-Section
-      # @section -- config Config-File
-      rightsSection: |-
-        type = owner_only
-      #
-      # -- `[storage]`-Section
-      # @section -- config Config-File
-      storageSection: |-
-        type = multifilesystem
-        filesystem_folder = /data/collections
-      #
-      # -- `[web]`-Section
-      # @section -- config Config-File
-      webSection: |-
-        type = internal
-      #
-      # -- `[logging]`-Section
-      # @section -- config Config-File
-      loggingSection: |-
-        level = info
+    # -- `[rights]`-Section
+    # @section -- Config specifications
+    rightsSection: |-
+      type = owner_only
+    #
+    # -- `[storage]`-Section
+    # @section -- Config specifications
+    storageSection: |-
+      type = multifilesystem
+      filesystem_folder = /data/collections
+    #
+    # -- `[web]`-Section
+    # @section -- Config specifications
+    webSection: |-
+      type = internal
+    #
+    # -- `[logging]`-Section
+    # @section -- Config specifications
+    loggingSection: |-
+      level = info
 
 
 # =================================================================
@@ -296,25 +300,25 @@ configFiles:
 ingressRoute:
   #
   # -- Whether to enable the IngressRoute for Radicale
-  # @section -- IngressRoute specifications
+  # @section -- Ingress - IngressRoute specifications
   enabled: false
   #
   # -- Listening for Incoming Connections/Requests
   # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
-  # @section -- IngressRoute specifications
+  # @section -- Ingress - IngressRoute specifications
   entryPoints: ["websecure"]
   #
   # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
   # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
-  # @section -- IngressRoute specifications
+  # @section -- Ingress - IngressRoute specifications
   certResolver: ""
   #
-  # -- Hostname
-  # @section -- IngressRoute specifications
-  host: ""
+  # -- Route-Match of the IngressRoute
+  # @section -- Ingress - IngressRoute specifications
+  routeMatch: Host(``)
 #
 # -- Traefik Middlewares that should be used by the IngressRoute-rule
-# @section -- IngressRoute specifications
+# @section -- Ingress - Middleware specifications
 middlewares: []
 # e.g.:
 #  - name: radicale-headers

@@ -67,31 +67,33 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 */}}
 {{- define "radicale.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "radicale.validateValues.configFiles.config" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.configFile" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
-
 {{- if $message -}}
 {{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/*
-Validate values of Radicale - configFile.config
+Validate values of Radicale - configFile
 */}}
-{{- define "radicale.validateValues.configFiles.config" -}}
-{{- $config := .Values.configFiles.config -}}
-{{- if and $config.useOwnConfigFileContent (not $config.ownConfigFileContent) -}}
-radicale: configFiles.config
-    You have to provide your own config-file content when enabling `.Values.configFiles.config.useOwnConfigFileContent`
-{{- end -}}
-{{- end -}}
+{{- define "radicale.validateValues.configFile" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $config := .Values.configFile -}}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n  > " $messages -}}
+{{- if $message -}}
+{{- printf " radicale: configFile\n   > %s" $message -}}
+{{- end }}
+{{- end }}
 
 {{/*
 Create the Radicale-Container-Image-URL
 */}}
 {{- define "radicale.containerImage" -}}
-{{- $containerImage := .Values.containers.radicale.image -}}
+{{- $containerImage := .Values.radicaleContainer.image -}}
 {{- $imageTag := $containerImage.tag | default .Chart.AppVersion -}}
 {{- printf "%s:%s" $containerImage.repository $imageTag }}
 {{- end }}
@@ -99,36 +101,69 @@ Create the Radicale-Container-Image-URL
 {{/*
 Create Secret-Name
 */}}
-{{- define "radicale.secret" -}}
-{{- $name := .Values.authentication.existingSecretName | default (include "radicale.fullname" .) -}}
-{{- printf "%s" $name }}
+{{- define "radicale.secretName" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $secretName := $authentication.secretName | default (include "radicale.fullname" .) -}}
+{{- printf "%s" $secretName }}
 {{- end }}
 
 {{/*
 Create IngressRoute-Name
 */}}
-{{- define "radicale.ingressRoute" -}}
+{{- define "radicale.ingressRouteName" -}}
 {{- printf "%s" (include "radicale.fullname" .) }}
 {{- end }}
 
 {{/*
 Create ConfigMap-Name
 */}}
-{{- define "radicale.configMap" -}}
-{{- printf "%s" (include "radicale.fullname" .) }}
+{{- define "radicale.configMapName" -}}
+{{- $configFile := .Values.configFile -}}
+{{- $configMapName :=  $configFile.configMapName | default (include "radicale.fullname" .) -}}
+{{- printf "%s" $configMapName }}
 {{- end }}
 
 {{/*
 Create Service-Name
 */}}
-{{- define "radicale.service" -}}
+{{- define "radicale.serviceName" -}}
 {{- printf "%s" (include "radicale.fullname" .) }}
 {{- end }}
 
 {{/*
-Create PVC-Name for NTFY
+Create PVC-Name for radicale
 */}}
-{{- define "radicale.pvc" -}}
+{{- define "radicale.pvcName" -}}
 {{- $claimName := .Values.persistence.claimName | default (include "radicale.fullname" .) -}}
 {{- printf "%s" $claimName }}
-{{- end -}}
+{{- end }}
+
+{{/*
+Create boolean whether the a ConfigMap-Resource needs to be created or not
+*/}}
+{{- define "radicale.createConfigMap" -}}
+{{- $configFile := .Values.configFile -}}
+{{- if not $configFile.useExistingConfigMap -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether the PersistentVolumeClaim needs to be created or not
+*/}}
+{{- define "radicale.createPVC" -}}
+{{- $persistence := .Values.persistence -}}
+{{- if and $persistence.enabled $persistence.createPVC -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether the Secret needs to be created or not
+*/}}
+{{- define "radicale.createSecret" -}}
+{{- $authentication := .Values.authentication -}}
+{{- if not $authentication.useExistingSecret -}}
+true
+{{- end }}
+{{- end }}
