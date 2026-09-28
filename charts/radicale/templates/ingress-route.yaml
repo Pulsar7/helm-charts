@@ -9,7 +9,7 @@ kind: IngressRoute
 metadata:
   name: {{ include "radicale.ingressRouteName" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels: {{- include "radicale.labels" . }}
+  labels: {{- include "radicale.labels" . | nindent 4 }}
 spec:
   entryPoints: {{- toYaml $ingressRoute.entryPoints | nindent 4 }}
   routes:
