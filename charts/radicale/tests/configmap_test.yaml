@@ -1,9 +1,9 @@
 #------------------------------------------------------------------------------
 #
-# ConfigMap-Unittests Test-Suite for Radicale
+# ConfigMap-Unittests Test-Suite for radicale
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
-# 
+#
 #------------------------------------------------------------------------------
 #
 suite: Test ConfigMap
@@ -12,15 +12,9 @@ templates:
   - templates/configmap.yaml
 #
 tests:
-  - it: should render configmap with custom config-file content
-    #
+  - it: should not render configmap resource
     set:
-      configFiles.config.useOwnConfigFileContent: true
-      configFiles.config.ownConfigFileContent: "test radicale-config-content"
-    #
+      configFile.useExistingConfigMap: true
     asserts:
-      - isKind:
-          of: ConfigMap
-      - equal:
-          path: data.config
-          value: "test radicale-config-content"
+      - notExists:
+          path: kind

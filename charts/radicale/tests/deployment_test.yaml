@@ -1,9 +1,9 @@
 #------------------------------------------------------------------------------
 #
-# Deployment-Unittests Test-Suite for Radicale
+# Deployment-Unittests Test-Suite for radicale
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
-# 
+#
 #------------------------------------------------------------------------------
 #
 # Test suite name to show on test result output
@@ -19,16 +19,14 @@ templates:
   - templates/secret.yaml
   - templates/pvc.yaml
   - templates/ingress-route.yaml
+  - templates/middlewares.yaml
   - templates/configmap.yaml
 #
 tests:
   - it: should render deployment with disabled persistence and without PVC
-    #
     template: templates/deployment.yaml
-    #
     set:
       persistence.enabled: false
-    #
     asserts:
       - isKind:
           of: Deployment
@@ -36,15 +34,12 @@ tests:
           path: spec.template.metadata.annotations["checksum/pvc"]
       - notExists:
           path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-  
+
   - it: should render deployment with enabled default created PVC
-    #
     template: templates/deployment.yaml
-    #
     set:
       persistence.enabled: true
       persistence.createNewPVC: true
-    #
     asserts:
       - isKind:
           of: Deployment
@@ -52,27 +47,21 @@ tests:
           path: spec.template.metadata.annotations["checksum/pvc"]
       - exists:
           path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-  
+
   - it: should render deployment with enabled IngressRoute
-    #
     template: templates/deployment.yaml
-    #
     set:
       ingressRoute.enabled: true
-    #
     asserts:
       - isKind:
           of: Deployment
       - exists:
           path: spec.template.metadata.annotations["checksum/ingress-route"]
-  
+
   - it: should render deployment without IngressRoute
-    #
     template: templates/deployment.yaml
-    #
     set:
       ingressRoute.enabled: false
-    #
     asserts:
       - isKind:
           of: Deployment
