@@ -1,12 +1,12 @@
-#------------------------------------------------------------------
+#------------------------------------------------------------------------
 #
-# Values for the Custom NTFY-Helm-Chart
+# Helm-Values for the ntfy-Helm chart
 #
-#------------------------------------------------------------------
+#------------------------------------------------------------------------
 
-# =================================================================
+# =======================================================================
 # Pod specifications
-# =================================================================
+# =======================================================================
 #
 # -- Number of Pods
 # @section -- Pod specifications
@@ -34,10 +34,6 @@ podAnnotations: {}
 # @section -- Pod specifications
 podLabels: {}
 #
-# -- Additional Volumes
-# @section -- Pod specifications
-additionalVolumes: {}
-#
 # -- Kubernetes only schedules the Pod onto nodes that have each of the labels you specify
 # @section -- Pod specifications
 nodeSelector: {}
@@ -49,25 +45,35 @@ affinity: {}
 # -- Tolerations allow the scheduler to schedule pods with matching taints
 # @section -- Pod specifications
 tolerations: {}
-
-
-# =================================================================
-# Container specifications
-# =================================================================
 #
-containers:
-  ntfy:
-    #
-    # Image specifications of the NTFY-Container
+# -- Additional Volumes
+# @section -- Pod specifications
+extraVolumes: {}
+
+
+# =======================================================================
+# Containers specifications
+# =======================================================================
+#
+# -- List of additional init-Containers
+# @section -- Additional init-Container specifications
+extraInitContainers: []
+#
+# -- List of sidecar-Containers
+# @section -- Additional sidecar-Containers
+extraContainers: []
+#
+ntfyContainer:
+  image:
     image:
       #
       # -- Container-Image-Repository
       # @section -- NTFY-Container specifications
       repository: "docker.io/binwiederhier/ntfy"
       #
-      # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
+      # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
       # @section -- NTFY-Container specifications
-      tag: "v2.26.0"
+      tag: ""
       #
       # -- Container-Image pull-policy
       # @section -- NTFY-Container specifications
@@ -85,116 +91,70 @@ containers:
     # -- Container Resources
     # @section -- NTFY-Container specifications
     resources: {}
-    #resources:
-    #  requests:
-    #    memory: 200Mi
-    #    cpu: 100m
-    #  limits:
-    #    memory: 500Mi
-    #    cpu: 500m
     #
     service:
-      # -- Service Type
-      # @section -- NTFY-Container specifications
-      type: ClusterIP
       #
-      # @ignored
+      # -- Name of the NTFY-Service resource
+      # @section -- NTFY-Service specifications
+      serviceName: ntfy-http
+      #
+      # -- Type of the NTFY-Service resource
+      # @section -- NTFY-Service specifications
+      type: ClusterIP
       ports:
         # @ignored
         - name: http
           #
-          # reference containerPort
-          # @ignored 
+          # container-Port
+          # @ignored
           containerPort: 5000
           #
-          # -- Exposed Container-Port
-          # @section -- NTFY-Container-Port
+          # -- Exposed Service-Port
+          # @section -- NTFY-Service specifications
           port: 5000
-          #
-          # reference containerPort by name
           # @ignored
           targetPort: http
-          #
+          # @ignored
           protocol: TCP
     #
-    # -- Additional Volume-Mounts for Container
+    # -- Additional VolumeMounts
     # @section -- NTFY-Container specifications
-    additionalVolumeMounts: {}
+    extraVolumeMonts: []
     #
-    # -- Additional Environment-variables
+    # -- Additional environment-Variables
     # @section -- NTFY-Container specifications
-    additionalEnv: {}
+    extraEnvs: []
     #
-    # -- Additional Arguments
+    # -- Additional Container-arguments
     # @section -- NTFY-Container specifications
-    additionalArgs: {}
+    extraArgs: []
     #
-    probes:
-      #
-      livenessProbe:
-        #
-        # -- Whether to enable the Liveness-Probe
-        # @section -- NTFY-Container-Probes specifications
-        enabled: true
-        #
-        # -- Initial Delay in Seconds
-        # @section -- NTFY-Container-Probes specifications
-        initialDelaySeconds: 30
-        #
-        # -- How often to perform the liveness checks
-        # @section -- NTFY-Container-Probes specifications
-        periodSeconds: 10
-        #
-        # -- Time to wait for a response from the database
-        # @section -- NTFY-Container-Probes specifications
-        timeoutSeconds: 5
-        #
-        # -- Number of consecutive failures before restarting the Pod
-        # @section -- NTFY-Container-Probes specifications
-        failureThreshold: 3
-        #
-        # -- Number of successful checks before considering the Pod healthy (again)
-        # @section -- NTFY-Container-Probes specifications
-        successThreshold: 1
-      #
-      readinessProbe:
-        #
-        # -- Whether to enable the Readiness-Probe
-        # @section -- NTFY-Container-Probes specifications
-        enabled: true
-        #
-        # -- How long to wait before starting the first readiness Probe after the container starts
-        # @section -- NTFY-Container-Probes specifications
-        initialDelaySeconds: 30
-        #
-        # -- How often to perform the readiness checks after the initial delay
-        # @section -- NTFY-Container-Probes specifications
-        periodSeconds: 5
-        #
-        # -- The maximum amount of time the probe will wait for a response from the application
-        # @section -- NTFY-Container-Probes specifications
-        timeoutSeconds: 2
-        #
-        # -- Number of consecutive failures before restarting the Pod
-        # @section -- NTFY-Container-Probes specifications
-        failureThreshold: 3
-        #
-        # -- Number of successful checks before considering the Pod healthy
-        # @section -- NTFY-Container-Probes specifications
-        successThreshold: 1
+    # -- Startup-Probe
+    # @section -- NTFY-Container specifications
+    startupProbe: {}
+    #
+    # -- Readiness-Probe
+    # @section -- NTFY-Container specifications
+    readinessProbe: {}
+    #
+    # -- Liveness-Probe
+    # @section -- NTFY-Container specifications
+    livenessProbe: {}
 
 
-# =================================================================
+# =======================================================================
 # Authentication specifications
-# =================================================================
-#
+# =======================================================================
 authentication:
   authTokens:
     #
-    # -- Name of an existing Secret for Authentication-Tokens.
-    # A Secret will be created if not set.
+    # -- Whether to use an existing Secret or not
     # @section -- NTFY-Authentication specifications
-    existingSecretName: ""
+    useExistingSecret: false
+    #
+    # -- Name of the Secret for Authentication-Tokens.
+    # @section -- NTFY-Authentication specifications
+    secretName: ""
     #
     # -- Secret-Key Name for Authentication-Tokens
     # @section -- NTFY-Authentication specifications
@@ -202,10 +162,13 @@ authentication:
   #
   authUsers:
     #
-    # -- Name of an existing Secret for Authentication-Users.
-    # A Secret will be created if not set.
+    # -- Whether to use an existing Secret or not
     # @section -- NTFY-Authentication specifications
-    existingSecretName: ""
+    useExistingSecret: false
+    #
+    # -- Name of the Secret for Authentication-Users.
+    # @section -- NTFY-Authentication specifications
+    secretName: ""
     #
     # -- Secret-Key Name for Authentication-Users
     # @section -- NTFY-Authentication specifications
@@ -213,10 +176,13 @@ authentication:
   #
   authAccess:
     #
-    # -- Name of an existing Secret for Authentication-Access.
-    # A Secret will be created if not set.
+    # -- Whether to use an existing Secret or not
     # @section -- NTFY-Authentication specifications
-    existingSecretName: ""
+    useExistingSecret: false
+    #
+    # -- Name of the Secret for Authentication-Access.
+    # @section -- NTFY-Authentication specifications
+    secretName: ""
     #
     # -- Secret-Key Name for Authentication-Access
     # @section -- NTFY-Authentication specifications
@@ -226,294 +192,276 @@ authentication:
 # =================================================================
 # Persistence specifications
 # =================================================================
-#
 persistence:
   #
   # -- Whether to enable persistence for 'cache.db' and 'user.db' (enables PVC)
+  # Otherwise an emptyDir gets used the the databases.
   # @section -- NTFY-Persistence specifications
   enabled: false
   #
-  # -- SizeLimit for emptyDir (used when persistence/PVC is disabled)
+  # -- EmptyDir-Object that is being used when persistence is disabled.
   # @section -- NTFY-Persistence specifications
-  emptyDirSizeLimit: "1Gi"
+  emptyDir:
+    sizeLimit: 1Gi
   #
-  # -- Whether to create a new PVC
-  # @section -- NTFY-Persistence specifications
-  createNewPVC: true
-  #
-  # -- StorageClassName of the PVC
-  # @section -- NTFY-Persistence specifications
-  storageClassName: ""
-  #
-  # -- Name of the PVC
-  # @section -- NTFY-Persistence specifications
-  claimName: "ntfy-data-pvc"
-  #
-  # -- Access-Modes of the PVC
-  # @section -- NTFY-Persistence specifications
-  accessModes:
-    - ReadWriteOnce
-  #
-  # -- storage-request for the PVC
-  # @section -- NTFY-Persistence specifications
-  storageRequest: "5Gi"
-
-
-# =================================================================
-# Config specifications
-# =================================================================
-#
-configFiles:
-  #
-  # 'server.yaml'
-  serverYAML:
+  persistentVolumeClaim:
     #
-    # -- Whether to use your own 'server.yaml'-file
-    # @section -- server.yaml Config-File
-    useOwnConfigFileContent: false
+    # -- Whether to use an existing PersistentVolumeClaim or not.
+    # @section -- NTFY-Persistence specifications
+    useExistingPVC: true
     #
-    # -- Provide own 'server.yaml' file-content
-    # @section -- server.yaml Config-File
-    ownConfigFileContent: ""
-    #ownConfigFileContent: |
+    # -- StorageClassName of the PVC.
+    # ignored when `useExistingPVC: false`
+    # @section -- NTFY-Persistence specifications
+    storageClassName: ""
     #
-    # Configure existing 'server.yaml'-file (will be ignored, if `useOwnConfigFileContent: true`)
-    dynamicValues:
-      #
-      # -- Additional NTFY-YAML-Configuration that gets appended
-      # to the YAML-config.
-      # @section -- server.yaml Config-File
-      additionalConfig: {}
-      #
-      # -- Whether NTFY is behind a Proxy
-      # @section -- server.yaml Config-File
-      behindProxy: false
-      #
-      # -- Forwarded Proxy-Header (e.g. "X-Forwarded-For")
-      # @section -- server.yaml Config-File
-      proxyForwardedHeader: ""
-      #
-      # -- A comma-separated list of IP addresses, hostnames or CIDRs that are removed from 
-      # the forwarded header to determine the real IP address (e.g. "1.2.3.4, 5.6.7.8")
-      # @section -- server.yaml Config-File
-      proxyTrustedHosts: ""
-      #
-      # -- Public facing base URL of the service
-      # @section -- server.yaml Config-File
-      baseURL: ""
-      #
-      attachments:
-        #
-        # -- Whether to enable attachments.
-        # `baseURL` and `attachments.cacheDir` has to be set!
-        # @section -- server.yaml Config-File
-        enabled: false
-        #
-        # -- The cache directory for attached files
-        # @section -- server.yaml Config-File
-        cacheDir: "/var/lib/ntfy"
-        #
-        # -- The limit of the on-disk attachment cache directory (total size)
-        # @section -- server.yaml Config-File
-        totalSizeLimit: "5G"
-        #
-        # -- The per-file attachment size limit (e.g. 300k, 2M, 100M)
-        # @section -- server.yaml Config-File
-        fileSizeLimit: "15M"
-        #
-        # -- The duration after which uploaded attachments will be deleted (e.g. 3h, 20h)
-        # @section -- server.yaml Config-File
-        expiryDuration: "3h"
-      #
-      rateLimits:
-        #
-        # -- Whether to enable subscriber-based rate limiting (mostly used for UnifiedPush)
-        # @section -- server.yaml Config-File
-        visitorSubscriberRateLimiting: false
-        #
-        # -- The max size of a message body
-        # @section -- server.yaml Config-File
-        messageSizeLimit: "4k"
-        #
-        # -- The max delay of a message when using the "Delay" header
-        # @section -- server.yaml Config-File
-        messageDelayLimit: "3d"
-        #
-        # -- Total number of topics before the server rejects new topics
-        # @section -- server.yaml Config-File
-        globalTopicLimit: 15000
-        #
-        # -- Number of subscriptions per visitor (IP address)
-        # @section -- server.yaml Config-File
-        visitorSubscriptionLimit: 30
-        #
-        # -- The initial bucket of requests each visitor has
-        # @section -- server.yaml Config-File
-        visitorRequestLimitBurst: 60
-        #
-        # -- The rate at which the bucket is refilled
-        # @section -- server.yaml Config-File
-        visitorRequestLimitReplenish: "5s"
-        #
-        # -- A comma-separated list of hostnames, IPs or CIDRs to be
-        # exempt from request rate limiting. Hostnames are resolved at the time the server is started.
-        # Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24"
-        # @section -- server.yaml Config-File
-        visitorRequestLimitExemptHosts: ""
-        #
-        # -- Hard daily limit of messages per visitor and day. The limit is reset
-        # every day at midnight UTC. If the limit is not set (or set to zero), the request
-        # limit (see above) governs the upper limit.
-        # @section -- server.yaml Config-File
-        visitorMessageDailyLimit: 0
-        #
-        # -- The total storage limit used for attachments per visitor
-        # @section -- server.yaml Config-File
-        visitorAttachmentTotalSizeLimit: "100M"
-        #
-        # -- The total daily attachment download/upload traffic limit per visitor
-        # @section -- server.yaml Config-File
-        visitorAttachmentDailyBandwidthLimit: "500M"
-      #
-      # -- auth-file
-      # @section -- server.yaml Config-File
-      authFile: "/var/lib/ntfy/user.db"
-      #
-      # -- auth-default-access
-      # @section -- server.yaml Config-File
-      authDefaultAccess: "deny-all"
-      #
-      # -- auth-users (Secret is recommended instead)
-      # @section -- server.yaml Config-File
-      authUsers: []
-      #authUsers:
-      #  - "test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin"
-      #  - "test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user"
-      #
-      # -- auth-access (Secret is recommended instead)
-      # @section -- server.yaml Config-File
-      authAccess: []
-      #authAccess:
-      #  - "test-user:TestTopic:rw"
-      #
-      # -- auth-tokens (Secret is recommended instead)
-      # @section -- server.yaml Config-File
-      authTokens: []
-      #authTokens:
-      #  - "test-user:tk_84t6qy4qxadevc37jbqty4q8xlpzl:Test-Token for Test-User"
-      #
-      # -- Messages are cached in a local SQLite database instead of only in-memory
-      # @section -- server.yaml Config-File
-      cacheFile: "/var/lib/ntfy/cache.db"
-      #
-      # -- Defines the duration for which messages will be buffered
-      # before they are deleted
-      # @section -- server.yaml Config-File
-      cacheDuration: "72h"
-      #
-      # -- Allow enabling async batch writing of messages.
-      # If set, messages will be queued and written to the database in batches of the given
-      # size, or after the given timeout. This is only required for high volume servers.
-      # @section -- server.yaml Config-File
-      cacheBatchSize: 0
-      #
-      # -- Allow enabling async batch writing of messages.
-      # If set, messages will be queued and written to the database in batches of the given
-      # size, or after the given timeout. This is only required for high volume servers.
-      # @section -- server.yaml Config-File
-      cacheBatchTimeout: "0ms"
-      #
-      # -- Allows to run commands when the database is initialized
-      # @section -- server.yaml Config-File
-      cacheStartupQueries: ""
-      #
-      # -- Interval in which the manager prunes old messages, deletes topics
-      # and prints the stats
-      # @section -- server.yaml Config-File
-      managerInterval: "1m"
-      #
-      # -- Topic names that are not allowed
-      # @section -- server.yaml Config-File
-      disallowedTopics: []
-      #disallowedTopics:
-      #  - Test
-      #  - Not-Allowed
-      #  - NotAllowed
-      #  - Invalid
-      # 
-      # -- Defines the root path of the web app, or disables the web app entirely
-      # @section -- server.yaml Config-File
-      webRoot: /
-      #
-      # -- Whether to allow users to sign up via the web app, or API.
-      # `enableLogin` needs to be set when enabled.
-      # @section -- server.yaml Config-File
-      enableSignup: false
-      #
-      # -- Whether to redirect users to the login page if they are not logged in (disallows web app access without login).
-      # `enableLogin` needs to be set when enabled.
-      # @section -- server.yaml Config-File
-      requireLogin: false
-      #
-      # -- Whether to allow users to log in via the web app, or API
-      # @section -- server.yaml Config-File
-      enableLogin: false
-      #
-      # -- Whether to allow users to reserve topics (if their tier allows it)
-      # @section -- server.yaml Config-File
-      enableReservations: false
-      #
-      # -- Whether to enable Prometheus-style metrics via a `/metrics` endpoint 
-      # or on a dedicated listen IP/port
-      # @section -- server.yaml Config-File
-      enableMetrics: false
-      #
-      # -- Exposes the metrics endpoint via a dedicated [IP]:port
-      # @section -- server.yaml Config-File
-      #metricsListenHttp: ":9090"
-      #
-      # -- Defines the default log level
-      # @section -- server.yaml Config-File
-      logLevel: "info"
-      #
-      # -- Log-level-overrides (for debugging, only use temporarily)
-      # @section -- server.yaml Config-File
-      logLevelOverrides: []
-      #logLevelOverrides:
-      #  - "tag=manager -> trace"
-      #  - "visitor_ip=1.2.3.4 -> debug"
-      #  - "time_taken_ms -> debug"
-      #
-      # -- Defines the output format, can be "text" (default) or "json"
-      # @section -- server.yaml Config-File
-      logFormat: "json"
-      #
-      # -- Filename to write logs to. If this is not set, ntfy logs to stderr.
-      # @section -- server.yaml Config-File
-      logFile: ""
+    # -- Name of the PVC
+    # @section -- NTFY-Persistence specifications
+    claimName: "ntfy-data-pvc"
+    #
+    # -- Access-Modes of the PVC.
+    # ignored when `useExistingPVC: false`
+    # @section -- NTFY-Persistence specifications
+    accessModes: ["ReadWriteOnce"]
+    #
+    # -- `resources.storage.request` for the PVC.
+    # ignored when `useExistingPVC: false`
+    # @section -- NTFY-Persistence specifications
+    storageRequest: "5Gi"
+    #
+    # -- additional specs for the PVC.
+    # ignored when `useExistingPVC: false`
+    # @section -- NTFY-Persistence specifications
+    extraSpecs: {}
 
 
 # =================================================================
-# IngressRoute specifications
+# Config-files specifications
 # =================================================================
-#
-ingressRoute:
+serverConfig:
   #
-  # -- Whether to enable the IngressRoute for NTFY
-  # @section -- IngressRoute specifications
-  enabled: false
+  # -- Whether to use an existing ConfigMap instead of creating one.
+  # @section -- Server-Config specifications
+  useExistingConfigMap: false
   #
-  # -- Traefik EntryPoints
-  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
-  # @section -- IngressRoute specifications
-  entryPoints:
-    - websecure
+  # -- Name of the ConfigMap
+  # @section -- Server-Config specifications
+  configMapName: ""
   #
-  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
-  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
-  # @section -- IngressRoute specifications
-  certResolver: ""
+  # -- Key to the ConfigMap-item
+  # @section -- Server-Config specifications
+  configMapItemKey: "server.yaml"
   #
-  # -- Hostname
-  # @section -- IngressRoute specifications
-  host: ""
+  # ignored when `useExistingConfigMap: true`
+  dynamicValues:
+    #
+    # -- Append additional lines to the server-config-file
+    # @section -- Server-Config specifications
+    extraConfig: ""
+    #
+    # -- Whether NTFY is behind a Proxy
+    # @section -- Server-Config specifications
+    behindProxy: false
+    #
+    # -- Forwarded Proxy-Header (e.g. "X-Forwarded-For")
+    # @section -- Server-Config specifications
+    proxyForwardedHeader: ""
+    #
+    # -- A comma-separated list of IP addresses, hostnames or CIDRs that are removed from 
+    # the forwarded header to determine the real IP address (e.g. "1.2.3.4, 5.6.7.8")
+    # @section -- Server-Config specifications
+    proxyTrustedHosts: ""
+    #
+    # -- Public facing base URL of the service
+    # @section -- Server-Config specifications
+    baseURL: ""
+    #
+    attachments:
+      #
+      # -- Whether to enable attachments.
+      # `baseURL` and `attachments.cacheDir` has to be set!
+      # @section -- Server-Config specifications
+      enabled: false
+      #
+      # -- The cache directory for attached files
+      # @section -- Server-Config specifications
+      cacheDir: "/var/lib/ntfy"
+      #
+      # -- The limit of the on-disk attachment cache directory (total size)
+      # @section -- Server-Config specifications
+      totalSizeLimit: "5G"
+      #
+      # -- The per-file attachment size limit (e.g. 300k, 2M, 100M)
+      # @section -- Server-Config specifications
+      fileSizeLimit: "15M"
+      #
+      # -- The duration after which uploaded attachments will be deleted (e.g. 3h, 20h)
+      # @section -- Server-Config specifications
+      expiryDuration: "3h"
+    #
+    rateLimits:
+      #
+      # -- Whether to enable subscriber-based rate limiting (mostly used for UnifiedPush)
+      # @section -- Server-Config specifications
+      visitorSubscriberRateLimiting: false
+      #
+      # -- The max size of a message body
+      # @section -- Server-Config specifications
+      messageSizeLimit: "4k"
+      #
+      # -- The max delay of a message when using the "Delay" header
+      # @section -- Server-Config specifications
+      messageDelayLimit: "3d"
+      #
+      # -- Total number of topics before the server rejects new topics
+      # @section -- Server-Config specifications
+      globalTopicLimit: 15000
+      #
+      # -- Number of subscriptions per visitor (IP address)
+      # @section -- Server-Config specifications
+      visitorSubscriptionLimit: 30
+      #
+      # -- The initial bucket of requests each visitor has
+      # @section -- Server-Config specifications
+      visitorRequestLimitBurst: 60
+      #
+      # -- The rate at which the bucket is refilled
+      # @section -- Server-Config specifications
+      visitorRequestLimitReplenish: "5s"
+      #
+      # -- A comma-separated list of hostnames, IPs or CIDRs to be
+      # exempt from request rate limiting. Hostnames are resolved at the time the server is started.
+      # Example: "1.2.3.4,ntfy.example.com,8.7.6.0/24"
+      # @section -- Server-Config specifications
+      visitorRequestLimitExemptHosts: ""
+      #
+      # -- Hard daily limit of messages per visitor and day. The limit is reset
+      # every day at midnight UTC. If the limit is not set (or set to zero), the request
+      # limit (see above) governs the upper limit.
+      # @section -- Server-Config specifications
+      visitorMessageDailyLimit: 0
+      #
+      # -- The total storage limit used for attachments per visitor
+      # @section -- Server-Config specifications
+      visitorAttachmentTotalSizeLimit: "100M"
+      #
+      # -- The total daily attachment download/upload traffic limit per visitor
+      # @section -- Server-Config specifications
+      visitorAttachmentDailyBandwidthLimit: "500M"
+    #
+    # -- auth-file
+    # @section -- Server-Config specifications
+    authFile: "/var/lib/ntfy/user.db"
+    #
+    # -- auth-default-access
+    # @section -- Server-Config specifications
+    authDefaultAccess: "deny-all"
+    #
+    # -- auth-users (Secret is recommended instead)
+    # @section -- Server-Config specifications
+    authUsers: []
+    #authUsers:
+    #  - "test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin"
+    #  - "test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user"
+    #
+    # -- auth-access (Secret is recommended instead)
+    # @section -- Server-Config specifications
+    authAccess: []
+    #authAccess:
+    #  - "test-user:TestTopic:rw"
+    #
+    # -- auth-tokens (Secret is recommended instead)
+    # @section -- Server-Config specifications
+    authTokens: []
+    #authTokens:
+    #  - "test-user:tk_84t6qy4qxadevc37jbqty4q8xlpzl:Test-Token for Test-User"
+    #
+    # -- Messages are cached in a local SQLite database instead of only in-memory
+    # @section -- Server-Config specifications
+    cacheFile: "/var/lib/ntfy/cache.db"
+    #
+    # -- Defines the duration for which messages will be buffered
+    # before they are deleted
+    # @section -- Server-Config specifications
+    cacheDuration: "72h"
+    #
+    # -- Allow enabling async batch writing of messages.
+    # If set, messages will be queued and written to the database in batches of the given
+    # size, or after the given timeout. This is only required for high volume servers.
+    # @section -- Server-Config specifications
+    cacheBatchSize: 0
+    #
+    # -- Allow enabling async batch writing of messages.
+    # If set, messages will be queued and written to the database in batches of the given
+    # size, or after the given timeout. This is only required for high volume servers.
+    # @section -- Server-Config specifications
+    cacheBatchTimeout: "0ms"
+    #
+    # -- Allows to run commands when the database is initialized
+    # @section -- Server-Config specifications
+    cacheStartupQueries: ""
+    #
+    # -- Interval in which the manager prunes old messages, deletes topics
+    # and prints the stats
+    # @section -- Server-Config specifications
+    managerInterval: "1m"
+    #
+    # -- Topic names that are not allowed
+    # @section -- Server-Config specifications
+    disallowedTopics: []
+    #disallowedTopics:
+    #  - Test
+    #  - Not-Allowed
+    #  - NotAllowed
+    #  - Invalid
+    # 
+    # -- Defines the root path of the web app, or disables the web app entirely
+    # @section -- Server-Config specifications
+    webRoot: /
+    #
+    # -- Whether to allow users to sign up via the web app, or API.
+    # `enableLogin` needs to be set when enabled.
+    # @section -- Server-Config specifications
+    enableSignup: false
+    #
+    # -- Whether to redirect users to the login page if they are not logged in (disallows web app access without login).
+    # `enableLogin` needs to be set when enabled.
+    # @section -- Server-Config specifications
+    requireLogin: false
+    #
+    # -- Whether to allow users to log in via the web app, or API
+    # @section -- Server-Config specifications
+    enableLogin: false
+    #
+    # -- Whether to allow users to reserve topics (if their tier allows it)
+    # @section -- Server-Config specifications
+    enableReservations: false
+    #
+    # -- Whether to enable Prometheus-style metrics via a `/metrics` endpoint 
+    # or on a dedicated listen IP/port
+    # @section -- Server-Config specifications
+    enableMetrics: false
+    #
+    # -- Exposes the metrics endpoint via a dedicated [IP]:port
+    # @section -- Server-Config specifications
+    #metricsListenHttp: ":9090"
+    #
+    # -- Defines the default log level
+    # @section -- Server-Config specifications
+    logLevel: "info"
+    #
+    # -- Log-level-overrides (for debugging, only use temporarily)
+    # @section -- Server-Config specifications
+    logLevelOverrides: []
+    #logLevelOverrides:
+    #  - "tag=manager -> trace"
+    #  - "visitor_ip=1.2.3.4 -> debug"
+    #  - "time_taken_ms -> debug"
+    #
+    # -- Defines the output format, can be "text" (default) or "json"
+    # @section -- Server-Config specifications
+    logFormat: "json"
+    #
+    # -- Filename to write logs to. If this is not set, ntfy logs to stderr.
+    # @section -- Server-Config specifications
+    logFile: ""
