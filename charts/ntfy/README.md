@@ -24,12 +24,15 @@ Helm chart to deploy ntfy
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| authentication.authAccess.defaultSecretValue | string | `"test-user:TestTopic:rw"` | Default Secret-Value. ignored when `authTokens.useExistingSecret: true` |
 | authentication.authAccess.secretKey | string | `"auth-access"` | Secret-Key Name for Authentication-Access |
 | authentication.authAccess.secretName | string | `""` | Name of the Secret for Authentication-Access. |
 | authentication.authAccess.useExistingSecret | bool | `false` | Whether to use an existing Secret or not |
+| authentication.authTokens.defaultSecretValue | string | `"test-user:tk_84t6qy4qxadevc37jbqty4q8xlpzl:Test-Token for Test-User"` | Default Secret-Value. ignored when `authTokens.useExistingSecret: true` |
 | authentication.authTokens.secretKey | string | `"auth-tokens"` | Secret-Key Name for Authentication-Tokens |
 | authentication.authTokens.secretName | string | `""` | Name of the Secret for Authentication-Tokens. |
 | authentication.authTokens.useExistingSecret | bool | `false` | Whether to use an existing Secret or not |
+| authentication.authUsers.defaultSecretValue | string | `"test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin,test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user"` | Default Secret-Value. ignored when `authTokens.useExistingSecret: true` |
 | authentication.authUsers.secretKey | string | `"auth-users"` | Secret-Key Name for Authentication-Users |
 | authentication.authUsers.secretName | string | `""` | Name of the Secret for Authentication-Users. |
 | authentication.authUsers.useExistingSecret | bool | `false` | Whether to use an existing Secret or not |
@@ -50,33 +53,34 @@ Helm chart to deploy ntfy
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ntfyContainer.image.extraArgs | list | `[]` | Additional Container-arguments |
-| ntfyContainer.image.extraEnvs | list | `[]` | Additional environment-Variables |
-| ntfyContainer.image.extraVolumeMonts | list | `[]` | Additional VolumeMounts |
-| ntfyContainer.image.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
-| ntfyContainer.image.image.repository | string | `"docker.io/binwiederhier/ntfy"` | Container-Image-Repository |
-| ntfyContainer.image.image.tag | string | `""` | Container-Image-Tag (overrides `.Chart.AppVersion`) |
-| ntfyContainer.image.livenessProbe | object | `{}` | Liveness-Probe |
-| ntfyContainer.image.readinessProbe | object | `{}` | Readiness-Probe |
-| ntfyContainer.image.resources | object | `{}` | Container Resources |
-| ntfyContainer.image.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Container Security Context |
-| ntfyContainer.image.startupProbe | object | `{}` | Startup-Probe |
+| ntfyContainer.extraArgs | list | `[]` | Additional Container-arguments |
+| ntfyContainer.extraEnvs | list | `[]` | Additional environment-Variables |
+| ntfyContainer.extraVolumeMonts | list | `[]` | Additional VolumeMounts |
+| ntfyContainer.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
+| ntfyContainer.image.registry | string | `"docker.io"` | Container-Image registry |
+| ntfyContainer.image.repository | string | `"binwiederhier/ntfy"` | Container-Image repository |
+| ntfyContainer.image.tag | string | `""` | Container-Image-Tag (overrides `.Chart.AppVersion`) |
+| ntfyContainer.livenessProbe | object | `{}` | Liveness-Probe |
+| ntfyContainer.readinessProbe | object | `{}` | Readiness-Probe |
+| ntfyContainer.resources | object | `{}` | Container Resources |
+| ntfyContainer.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Container Security Context |
+| ntfyContainer.startupProbe | object | `{}` | Startup-Probe |
 
 ### NTFY-Service specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ntfyContainer.image.service.serviceName | string | `"ntfy-http"` | Name of the NTFY-Service resource |
-| ntfyContainer.image.service.type | string | `"ClusterIP"` | Type of the NTFY-Service resource |
+| ntfyContainer.service.serviceName | string | `"ntfy-http"` | Name of the NTFY-Service resource |
+| ntfyContainer.service.type | string | `"ClusterIP"` | Type of the NTFY-Service resource |
 
 ### NTFY-Persistence specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | persistence.emptyDir | object | `{"sizeLimit":"1Gi"}` | EmptyDir-Object that is being used when persistence is disabled. |
-| persistence.enabled | bool | `false` | Whether to enable persistence for 'cache.db' and 'user.db' (enables PVC) Otherwise an emptyDir gets used the the databases. |
+| persistence.enabled | bool | `true` | Whether to enable persistence for 'cache.db' and 'user.db' (enables PVC) Otherwise an emptyDir gets used the the databases. |
 | persistence.persistentVolumeClaim.accessModes | list | `["ReadWriteOnce"]` | Access-Modes of the PVC. ignored when `useExistingPVC: false` |
-| persistence.persistentVolumeClaim.claimName | string | `"ntfy-data-pvc"` | Name of the PVC |
+| persistence.persistentVolumeClaim.claimName | string | `""` | Name of the PVC |
 | persistence.persistentVolumeClaim.extraSpecs | object | `{}` | additional specs for the PVC. ignored when `useExistingPVC: false` |
 | persistence.persistentVolumeClaim.storageClassName | string | `""` | StorageClassName of the PVC. ignored when `useExistingPVC: false` |
 | persistence.persistentVolumeClaim.storageRequest | string | `"5Gi"` | `resources.storage.request` for the PVC. ignored when `useExistingPVC: false` |
@@ -137,7 +141,7 @@ Helm chart to deploy ntfy
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ntfyContainer.image.service.ports | list | `[]` |  |
+| ntfyContainer.service.ports | list | `[]` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

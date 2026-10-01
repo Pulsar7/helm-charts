@@ -65,81 +65,84 @@ extraContainers: []
 #
 ntfyContainer:
   image:
-    image:
-      #
-      # -- Container-Image-Repository
-      # @section -- NTFY-Container specifications
-      repository: "docker.io/binwiederhier/ntfy"
-      #
-      # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
-      # @section -- NTFY-Container specifications
-      tag: ""
-      #
-      # -- Container-Image pull-policy
-      # @section -- NTFY-Container specifications
-      pullPolicy: IfNotPresent
     #
-    # -- Container Security Context
+    # -- Container-Image registry
     # @section -- NTFY-Container specifications
-    securityContext:
-      runAsUser: 10000
-      runAsGroup: 10000
-      runAsNonRoot: true
-      allowPrivilegeEscalation: false
-      privileged: false
+    registry: "docker.io"
     #
-    # -- Container Resources
+    # -- Container-Image repository
     # @section -- NTFY-Container specifications
-    resources: {}
+    repository: "binwiederhier/ntfy"
     #
-    service:
-      #
-      # -- Name of the NTFY-Service resource
-      # @section -- NTFY-Service specifications
-      serviceName: ntfy-http
-      #
-      # -- Type of the NTFY-Service resource
-      # @section -- NTFY-Service specifications
-      type: ClusterIP
-      ports:
+    # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
+    # @section -- NTFY-Container specifications
+    tag: ""
+    #
+    # -- Container-Image pull-policy
+    # @section -- NTFY-Container specifications
+    pullPolicy: IfNotPresent
+  #
+  # -- Container Security Context
+  # @section -- NTFY-Container specifications
+  securityContext:
+    runAsUser: 10000
+    runAsGroup: 10000
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+    privileged: false
+  #
+  # -- Container Resources
+  # @section -- NTFY-Container specifications
+  resources: {}
+  #
+  service:
+    #
+    # -- Name of the NTFY-Service resource
+    # @section -- NTFY-Service specifications
+    serviceName: ntfy-http
+    #
+    # -- Type of the NTFY-Service resource
+    # @section -- NTFY-Service specifications
+    type: ClusterIP
+    ports:
+      # @ignored
+      - name: http
+        #
+        # container-Port
         # @ignored
-        - name: http
-          #
-          # container-Port
-          # @ignored
-          containerPort: 5000
-          #
-          # -- Exposed Service-Port
-          # @section -- NTFY-Service specifications
-          port: 5000
-          # @ignored
-          targetPort: http
-          # @ignored
-          protocol: TCP
-    #
-    # -- Additional VolumeMounts
-    # @section -- NTFY-Container specifications
-    extraVolumeMonts: []
-    #
-    # -- Additional environment-Variables
-    # @section -- NTFY-Container specifications
-    extraEnvs: []
-    #
-    # -- Additional Container-arguments
-    # @section -- NTFY-Container specifications
-    extraArgs: []
-    #
-    # -- Startup-Probe
-    # @section -- NTFY-Container specifications
-    startupProbe: {}
-    #
-    # -- Readiness-Probe
-    # @section -- NTFY-Container specifications
-    readinessProbe: {}
-    #
-    # -- Liveness-Probe
-    # @section -- NTFY-Container specifications
-    livenessProbe: {}
+        containerPort: 5000
+        #
+        # -- Exposed Service-Port
+        # @section -- NTFY-Service specifications
+        port: 5000
+        # @ignored
+        targetPort: http
+        # @ignored
+        protocol: TCP
+  #
+  # -- Additional VolumeMounts
+  # @section -- NTFY-Container specifications
+  extraVolumeMonts: []
+  #
+  # -- Additional environment-Variables
+  # @section -- NTFY-Container specifications
+  extraEnvs: []
+  #
+  # -- Additional Container-arguments
+  # @section -- NTFY-Container specifications
+  extraArgs: []
+  #
+  # -- Startup-Probe
+  # @section -- NTFY-Container specifications
+  startupProbe: {}
+  #
+  # -- Readiness-Probe
+  # @section -- NTFY-Container specifications
+  readinessProbe: {}
+  #
+  # -- Liveness-Probe
+  # @section -- NTFY-Container specifications
+  livenessProbe: {}
 
 
 # =======================================================================
@@ -159,6 +162,12 @@ authentication:
     # -- Secret-Key Name for Authentication-Tokens
     # @section -- NTFY-Authentication specifications
     secretKey: "auth-tokens"
+    #
+    # -- Default Secret-Value.
+    # ignored when `authTokens.useExistingSecret: true`
+    # @section -- NTFY-Authentication specifications
+    defaultSecretValue: |-
+      test-user:tk_84t6qy4qxadevc37jbqty4q8xlpzl:Test-Token for Test-User
   #
   authUsers:
     #
@@ -173,6 +182,12 @@ authentication:
     # -- Secret-Key Name for Authentication-Users
     # @section -- NTFY-Authentication specifications
     secretKey: "auth-users"
+    #
+    # -- Default Secret-Value.
+    # ignored when `authTokens.useExistingSecret: true`
+    # @section -- NTFY-Authentication specifications
+    defaultSecretValue: |-
+      test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin,test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user
   #
   authAccess:
     #
@@ -187,6 +202,12 @@ authentication:
     # -- Secret-Key Name for Authentication-Access
     # @section -- NTFY-Authentication specifications
     secretKey: "auth-access"
+    #
+    # -- Default Secret-Value.
+    # ignored when `authTokens.useExistingSecret: true`
+    # @section -- NTFY-Authentication specifications
+    defaultSecretValue: |-
+      test-user:TestTopic:rw
 
 
 # =================================================================
@@ -197,7 +218,7 @@ persistence:
   # -- Whether to enable persistence for 'cache.db' and 'user.db' (enables PVC)
   # Otherwise an emptyDir gets used the the databases.
   # @section -- NTFY-Persistence specifications
-  enabled: false
+  enabled: true
   #
   # -- EmptyDir-Object that is being used when persistence is disabled.
   # @section -- NTFY-Persistence specifications
@@ -217,7 +238,7 @@ persistence:
     #
     # -- Name of the PVC
     # @section -- NTFY-Persistence specifications
-    claimName: "ntfy-data-pvc"
+    claimName: ""
     #
     # -- Access-Modes of the PVC.
     # ignored when `useExistingPVC: false`
@@ -417,7 +438,7 @@ serverConfig:
     # 
     # -- Defines the root path of the web app, or disables the web app entirely
     # @section -- Server-Config specifications
-    webRoot: /
+    webRoot: "/"
     #
     # -- Whether to allow users to sign up via the web app, or API.
     # `enableLogin` needs to be set when enabled.

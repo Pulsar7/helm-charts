@@ -72,9 +72,93 @@ true
 {{- end }}
 
 {{/*
+Create boolean whether to create the ConfigMap-resource or not.
+*/}}
+{{- define "ntfy.createSecret" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authTokens := $authentication.authTokens -}}
+{{- $authUsers := $authentication.authUsers -}}
+{{- $authAccess := $authentication.authAccess -}}
+{{- if or (not $authTokens.useExistingSecret) (not $authUsers.useExistingSecret) (not $authAccess.useExistingSecret) -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether to create the PVC-resource or not.
+*/}}
+{{- define "ntfy.createPersistentVolumeClaim" -}}
+{{- $persistence := .Values.persistence -}}
+{{- $pvc := $persistence.persistentVolumeClaim -}}
+{{- if and $persistence.enabled $pvc.useExistingPVC -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
 Create name of configMap
 */}}
 {{- define "ntfy.configMapName" -}}
 {{- $serverConfig := .Values.serverConfig -}}
 {{- default (include "ntfy.fullname" .) $serverConfig.configMapName }}
+{{- end }}
+
+{{/*
+Create name of PersistentVolumeClaim
+*/}}
+{{- define "ntfy.persistentVolumeClaimName" -}}
+{{- $persistencePVC := .Values.persistence.persistentVolumeClaim -}}
+{{- default (printf "%s-data" (include "ntfy.fullname" .)) $persistencePVC.claimName }}
+{{- end }}
+
+{{/*
+Create NTFY-Container Image URL
+*/}}
+{{- define "ntfy.containerImage" -}}
+{{- $ntfyContainerImage := .Values.ntfyContainer.image -}}
+{{- $containerImageTag := default $ntfyContainerImage.tag .Chart.AppVersion -}}
+{{- printf "%s/%s:%s" $ntfyContainerImage.registry $ntfyContainerImage.repository $containerImageTag -}}
+{{- end }}
+
+{{/*
+Create Secret-Name for authTokens
+*/}}
+{{- define "ntfy.secretName.authTokens" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authTokens := $authentication.authTokens -}}
+{{- default (printf "%s-authTokens" (include "ntfy.fullname" .)) $authTokens.secretName }}
+{{- end }}
+
+{{/*
+Create Secret-Name for authUsers
+*/}}
+{{- define "ntfy.secretName.authUsers" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authUsers := $authentication.authUsers -}}
+{{- default (printf "%s-authUsers" (include "ntfy.fullname" .)) $authUsers.secretName }}
+{{- end }}
+
+{{/*
+Create Secret-Name for authAccess
+*/}}
+{{- define "ntfy.secretName.authAccess" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authAccess := $authentication.authAccess -}}
+{{- default (printf "%s-authAccess" (include "ntfy.fullname" .)) $authAccess.secretName }}
+{{- end }}
+
+{{/*
+Create list of Secret-Names
+
+Using `$` as context when calling the `include`-function 
+to ensure using the root-context instead of the current `range`-context.
+*/}}
+{{- define "ntfy.secretNames" -}}
+{{- $secretItems := list "authTokens" "authUsers" "authAccess" -}}
+{{- $secretNames := list -}}
+{{- range $secretItems }}
+{{- $funcName := (printf "ntfy.secretName.%s" .) -}}
+{{- $secretNames = append $secretNames (include $funcName $) -}}
+{{- end }}
+{{- $secretNames | toJson -}}
 {{- end }}

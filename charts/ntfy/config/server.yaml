@@ -464,7 +464,7 @@ metrics-listen-http: "{{ $config.metricsListenHttp }}"
 #      - "time_taken_ms -> debug"
 #
 log-level: {{ $config.logLevel }}
-log-level-overrides: {{ toYaml $config.logLevelOverrides | nindent 2 }}
+log-level-overrides: {{ $config.logLevelOverrides | toYaml | nindent 2 }}
 log-format: {{ $config.logFormat }}
 {{- if $config.logFile }}
 log-file: {{ $config.logFile }}
@@ -472,8 +472,8 @@ log-file: {{ $config.logFile }}
 ## Do not use a logfile.
 {{- end }}
 
-{{- if $config.additionalConfig }}
-{{ toYaml $config.additionalConfig }}
+{{- if $config.extraConfig }}
+{{ toYaml $config.extraConfig }}
 {{- else }}
 ## No additional Config to append.
 {{- end }}

@@ -1,4 +1,14 @@
 {{- $ntfyContainer := .Values.ntfyContainer -}}
+{{- $ntfyContainerService := $ntfyContainer.service -}}
+{{- $ntfyContainerStartupProbe := $ntfyContainer.startupProbe -}}
+{{- $ntfyContainerReadinessProbe := $ntfyContainer.readinessProbe -}}
+{{- $ntfyContainerLivenessProbe := $ntfyContainer.livenessProbe -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authTokens := $authentication.authTokens -}}
+{{- $authUsers := $authentication.authUsers -}}
+{{- $authAccess := $authentication.authAccess -}}
+{{- $serverConfig := .Values.serverConfig -}}
+{{- $persistence := .Values.persistence -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,6 +25,12 @@ spec:
       annotations:
         {{- if (include "ntfy.createConfigMap" .) }}
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if (include "ntfy.createSecret" .) }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if (include "ntfy.createPersistentVolumeClaim" .) }}
+        checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -36,10 +52,88 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         command: ["ntfy"]
-        {{- if $ntfyContainer.extraArgs }}
         args:
+        - "serve"
+        - "--config=/etc/ntfy-config/server.yaml"
+        {{- if $ntfyContainer.extraArgs }}
         {{- $ntfyContainer.extraArgs | toYaml | nindent 8 }}
         {{- end }}
         {{- if $ntfyContainer.securityContext }}
         securityContext: {{- $ntfyContainer.securityContext | toYaml | nindent 10 }}
         {{- end }}
+        image: {{ include "ntfy.containerImage" . }}
+        imagePullPolicy: {{ $ntfyContainer.image.pullPolicy }}
+        ports:
+        {{- range $ntfyContainerService.ports }}
+        - name: {{ .name }}
+          containerPort: {{ .containerPort }}
+        {{- end }}
+        env:
+        - name: "NTFY_AUTH_TOKENS"
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "ntfy.secretName.authTokens" . }}
+              key: {{ $authTokens.secretKey }}
+        - name: "NTFY_AUTH_USERS"
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "ntfy.secretName.authUsers" . }}
+              key: {{ $authUsers.secretKey }}
+        - name: "NTFY_AUTH_ACCESS"
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "ntfy.secretName.authAccess" . }}
+              key: {{ $authAccess.secretKey }}
+        {{- if $ntfyContainer.extraEnvs }}
+        {{- $ntfyContainer.extraEnvs | toYaml | nindent 8 }}
+        {{- end }}
+        {{- if $ntfyContainer.resources }}
+        resources: {{- $ntfyContainer.resources | toYaml | nindent 10 }}
+        {{- end }}
+        {{- if $ntfyContainerStartupProbe }}
+        startupProbe: {{- $ntfyContainerStartupProbe | toYaml | nindent 10 }}
+        {{- end }}
+        {{- if $ntfyContainerReadinessProbe }}
+        readinessProbe: {{- $ntfyContainerReadinessProbe | toYaml | nindent 10 }}
+        {{- end }}
+        {{- if $ntfyContainerLivenessProbe }}
+        livenessProbe: {{- $ntfyContainerLivenessProbe | toYaml | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+        - name: config
+          mountPath: /etc/ntfy-config
+          readOnly: true
+        - name: data
+          mountPath: /var/lib/ntfy
+        {{- if $ntfyContainer.extraVolumeMounts }}
+        {{- $ntfyContainer.extraVolumeMounts | toYaml | nindent 8 }}
+        {{- end }}
+      {{- if .Values.extraContainers }}
+      {{- .Values.extraContainers | toYaml | nindent 6 }}
+      {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "ntfy.configMapName" . }}
+          items:
+          - key: {{ $serverConfig.configMapItemKey }}
+            path: server.yaml
+      - name: data
+        {{- if $persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "ntfy.persistentVolumeClaimName" . }}
+        {{- else }}
+        emptyDir: {{ $persistence.emptyDir | toYaml | nindent 10 }}
+        {{- end }}
+      {{- if .Values.extraVolumes }}
+      {{- .Values.extraVolumes | toYaml | nindent 6 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- .Values.nodeSelector | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity: {{- .Values.affinity | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- .Values.tolerations | toYaml | nindent 8 }}
+      {{- end }}
