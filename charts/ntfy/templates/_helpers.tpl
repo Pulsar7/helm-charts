@@ -90,7 +90,7 @@ Create boolean whether to create the PVC-resource or not.
 {{- define "ntfy.createPersistentVolumeClaim" -}}
 {{- $persistence := .Values.persistence -}}
 {{- $pvc := $persistence.persistentVolumeClaim -}}
-{{- if and $persistence.enabled $pvc.useExistingPVC -}}
+{{- if and $persistence.enabled (not $pvc.useExistingPVC) -}}
 true
 {{- end }}
 {{- end }}
@@ -116,7 +116,7 @@ Create NTFY-Container Image URL
 */}}
 {{- define "ntfy.containerImage" -}}
 {{- $ntfyContainerImage := .Values.ntfyContainer.image -}}
-{{- $containerImageTag := default $ntfyContainerImage.tag .Chart.AppVersion -}}
+{{- $containerImageTag := default .Chart.AppVersion $ntfyContainerImage.tag -}}
 {{- printf "%s/%s:%s" $ntfyContainerImage.registry $ntfyContainerImage.repository $containerImageTag -}}
 {{- end }}
 

@@ -55,7 +55,7 @@ Helm chart to deploy ntfy
 |-----|------|---------|-------------|
 | ntfyContainer.extraArgs | list | `[]` | Additional Container-arguments |
 | ntfyContainer.extraEnvs | list | `[]` | Additional environment-Variables |
-| ntfyContainer.extraVolumeMonts | list | `[]` | Additional VolumeMounts |
+| ntfyContainer.extraVolumeMounts | list | `[]` | Additional VolumeMounts |
 | ntfyContainer.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | ntfyContainer.image.registry | string | `"docker.io"` | Container-Image registry |
 | ntfyContainer.image.repository | string | `"binwiederhier/ntfy"` | Container-Image repository |
@@ -84,7 +84,7 @@ Helm chart to deploy ntfy
 | persistence.persistentVolumeClaim.extraSpecs | object | `{}` | additional specs for the PVC. ignored when `useExistingPVC: false` |
 | persistence.persistentVolumeClaim.storageClassName | string | `""` | StorageClassName of the PVC. ignored when `useExistingPVC: false` |
 | persistence.persistentVolumeClaim.storageRequest | string | `"5Gi"` | `resources.storage.request` for the PVC. ignored when `useExistingPVC: false` |
-| persistence.persistentVolumeClaim.useExistingPVC | bool | `true` | Whether to use an existing PersistentVolumeClaim or not. |
+| persistence.persistentVolumeClaim.useExistingPVC | bool | `false` | Whether to use an existing PersistentVolumeClaim or not. |
 
 ### Server-Config specifications
 

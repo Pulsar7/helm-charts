@@ -1,0 +1,345 @@
+#------------------------------------------------------------------------------
+#
+# Deployment-Unittests Test-Suite for ntfy
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test Deployment
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/deployment.yaml
+  #
+  # following are required to calculate their checksum
+  - templates/configmap.yaml
+  - templates/pvc.yaml
+  - templates/secrets.yaml
+#
+tests:
+  - it: should render Deployment with default checksum-annotations
+    template: templates/deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/configmap"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/secret"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/pvc"]
+
+  - it: should render Deployment without checksum/configmap annotation
+    template: templates/deployment.yaml
+    set:
+      serverConfig.useExistingConfigMap: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/configmap"]
+
+  - it: should render Deployment without checksum/secret annotation
+    template: templates/deployment.yaml
+    set:
+      authentication:
+        authTokens:
+          useExistingSecret: true
+        authUsers:
+          useExistingSecret: true
+        authAccess:
+          useExistingSecret: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/secret"]
+  
+  - it: should render Deployment with adjusted ntfy-Container image-URL
+    template: templates/deployment.yaml
+    set:
+      ntfyContainer.image:
+        registry: "my-private.registry"
+        repository: "my/private-ntfy-repo"
+        tag: "1337.1337.1337"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "my-private.registry/my/private-ntfy-repo:1337.1337.1337"
+      
+  - it: should render Deployment with additional ntfy-Container arguments
+    template: templates/deployment.yaml
+    set:
+      ntfyContainer.extraArgs: ["--non-existing-test-command"]
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].args[2]
+          value: "--non-existing-test-command"
+  
+  - it: should render Deployment with additional ntfy-Container environment-variables
+    template: templates/deployment.yaml
+    set:
+      ntfyContainer.extraEnvs:
+        - name: "1337-test-env"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].env[3]
+          value: 
+            name: 1337-test-env
+  
+  - it: should render Deployment environment-variables with adjusted Secret-names for authentication
+    template: templates/deployment.yaml
+    set:
+      authentication:
+        authTokens:
+          secretName: "test-auth-tokens-secret"
+          secretKey: "test-auth-tokens-secret-key"
+        authUsers:
+          secretName: "test-auth-users-secret"
+          secretKey: "test-auth-users-secret-key"
+        authAccess:
+          secretName: "test-auth-access-secret"
+          secretKey: "test-auth-access-secret-key"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: "NTFY_AUTH_TOKENS"
+            valueFrom:
+              secretKeyRef:
+                name: "test-auth-tokens-secret"
+                key: "test-auth-tokens-secret-key"
+      - equal:
+          path: spec.template.spec.containers[0].env[1]
+          value:
+            name: "NTFY_AUTH_USERS"
+            valueFrom:
+              secretKeyRef:
+                name: "test-auth-users-secret"
+                key: "test-auth-users-secret-key"
+      - equal:
+          path: spec.template.spec.containers[0].env[2]
+          value:
+            name: "NTFY_AUTH_ACCESS"
+            valueFrom:
+              secretKeyRef:
+                name: "test-auth-access-secret"
+                key: "test-auth-access-secret-key"
+  
+  - it: should render Deployment with adjusted resources for the ntfy-Container
+    template: templates/deployment.yaml
+    set:
+      ntfyContainer.resources:
+        requests:
+          cpu: "100m"
+          memory: "500Mi"
+        limits:
+          cpu: "1337"
+          memory: "1337Gi"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].resources
+          value:
+            requests:
+              cpu: "100m"
+              memory: "500Mi"
+            limits:
+              cpu: "1337"
+              memory: "1337Gi"
+  
+  - it: should render Deployment with adjusted probes (startup, readiness and liveness)
+    template: templates/deployment.yaml
+    set:
+      ntfyContainer.startupProbe:
+        httpGet:
+          path: /healthz
+          port: liveness-port
+        failureThreshold: 30
+        periodSeconds: 10
+      ntfyContainer.readinessProbe:
+        exec:
+          command:
+          - /bin/cat
+          - /tmp/healthy
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      ntfyContainer.livenessProbe:
+        httpGet:
+          path: /healthz
+          port: liveness-port
+        failureThreshold: 1
+        periodSeconds: 10
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe
+          value:
+            httpGet:
+              path: /healthz
+              port: liveness-port
+            failureThreshold: 30
+            periodSeconds: 10
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe
+          value:
+            exec:
+              command:
+              - /bin/cat
+              - /tmp/healthy
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            httpGet:
+              path: /healthz
+              port: liveness-port
+            failureThreshold: 1
+            periodSeconds: 10
+    
+  - it: should render Deployment with additional volumeMounts for the ntfy-Container
+    template: templates/deployment.yaml
+    set:
+      ntfyContainer.extraVolumeMounts:
+        - name: additional-test-mount
+          mountPath: /additional/test/folder
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[2]
+          value:
+            name: additional-test-mount
+            mountPath: /additional/test/folder
+  
+  - it: should render Deployment with an additional sidecar-Container
+    template: templates/deployment.yaml
+    set:
+      extraContainers:
+        - name: additional-test-sidecar
+          image: "test-registry/sidecar-image:1337.7331.1337"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[1]
+          value:
+            name: additional-test-sidecar
+            image: "test-registry/sidecar-image:1337.7331.1337"
+  
+  - it: should render Deployment with additional Volumes
+    template: templates/deployment.yaml
+    set:
+      extraVolumes:
+        - name: additional-test-volume
+          emptyDir: {}
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.volumes[2]
+          value:
+            name: additional-test-volume
+            emptyDir: {}
+  
+  - it: should render Deployment with disabled persistence
+    template: templates/deployment.yaml
+    set:
+      persistence:
+        enabled: false
+        emptyDir:
+          sizeLimit: 1337Gi
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/pvc"]
+      - notExists:
+          path: spec.template.spec.volumes[1].persistentVolumeClaim
+      - equal:
+          path: spec.template.spec.volumes[1].emptyDir
+          value:
+            sizeLimit: 1337Gi
+  
+  - it: should render Deployment with enabled persistence
+    template: templates/deployment.yaml
+    set:
+      persistence:
+        enabled: true
+        persistentVolumeClaim:
+          useExistingPVC: false
+          claimName: "test-persistence-pvc"
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/pvc"]
+      - notExists:
+          path: spec.template.spec.volumes[1].emptyDir
+      - equal:
+          path: spec.template.spec.volumes[1].persistentVolumeClaim
+          value:
+            claimName: "test-persistence-pvc"
+  
+  - it: should render Deployment with adjusted nodeSelector, affinity, tolerations
+    template: templates/deployment.yaml
+    set:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/e2e-az-name
+                operator: In
+                values:
+                - e2e-az1
+                - e2e-az2
+      nodeSelector:
+        key1: value1
+        key2: value2
+      tolerations:
+        - key: "key1"
+          operator: "Equal"
+          value: "value1"
+          effect: "NoSchedule"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/e2e-az-name
+                    operator: In
+                    values:
+                    - e2e-az1
+                    - e2e-az2
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            key1: value1
+            key2: value2
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: "key1"
+              operator: "Equal"
+              value: "value1"
+              effect: "NoSchedule"
