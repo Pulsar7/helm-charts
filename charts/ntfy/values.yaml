@@ -104,6 +104,7 @@ ntfyContainer:
     # -- Type of the NTFY-Service resource
     # @section -- NTFY-Service specifications
     type: ClusterIP
+    # @ignored
     ports:
       # @ignored
       - name: http
