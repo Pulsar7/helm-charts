@@ -126,7 +126,7 @@ Create Secret-Name for authTokens
 {{- define "ntfy.secretName.authTokens" -}}
 {{- $authentication := .Values.authentication -}}
 {{- $authTokens := $authentication.authTokens -}}
-{{- default (printf "%s-authTokens" (include "ntfy.fullname" .)) $authTokens.secretName }}
+{{- default (printf "%s-auth-tokens" (include "ntfy.fullname" .)) $authTokens.secretName }}
 {{- end }}
 
 {{/*
@@ -135,7 +135,7 @@ Create Secret-Name for authUsers
 {{- define "ntfy.secretName.authUsers" -}}
 {{- $authentication := .Values.authentication -}}
 {{- $authUsers := $authentication.authUsers -}}
-{{- default (printf "%s-authUsers" (include "ntfy.fullname" .)) $authUsers.secretName }}
+{{- default (printf "%s-auth-users" (include "ntfy.fullname" .)) $authUsers.secretName }}
 {{- end }}
 
 {{/*
@@ -144,7 +144,7 @@ Create Secret-Name for authAccess
 {{- define "ntfy.secretName.authAccess" -}}
 {{- $authentication := .Values.authentication -}}
 {{- $authAccess := $authentication.authAccess -}}
-{{- default (printf "%s-authAccess" (include "ntfy.fullname" .)) $authAccess.secretName }}
+{{- default (printf "%s-auth-access" (include "ntfy.fullname" .)) $authAccess.secretName }}
 {{- end }}
 
 {{/*
@@ -161,4 +161,33 @@ to ensure using the root-context instead of the current `range`-context.
 {{- $secretNames = append $secretNames (include $funcName $) -}}
 {{- end }}
 {{- $secretNames | toJson -}}
+{{- end }}
+
+{{/*
+Compile all warnings into a single message, and call fail.
+See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f70476529e720/bitnami/airflow/templates/_helpers.tpl#L434
+*/}}
+{{- define "ntfy.validateValues" -}}
+{{- $messages := list -}}
+{{- $messages := append $messages (include "ntfy.validateValues.configFile.serverConfig" .) -}}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n" $messages -}}
+{{- if $message -}}
+{{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate values of ntfy - configFile.serverConfig
+*/}}
+{{- define "ntfy.validateValues.configFile.serverConfig" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $config := .Values.serverConfig -}}
+
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n  > " $messages -}}
+{{- if $message -}}
+{{- printf " ntfy: serverConfig\n   > %s" $message -}}
+{{- end }}
 {{- end }}

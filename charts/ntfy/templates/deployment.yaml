@@ -7,6 +7,9 @@
 {{- $authTokens := $authentication.authTokens -}}
 {{- $authUsers := $authentication.authUsers -}}
 {{- $authAccess := $authentication.authAccess -}}
+{{- $authSecretNames := (include "ntfy.secretNames" .) | fromJsonArray -}}
+{{- $authSecretKeys := list $authTokens.secretKey $authUsers.secretKey $authAccess.secretKey -}}
+{{- $envList := list "NTFY_AUTH_TOKENS"  "NTFY_AUTH_USERS" "NTFY_AUTH_ACCESS" -}}
 {{- $serverConfig := .Values.serverConfig -}}
 {{- $persistence := .Values.persistence -}}
 apiVersion: apps/v1
@@ -69,21 +72,13 @@ spec:
           containerPort: {{ .containerPort }}
         {{- end }}
         env:
-        - name: "NTFY_AUTH_TOKENS"
+        {{- range $index, $secretName := $authSecretNames }}
+        - name: {{ index $envList $index }}
           valueFrom:
             secretKeyRef:
-              name: {{ include "ntfy.secretName.authTokens" . }}
-              key: {{ $authTokens.secretKey }}
-        - name: "NTFY_AUTH_USERS"
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "ntfy.secretName.authUsers" . }}
-              key: {{ $authUsers.secretKey }}
-        - name: "NTFY_AUTH_ACCESS"
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "ntfy.secretName.authAccess" . }}
-              key: {{ $authAccess.secretKey }}
+              name: {{ $secretName }}
+              key: {{ index $authSecretKeys $index }}
+        {{- end }}
         {{- if $ntfyContainer.extraEnvs }}
         {{- $ntfyContainer.extraEnvs | toYaml | nindent 8 }}
         {{- end }}
