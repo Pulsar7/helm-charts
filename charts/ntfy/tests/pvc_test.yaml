@@ -26,10 +26,8 @@ tests:
 
   - it: should not render the PVC with enabled persistence but existing PVC
     set:
-      persistence:
-        enabled: true
-        persistentVolumeClaim:
-          useExistingPVC: true
+      persistence.persistentVolumeClaim:
+        useExistingPVC: true
     asserts:
       - notExists:
           path: apiVersion
@@ -41,14 +39,49 @@ tests:
       - isKind:
           of: PersistentVolumeClaim
   
-  - it: should render the PVC with adjusted claim-name
+  - it: should render the PVC with adjusted Claim-name
     set:
-      persistence:
-        persistentVolumeClaim:
-          claimName: "test-claim"
+      persistence.persistentVolumeClaim:
+        claimName: "test-claim"
     asserts:
       - isKind:
           of: PersistentVolumeClaim
       - equal:
           path: metadata.name
           value: "test-claim"
+  
+  - it: should render the PVC with adjusted specs
+    set:
+      persistence.persistentVolumeClaim:
+        storageClassName: "invalid-storageClass"
+        accessModes: ["invalidAccessMode"]
+        storageRequest: "1337Gi"
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.storageClassName
+          value: "invalid-storageClass"
+      - equal:
+          path: spec.accessModes
+          value: ["invalidAccessMode"]
+      - equal:
+          path: spec.resources.requests.storage
+          value: "1337Gi"
+
+  - it: should render the PVC with additional specs-fields
+    set:
+      persistence.persistentVolumeClaim:
+        extraSpecs:
+          invalidPVCSpec: true
+          justAnotherObject:
+            hello: "hello world"
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - isSubset:
+          path: spec
+          content:
+            invalidPVCSpec: true
+            justAnotherObject:
+              hello: "hello world"

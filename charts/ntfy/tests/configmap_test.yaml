@@ -1,0 +1,32 @@
+#------------------------------------------------------------------------------
+#
+# ConfigMap-Unittests Test-Suite for ntfy
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+#
+# Test suite name to show on test result output
+suite: Test ConfigMap
+#
+# The template files scope to test in this suite
+# Only the selected files will be rendered
+templates:
+  - templates/configmap.yaml
+#
+tests:
+  - it: should not render ConfigMap-resource
+    set:
+      serverConfig.useExistingConfigMap: true
+    asserts:
+      - notExists:
+          path: ConfigMap
+  
+  - it: should render ConfigMap-resource with default Values
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - exists:
+          path: metadata
+      - exists:
+          path: data
