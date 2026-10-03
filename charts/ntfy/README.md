@@ -11,7 +11,7 @@ Helm chart to deploy ntfy
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity expand the types of constraints you can define |
-| extraVolumes | object | `{}` | Additional Volumes |
+| extraVolumes | list | `[]` | Additional Volumes |
 | nodeSelector | object | `{}` | Kubernetes only schedules the Pod onto nodes that have each of the labels you specify |
 | podAnnotations | object | `{}` | Additional Pod-annotations |
 | podLabels | object | `{}` | Additional Pod-Labels |

@@ -48,7 +48,7 @@ tolerations: {}
 #
 # -- Additional Volumes
 # @section -- Pod specifications
-extraVolumes: {}
+extraVolumes: []
 
 
 # =======================================================================
