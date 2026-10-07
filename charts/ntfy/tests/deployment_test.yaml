@@ -20,6 +20,7 @@ templates:
   - templates/secrets.yaml
   - templates/ingressroute.yaml
   - templates/middlewares.yaml
+  - templates/service.yaml
 #
 tests:
   - it: should render Deployment with default checksum-annotations
@@ -33,6 +34,8 @@ tests:
           path: spec.template.metadata.annotations["checksum/secret"]
       - exists:
           path: spec.template.metadata.annotations["checksum/pvc"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/service"]
 
   - it: should render Deployment without checksum/configmap annotation
     template: templates/deployment.yaml
