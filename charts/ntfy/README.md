@@ -18,7 +18,7 @@ Helm chart to deploy ntfy
 | podSecurityContext | object | `{"fsGroup":10000,"runAsGroup":10000,"runAsNonRoot":true,"runAsUser":10000}` | Pod Security Context |
 | replicaCount | int | `1` | Number of Pods |
 | strategy | object | `{"type":"Recreate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
-| tolerations | object | `{}` | Tolerations allow the scheduler to schedule pods with matching taints |
+| tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
 
 ### NTFY-Authentication specifications
 
@@ -48,6 +48,21 @@ Helm chart to deploy ntfy
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | extraInitContainers | list | `[]` | List of additional init-Containers |
+
+### IngressRoute specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| ingressRoute.certResolver | string | `""` | Name of the TLS-cert-resolver |
+| ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute |
+| ingressRoute.entryPoints | list | `[]` | Entrypoints |
+| ingressRoute.routeMatch | string | `"Host(``)"` | Route-Match |
+
+### IngressRoute/Middlewares specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| middlewares | list | `[]` | List of middlewares added to the IngressRoute ignored when (`ingressRoute.enabled: false`) |
 
 ### NTFY-Container specifications
 

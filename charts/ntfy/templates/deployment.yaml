@@ -1,3 +1,4 @@
+{{ include "ntfy.validateValues" . }}
 {{- $ntfyContainer := .Values.ntfyContainer -}}
 {{- $ntfyContainerService := $ntfyContainer.service -}}
 {{- $ntfyContainerStartupProbe := $ntfyContainer.startupProbe -}}
@@ -12,6 +13,8 @@
 {{- $envList := list "NTFY_AUTH_TOKENS"  "NTFY_AUTH_USERS" "NTFY_AUTH_ACCESS" -}}
 {{- $serverConfig := .Values.serverConfig -}}
 {{- $persistence := .Values.persistence -}}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- $middlewares := .Values.middlewares -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -34,6 +37,12 @@ spec:
         {{- end }}
         {{- if (include "ntfy.createPersistentVolumeClaim" .) }}
         checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if $ingressRoute.enabled }}
+        checksum/ingressroute: {{ include (print $.Template.BasePath "/ingressroute.yaml") . | sha256sum }}
+        {{- if $middlewares }}
+        checksum/middlewares: {{ include (print $.Template.BasePath "/middlewares.yaml") . | sha256sum }}
+        {{- end }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}

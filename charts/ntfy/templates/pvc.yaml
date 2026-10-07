@@ -1,3 +1,4 @@
+{{ include "ntfy.validateValues" . }}
 {{- $persistence := .Values.persistence -}}
 {{- $pvc := $persistence.persistentVolumeClaim -}}
 {{- if (include "ntfy.createPersistentVolumeClaim" .) }}

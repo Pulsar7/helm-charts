@@ -44,7 +44,7 @@ affinity: {}
 #
 # -- Tolerations allow the scheduler to schedule pods with matching taints
 # @section -- Pod specifications
-tolerations: {}
+tolerations: []
 #
 # -- Additional Volumes
 # @section -- Pod specifications
@@ -255,6 +255,33 @@ persistence:
     # ignored when `useExistingPVC: false`
     # @section -- NTFY-Persistence specifications
     extraSpecs: {}
+
+
+# =================================================================
+# Ingress specifications
+# =================================================================
+ingressRoute:
+  #
+  # -- Whether to enable the IngressRoute
+  # @section -- IngressRoute specifications
+  enabled: false
+  #
+  # -- Entrypoints
+  # @section -- IngressRoute specifications
+  entryPoints: []
+  #
+  # -- Route-Match
+  # @section -- IngressRoute specifications
+  routeMatch: Host(``)
+  #
+  # -- Name of the TLS-cert-resolver
+  # @section -- IngressRoute specifications
+  certResolver: ""
+#
+# -- List of middlewares added to the IngressRoute
+# ignored when (`ingressRoute.enabled: false`)
+# @section -- IngressRoute/Middlewares specifications
+middlewares: []
 
 
 # =================================================================

@@ -18,6 +18,8 @@ templates:
   - templates/configmap.yaml
   - templates/pvc.yaml
   - templates/secrets.yaml
+  - templates/ingressroute.yaml
+  - templates/middlewares.yaml
 #
 tests:
   - it: should render Deployment with default checksum-annotations
@@ -57,6 +59,32 @@ tests:
           of: Deployment
       - notExists:
           path: spec.template.metadata.annotations["checksum/secret"]
+  
+  - it: should render Deployment with checksum/ingressroute annotation
+    template: templates/deployment.yaml
+    set:
+      ingressRoute.enabled: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/ingressroute"]
+  
+  - it: should render Deployment with checksum/middlewares annotation
+    template: templates/deployment.yaml
+    set:
+      ingressRoute.enabled: true
+      middlewares:
+        - name: test-middleware
+          spec:
+            middlewareSpec: "1337"
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/ingressroute"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/middlewares"]
   
   - it: should render Deployment with adjusted ntfy-Container image-URL
     template: templates/deployment.yaml
