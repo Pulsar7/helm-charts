@@ -1,5 +1,6 @@
-{{- $config := .Values.configFiles.serverYAML.dynamicValues -}}
-{{- $ntfyContainer := .Values.containers.ntfy -}}
+{{- $ntfyContainer := .Values.ntfyContainer -}}
+{{- $ntfyContainerServicePorts := $ntfyContainer.service.ports -}}
+{{- $config := .Values.serverConfig.dynamicValues -}}
 {{- $rateLimits := $config.rateLimits -}}
 # > https://github.com/binwiederhier/ntfy/blob/v2.18.0/server/server.yml
 # ntfy server config file
@@ -25,7 +26,7 @@ base-url: {{ $config.baseURL }}
 # To listen on all interfaces, you may omit the IP address, e.g. ":443".
 # To disable HTTP, set "listen-http" to "-".
 #
-listen-http: ":{{ index $ntfyContainer.service.ports 0 "containerPort" }}"
+listen-http: ":{{ index $ntfyContainerServicePorts 0 "containerPort" }}"
 # listen-https:
 
 # Listen on a Unix socket, e.g. /var/lib/ntfy/ntfy.sock
@@ -463,7 +464,7 @@ metrics-listen-http: "{{ $config.metricsListenHttp }}"
 #      - "time_taken_ms -> debug"
 #
 log-level: {{ $config.logLevel }}
-log-level-overrides: {{ toYaml $config.logLevelOverrides | nindent 2 }}
+log-level-overrides: {{ $config.logLevelOverrides | toYaml | nindent 2 }}
 log-format: {{ $config.logFormat }}
 {{- if $config.logFile }}
 log-file: {{ $config.logFile }}
@@ -471,8 +472,8 @@ log-file: {{ $config.logFile }}
 ## Do not use a logfile.
 {{- end }}
 
-{{- if $config.additionalConfig }}
-{{ toYaml $config.additionalConfig }}
+{{- if $config.extraConfig }}
+{{ toYaml $config.extraConfig }}
 {{- else }}
 ## No additional Config to append.
 {{- end }}

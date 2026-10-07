@@ -51,47 +51,116 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the NTFY-Container-Image-URL
+Create the name of the service account to use
+*/}}
+{{- define "ntfy.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "ntfy.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether to create the ConfigMap-resource or not.
+*/}}
+{{- define "ntfy.createConfigMap" -}}
+{{- $serverConfig := .Values.serverConfig -}}
+{{- if not $serverConfig.useExistingConfigMap -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether to create the ConfigMap-resource or not.
+*/}}
+{{- define "ntfy.createSecret" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authTokens := $authentication.authTokens -}}
+{{- $authUsers := $authentication.authUsers -}}
+{{- $authAccess := $authentication.authAccess -}}
+{{- if or (not $authTokens.useExistingSecret) (not $authUsers.useExistingSecret) (not $authAccess.useExistingSecret) -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether to create the PVC-resource or not.
+*/}}
+{{- define "ntfy.createPersistentVolumeClaim" -}}
+{{- $persistence := .Values.persistence -}}
+{{- $pvc := $persistence.persistentVolumeClaim -}}
+{{- if and $persistence.enabled (not $pvc.useExistingPVC) -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create name of configMap
+*/}}
+{{- define "ntfy.configMapName" -}}
+{{- $serverConfig := .Values.serverConfig -}}
+{{- default (include "ntfy.fullname" .) $serverConfig.configMapName }}
+{{- end }}
+
+{{/*
+Create name of PersistentVolumeClaim
+*/}}
+{{- define "ntfy.persistentVolumeClaimName" -}}
+{{- $persistencePVC := .Values.persistence.persistentVolumeClaim -}}
+{{- default (printf "%s-data" (include "ntfy.fullname" .)) $persistencePVC.claimName }}
+{{- end }}
+
+{{/*
+Create NTFY-Container Image URL
 */}}
 {{- define "ntfy.containerImage" -}}
-{{- $containerImage := .Values.containers.ntfy.image -}}
-{{- $imageTag := $containerImage.tag | default .Chart.AppVersion -}}
-{{- printf "%s:%s" $containerImage.repository $imageTag }}
+{{- $ntfyContainerImage := .Values.ntfyContainer.image -}}
+{{- $containerImageTag := default .Chart.AppVersion $ntfyContainerImage.tag -}}
+{{- printf "%s/%s:%s" $ntfyContainerImage.registry $ntfyContainerImage.repository $containerImageTag -}}
 {{- end }}
 
 {{/*
-Create Authentication-Tokens Secret-Name
+Create Secret-Name for authTokens
 */}}
-{{- define "ntfy.authTokensSecretName" -}}
+{{- define "ntfy.secretName.authTokens" -}}
 {{- $authentication := .Values.authentication -}}
-{{- $authTokensSecretName := $authentication.authTokens.existingSecretName | default (include "ntfy.fullname" .) -}}
-{{- printf "%s" $authTokensSecretName }}
+{{- $authTokens := $authentication.authTokens -}}
+{{- default (printf "%s-auth-tokens" (include "ntfy.fullname" .)) $authTokens.secretName }}
 {{- end }}
 
 {{/*
-Create Authentication-Users Secret-Name
+Create Secret-Name for authUsers
 */}}
-{{- define "ntfy.authUsersSecretName" -}}
+{{- define "ntfy.secretName.authUsers" -}}
 {{- $authentication := .Values.authentication -}}
-{{- $authUsersSecretName := $authentication.authUsers.existingSecretName | default (include "ntfy.fullname" .) -}}
-{{- printf "%s" $authUsersSecretName }}
+{{- $authUsers := $authentication.authUsers -}}
+{{- default (printf "%s-auth-users" (include "ntfy.fullname" .)) $authUsers.secretName }}
 {{- end }}
 
 {{/*
-Create PVC-Name for NTFY
+Create Secret-Name for authAccess
 */}}
-{{- define "ntfy.pvc" -}}
-{{- $claimName := .Values.persistence.claimName | default (include "ntfy.fullname" .) -}}
-{{- printf "%s" $claimName }}
-{{- end -}}
+{{- define "ntfy.secretName.authAccess" -}}
+{{- $authentication := .Values.authentication -}}
+{{- $authAccess := $authentication.authAccess -}}
+{{- default (printf "%s-auth-access" (include "ntfy.fullname" .)) $authAccess.secretName }}
+{{- end }}
 
 {{/*
-Create Authentication-Access Secret-Name
+Create list of Secret-Names
+
+Using `$` as context when calling the `include`-function 
+to ensure using the root-context instead of the current `range`-context.
 */}}
-{{- define "ntfy.authAccessSecretName" -}}
-{{- $authentication := .Values.authentication -}}
-{{- $authAccessSecretName := $authentication.authAccess.existingSecretName | default (include "ntfy.fullname" .) -}}
-{{- printf "%s" $authAccessSecretName }}
+{{- define "ntfy.secretNames" -}}
+{{- $secretItems := list "authTokens" "authUsers" "authAccess" -}}
+{{- $secretNames := list -}}
+{{- range $secretItems }}
+{{- $funcName := (printf "ntfy.secretName.%s" .) -}}
+{{- $secretNames = append $secretNames (include $funcName $) -}}
+{{- end }}
+{{- $secretNames | toJson -}}
 {{- end }}
 
 {{/*
@@ -100,69 +169,25 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 */}}
 {{- define "ntfy.validateValues" -}}
 {{- $messages := list -}}
-{{- $messages := append $messages (include "ntfy.validateValues.persistence" .) -}}
-{{- $messages := append $messages (include "ntfy.validateValues.authentication" .) -}}
-{{- $messages := append $messages (include "ntfy.validateValues.containers" .) -}}
-{{- $messages := append $messages (include "ntfy.validateValues.configFiles.serverYAML" .) -}}
-{{- $messages := append $messages (include "ntfy.validateValues.configFiles.serverYAML.dynamicValues" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.configFile.serverConfig" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
-
 {{- if $message -}}
 {{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/*
-Validate values of NTFY
+Validate values of ntfy - configFile.serverConfig
 */}}
-{{- define "ntfy.validateValues.persistence" -}}
-{{- $persistence := .Values.persistence -}}
+{{- define "ntfy.validateValues.configFile.serverConfig" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $config := .Values.serverConfig -}}
 
-{{- end -}}
-
-{{/*
-Validate values of NTFY - Authentication
-*/}}
-{{- define "ntfy.validateValues.authentication" -}}
-{{- $auth := .Values.authentication -}}
-
-{{- end -}}
-
-{{/*
-Validate values of NTFY - Containers
-*/}}
-{{- define "ntfy.validateValues.containers" -}}
-{{- $containers := .Values.containers -}}
-
-{{- end -}}
-
-{{/*
-Validate values of NTFY - 'server.yaml'
-
-> `ownConfigFileContent` needs to be set when `useOwnConfigFileContent` is enabled
-*/}}
-{{- define "ntfy.validateValues.configFiles.serverYAML" -}}
-{{- $conf := .Values.configFiles.serverYAML -}}
-{{- if and $conf.useOwnConfigFileContent (not $conf.ownConfigFileContent) -}}
-ntfy: configFiles.serverYAML
-    When `useOwnConfigFileContent` is set `true`, you have to provide your `ownConfigFileContent`
-{{- end -}}
-{{- end -}}
-
-{{/*
-Validate values of NTFY - 'server.yaml'-authentication
-
-> `enableLogin` needs to be set when `enableSignup` enabled
-> `enableLogin` needs to be set when `requireLogin` enabled
-*/}}
-{{- define "ntfy.validateValues.configFiles.serverYAML.dynamicValues" -}}
-{{- $conf := .Values.configFiles.serverYAML.dynamicValues -}}
-{{- if and $conf.enableSignup (not $conf.enableLogin) -}}
-ntfy: configFiles.serverYAML
-    `enableLogin` has to be enabled too when `enableSignup` is enabled
-{{- else if and $conf.requireLogin (not $conf.enableLogin) -}}
-ntfy: configFiles.serverYAML
-    `enableLogin` has to be enabled too when `requireLogin` is enabled
-{{- end -}}
-{{- end -}}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n  > " $messages -}}
+{{- if $message -}}
+{{- printf " ntfy: serverConfig\n   > %s" $message -}}
+{{- end }}
+{{- end }}

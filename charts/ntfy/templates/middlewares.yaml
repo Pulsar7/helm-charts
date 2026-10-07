@@ -1,0 +1,17 @@
+{{ include "ntfy.validateValues" . }}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- if $ingressRoute.enabled }}
+{{- $middlewares := .Values.middlewares -}}
+{{- $namespace := .Release.Namespace | quote -}}
+{{- $labels := (include "ntfy.labels" .) -}}
+{{- range $middlewares }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .name }}
+  namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
+spec:
+  {{ .spec | toYaml | nindent 2 }}
+{{- end }}
+{{- end }}

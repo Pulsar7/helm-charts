@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Service-Unittests Test-Suite for NTFY
+# Service-Unittests Test-Suite for ntfy
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
@@ -15,18 +15,35 @@ templates:
   - templates/service.yaml
 #
 tests:
-  - it: should pass with different service-type and port
-    #
-    set:
-      containers.ntfy.service.type: NodePort
-      containers.ntfy.service.ports[0].port: 8000
-    #
+  - it: should render Service with default specs
     asserts:
       - isKind:
           of: Service
       - equal:
-          path: spec.type
-          value: NodePort
+          path: metadata.name
+          value: ntfy-http
       - equal:
-          path: spec.ports[0].port
-          value: 8000
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports
+          value:
+            - protocol: TCP
+              port: 5000
+              targetPort: http
+              name: http
+  
+  - it: should render Service with adjusted specs
+    set:
+      ntfyContainer.service:
+        serviceName: test-ntfy-http-service-name
+        type: InvalidServiceType
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: test-ntfy-http-service-name
+      - equal:
+          path: spec.type
+          value: InvalidServiceType

@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# PVC-Unittests Test-Suite for NTFY
+# PVC-Unittests Test-Suite for ntfy
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
@@ -15,44 +15,73 @@ templates:
   - templates/pvc.yaml
 #
 tests:
-  - it: should pass with enabled PVC and createNew
-    #
+  - it: should not render the PVC with disabled persistence
     set:
-      persistence.enabled: true
-      persistence.createNewPVC: true
-      persistence.storageClassName: "invalid-test-storageClass"
-      persistence.claimName: "test-invalid-claimName"
-      persistence.accessModes:
-        - ReadWriteMany
-    #
+      persistence.enabled: false
+    asserts:
+      - notExists:
+          path: apiVersion
+      - notExists:
+          path: kind
+
+  - it: should not render the PVC with enabled persistence but existing PVC
+    set:
+      persistence.persistentVolumeClaim:
+        useExistingPVC: true
+    asserts:
+      - notExists:
+          path: apiVersion
+      - notExists:
+          path: kind
+  
+  - it: should render the PVC by default
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+  
+  - it: should render the PVC with adjusted Claim-name
+    set:
+      persistence.persistentVolumeClaim:
+        claimName: "test-claim"
     asserts:
       - isKind:
           of: PersistentVolumeClaim
       - equal:
-          path: spec.accessModes
-          value: ["ReadWriteMany"]
+          path: metadata.name
+          value: "test-claim"
+  
+  - it: should render the PVC with adjusted specs
+    set:
+      persistence.persistentVolumeClaim:
+        storageClassName: "invalid-storageClass"
+        accessModes: ["invalidAccessMode"]
+        storageRequest: "1337Gi"
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
       - equal:
           path: spec.storageClassName
-          value: "invalid-test-storageClass"
+          value: "invalid-storageClass"
       - equal:
-          path: metadata.name
-          value: "test-invalid-claimName"
-  
-  - it: should pass with enabled PVC and not createNew
-    #
+          path: spec.accessModes
+          value: ["invalidAccessMode"]
+      - equal:
+          path: spec.resources.requests.storage
+          value: "1337Gi"
+
+  - it: should render the PVC with additional specs-fields
     set:
-      persistence.enabled: true
-      persistence.createNewPVC: false
-    #
+      persistence.persistentVolumeClaim:
+        extraSpecs:
+          invalidPVCSpec: true
+          justAnotherObject:
+            hello: "hello world"
     asserts:
-      - notExists:
+      - isKind:
+          of: PersistentVolumeClaim
+      - isSubset:
           path: spec
-  
-  - it: should pass with disabled PVC
-    #
-    set:
-      persistence.enabled: false
-    #
-    asserts:
-      - notExists:
-          path: spec    
+          content:
+            invalidPVCSpec: true
+            justAnotherObject:
+              hello: "hello world"
