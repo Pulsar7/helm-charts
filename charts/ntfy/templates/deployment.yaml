@@ -1,6 +1,5 @@
 {{ include "ntfy.validateValues" . }}
 {{- $ntfyContainer := .Values.ntfyContainer -}}
-{{- $ntfyContainerService := $ntfyContainer.service -}}
 {{- $ntfyContainerStartupProbe := $ntfyContainer.startupProbe -}}
 {{- $ntfyContainerReadinessProbe := $ntfyContainer.readinessProbe -}}
 {{- $ntfyContainerLivenessProbe := $ntfyContainer.livenessProbe -}}
@@ -55,12 +54,10 @@ spec:
         {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+      imagePullSecrets: {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
+      securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
@@ -77,9 +74,9 @@ spec:
         image: {{ include "ntfy.containerImage" . }}
         imagePullPolicy: {{ $ntfyContainer.image.pullPolicy }}
         ports:
-        {{- range $ntfyContainerService.ports }}
-        - name: {{ .name }}
-          containerPort: {{ .containerPort }}
+        {{- range $name, $port := $ntfyContainer.ports }}
+        - name: {{ $name }}
+          containerPort: {{ $port.containerPort }}
         {{- end }}
         env:
         {{- range $index, $secretName := $authSecretNames }}

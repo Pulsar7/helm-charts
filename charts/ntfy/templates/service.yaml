@@ -1,19 +1,18 @@
 {{ include "ntfy.validateValues" . }}
-{{- $ntfyContainer := .Values.ntfyContainer -}}
-{{- $ntfyContainerService := $ntfyContainer.service -}}
+{{- $service := .Values.service -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ $ntfyContainerService.serviceName }}
+  name: {{ $service.serviceName }}
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "ntfy.labels" . | nindent 4 }}
 spec:
   selector: {{- include "ntfy.selectorLabels" . | nindent 4 }}
-  type: {{ $ntfyContainerService.type }}
+  type: {{ $service.type }}
   ports:
-  {{- range $ntfyContainerService.ports }}
-  - protocol: {{ .protocol }}
-    port: {{ .port }}
+  {{- range $name, $port := $service.ports }}
+  - protocol: {{ $port.protocol }}
+    port: {{ $port.portNumber }}
     targetPort: {{ .targetPort }}
-    name: {{ .name }}
+    name: {{ $name }}
   {{- end }}

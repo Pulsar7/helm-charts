@@ -15,35 +15,37 @@ templates:
   - templates/service.yaml
 #
 tests:
-  - it: should render Service with default specs
-    asserts:
-      - isKind:
-          of: Service
-      - equal:
-          path: metadata.name
-          value: ntfy-http
-      - equal:
-          path: spec.type
-          value: ClusterIP
-      - equal:
-          path: spec.ports
-          value:
-            - protocol: TCP
-              port: 5000
-              targetPort: http
-              name: http
-  
   - it: should render Service with adjusted specs
     set:
-      ntfyContainer.service:
-        serviceName: test-ntfy-http-service-name
+      service:
+        serviceName: "test-service"
         type: InvalidServiceType
+        ports:
+          http:
+            portNumber: 1337
+            targetPort: http
+            protocol: InvalidProtocol
+          foo:
+            portNumber: 7331
+            targetPort: foo
+            protocol: baa
     asserts:
       - isKind:
           of: Service
       - equal:
           path: metadata.name
-          value: test-ntfy-http-service-name
+          value: test-service
       - equal:
           path: spec.type
           value: InvalidServiceType
+      - equal:
+          path: spec.ports
+          value:
+            - protocol: baa
+              port: 7331
+              targetPort: foo
+              name: foo
+            - protocol: InvalidProtocol
+              port: 1337
+              targetPort: http
+              name: http

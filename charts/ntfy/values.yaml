@@ -95,31 +95,17 @@ ntfyContainer:
   # @section -- NTFY-Container specifications
   resources: {}
   #
-  service:
-    #
-    # -- Name of the NTFY-Service resource
-    # @section -- NTFY-Service specifications
-    serviceName: ntfy-http
-    #
-    # -- Type of the NTFY-Service resource
-    # @section -- NTFY-Service specifications
-    type: ClusterIP
-    # @ignored
-    ports:
-      # @ignored
-      - name: http
-        #
-        # container-Port
-        # @ignored
-        containerPort: 5000
-        #
-        # -- Exposed Service-Port
-        # @section -- NTFY-Service specifications
-        port: 5000
-        # @ignored
-        targetPort: http
-        # @ignored
-        protocol: TCP
+  # Container ports
+  ports:
+    http:
+      #
+      # -- Exposed Container-Port
+      # @section -- NTFY-Container/ports/http specifications
+      containerPort: 5000
+      #
+      # -- Protocol
+      # @section -- NTFY-Container/ports/http specifications
+      protocol: TCP
   #
   # -- Additional VolumeMounts
   # @section -- NTFY-Container specifications
@@ -144,6 +130,37 @@ ntfyContainer:
   # -- Liveness-Probe
   # @section -- NTFY-Container specifications
   livenessProbe: {}
+
+
+# =======================================================================
+# Service specifications
+# =======================================================================
+service:
+  #
+  # -- Name of the NTFY-Service resource
+  # @section -- NTFY-Service specifications
+  serviceName: ntfy-http
+  #
+  # -- Type of the NTFY-Service resource
+  # @section -- NTFY-Service specifications
+  type: ClusterIP
+  # @ignored
+  ports:
+    #
+    # HTTP-port
+    http:
+      #
+      # -- Exposed Service-port
+      # @section -- NTFY-Service specifications
+      portNumber: 5000
+      #
+      # -- Exposed Container-port name
+      # @section -- NTFY-Service specifications
+      targetPort: http
+      #
+      # -- Protocol
+      # @section -- NTFY-Service specifications
+      protocol: TCP
 
 
 # =======================================================================
@@ -281,7 +298,7 @@ ingressRoute:
 # -- List of middlewares added to the IngressRoute
 # ignored when (`ingressRoute.enabled: false`)
 # @section -- IngressRoute/Middlewares specifications
-middlewares: []
+middlewares: {}
 
 
 # =================================================================

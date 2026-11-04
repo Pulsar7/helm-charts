@@ -1,8 +1,8 @@
 {{ include "ntfy.validateValues" . }}
 {{- $ingressRoute := .Values.ingressRoute -}}
 {{- if $ingressRoute.enabled }}
-{{- $ntfyContainer := .Values.ntfyContainer -}}
-{{- $ntfyContainerServicePorts := $ntfyContainer.service.ports -}}
+{{- $service := .Values.service -}}
+{{- $servicePorts := $service.ports -}}
 {{- $middlewares := .Values.middlewares -}}
 {{- $namespace := .Release.Namespace | quote -}}
 apiVersion: traefik.io/v1alpha1
@@ -17,13 +17,13 @@ spec:
   - match: {{ $ingressRoute.routeMatch }}
     kind: Rule
     services:
-    - name: {{ include "ntfy.fullname" . }}
-      port: {{ index $ntfyContainerServicePorts 0 "port" }}
+    - name: {{ $service.serviceName }}
+      port: {{ $servicePorts.http.portNumber }}
       scheme: http
     {{- if $middlewares }}
     middlewares:
-    {{- range $middlewares }}
-    - name: {{ .name }}
+    {{- range $name, $middleware := $middlewares }}
+    - name: {{ $name }}
       namespace: {{ $namespace }}
     {{- end }}
     {{- end }}

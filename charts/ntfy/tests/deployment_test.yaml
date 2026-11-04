@@ -78,7 +78,7 @@ tests:
     set:
       ingressRoute.enabled: true
       middlewares:
-        - name: test-middleware
+        test-middleware:
           spec:
             middlewareSpec: "1337"
     asserts:

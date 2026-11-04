@@ -30,4 +30,46 @@ tests:
     asserts:
       - isKind:
           of: IngressRoute
-    
+  
+  - it: should render the IngressRoute resource with adjusted specs
+    set:
+      service:
+        serviceName: "test-service"
+        ports:
+          http:
+            portNumber: 7331
+      ingressRoute:
+        enabled: true
+        routeMatch: Host(`test-host`)
+        entryPoints: ["invalid-entrypoint"]
+        certResolver: "invalid-certresolver"
+      middlewares: {}
+    asserts:
+      - equal:
+          path: spec.entryPoints
+          value: ["invalid-entrypoint"]
+      - equal:
+          path: spec.routes[0].match
+          value: Host(`test-host`)
+      - equal:
+          path: spec.routes[0].services[0].name
+          value: "test-service"
+      - equal:
+          path: spec.routes[0].services[0].port
+          value: 7331
+      - notExists:
+          path: spec.routes[0].middlewares
+  
+  - it: should not render the disabled IngressRoute resource with a defined test-middleware
+    set:
+      ingressRoute.enabled: true
+      middlewares:
+        example:
+          spec:
+            foo: baa
+    asserts:
+      - equal:
+          path: spec.routes[0].middlewares
+          value:
+            - name: example
+              namespace: NAMESPACE
