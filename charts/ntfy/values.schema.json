@@ -28,12 +28,16 @@
         },
         "securityContext": {"type": "object"},
         "resources": {"type": "object"},
-        "service": {
+        "ports": {
           "type": "object",
           "properties": {
-            "serviceName": {"type": "string"},
-            "type": {"type": "string"},
-            "ports": {"type": "array"}
+            "http": {
+              "type": "object",
+              "properties": {
+                "containerPort": {"type": "integer"},
+                "protocol": {"type": "string"}
+              }
+            }
           }
         },
         "extraVolumeMounts": {"type": "array"},
@@ -42,6 +46,27 @@
         "startupProbe": {"type": "object"},
         "readinessProbe": {"type": "object"},
         "livenessProbe": {"type": "object"}
+      }
+    },
+
+    "service": {
+      "type": "object",
+      "properties": {
+        "serviceName": {"type": "string"},
+        "type": {"type": "string"},
+        "ports": {
+          "type": "object",
+          "properties": {
+            "http": {
+              "type": "object",
+              "properties": {
+                "portNumber": {"type": "integer"},
+                "targetPort": {"type": "string"},
+                "protocol": {"type": "string"}
+              }
+            }
+          }
+        }
       }
     },
 
