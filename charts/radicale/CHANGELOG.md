@@ -28,9 +28,9 @@ This version adds additional Helm values validation checks as template functions
 
 ## `0.2.0` to `0.2.1`
 
-* 
+* __Fix__ indentation of `metadata.labels` at IngressRoute-manifest
 
-## `` to `0.2.0`
+## `0.1.10-alpha` to `0.2.0`
 
 > [!CAUTION]
 > This release includes **breaking changes**!

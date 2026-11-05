@@ -73,7 +73,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
-{{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
+{{- printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
 {{- end }}
 {{- end }}
 
