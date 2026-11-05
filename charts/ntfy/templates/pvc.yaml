@@ -1,17 +1,20 @@
 {{ include "ntfy.validateValues" . }}
 {{- $persistence := .Values.persistence -}}
-{{- if and $persistence.enabled $persistence.createNewPVC }}
+{{- $pvc := $persistence.persistentVolumeClaim -}}
+{{- if (include "ntfy.createPersistentVolumeClaim" .) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "ntfy.pvc" . }}
+  name: {{ include "ntfy.persistentVolumeClaimName" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels:
-    {{- include "ntfy.labels" . | nindent 4 }}
+  labels: {{- include "ntfy.labels" . | nindent 4 }}
 spec:
-  storageClassName: {{ $persistence.storageClassName }}
-  accessModes: {{ toYaml $persistence.accessModes | nindent 2 }}
+  storageClassName: {{ $pvc.storageClassName }}
+  accessModes: {{ $pvc.accessModes | toYaml | nindent 2 }}
   resources:
     requests:
-      storage: {{ $persistence.storageRequest }}
+      storage: {{ $pvc.storageRequest }}
+  {{- if $pvc.extraSpecs }}
+  {{- $pvc.extraSpecs | toYaml | nindent 2 }}
+  {{- end }}
 {{- end }}

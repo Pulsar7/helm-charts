@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# ConfigMap-Unittests Test-Suite for NTFY
+# ConfigMap-Unittests Test-Suite for ntfy
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
@@ -15,15 +15,18 @@ templates:
   - templates/configmap.yaml
 #
 tests:
-  - it: should pass with own 'server.yaml' configuration
-    #
+  - it: should not render ConfigMap-resource
     set:
-      configFiles.serverYAML.useOwnConfigFileContent: true
-      configFiles.serverYAML.ownConfigFileContent: "hello world"
-    #
+      serverConfig.useExistingConfigMap: true
+    asserts:
+      - notExists:
+          path: ConfigMap
+  
+  - it: should render ConfigMap-resource with default Values
     asserts:
       - isKind:
           of: ConfigMap
-      - equal:
-          path: data["server.yaml"]
-          value: "hello world"
+      - exists:
+          path: metadata
+      - exists:
+          path: data

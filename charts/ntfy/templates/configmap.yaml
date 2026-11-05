@@ -1,17 +1,13 @@
 {{ include "ntfy.validateValues" . }}
-{{- $serverYAML := .Values.configFiles.serverYAML -}}
+{{- $serverConfig := .Values.serverConfig -}}
+{{- if (include "ntfy.createConfigMap" .) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "ntfy.fullname" . }}
+  name: {{ include "ntfy.configMapName" . }}
   namespace: {{ .Release.Namespace | quote }}
-  labels:
-    {{- include "ntfy.labels" . | nindent 4 }}
+  labels: {{- include "ntfy.labels" . | nindent 4 }}
 data:
-  {{- if $serverYAML.useOwnConfigFileContent }}
-  server.yaml: |-
-    {{ toYaml $serverYAML.ownConfigFileContent | indent 4 }}
-  {{- else }}
-  server.yaml: |-
+  {{ $serverConfig.configMapItemKey }}: |-
     {{- tpl ($.Files.Get "config/server.yaml") . | nindent 4 }}
-  {{- end }}
+{{- end }}

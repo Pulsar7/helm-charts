@@ -1,10 +1,30 @@
 {{ template "chart.header" . }}
 {{ template "chart.description" . }}
 
-> [!IMPORTANT]
-> Only configured for Traefik-Ingress, since **IngressRoute** is being used.
-
 {{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+## Ingress
+
+You can optionally enable the `IngressRoute`-resource by enabling `.Values.ingressRoute.enabled` at the Helm-Values.
+Additionally, you can define `Middlewares` at `.Values.middlewares`.
+
+## Authentication
+
+By default a `test-admin` (role: **admin**) and `test-user` (role: **user**) is defined at the `.Values.authentication.authUsers`-block:
+
+```YAML
+defaultSecretValue: |-
+  test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin,test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user
+```
+
+Both (`test-admin` and `test-user`) use the same password: `lol1234`
+
+Currently, the `auth-users`, `auth-tokens` and `auth-access` configuration is stored as environment-variables at the Container.
+In the near future, the implementation may change to an init-container that adjusts the Server-configuration file at initialization instead.
+
+## Config-file
+
+{{ template "chart.requirementsSection" . }}
 
 {{ template "chart.valuesSection" . }}
 
