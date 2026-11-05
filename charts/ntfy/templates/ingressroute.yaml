@@ -22,8 +22,8 @@ spec:
       scheme: http
     {{- if $middlewares }}
     middlewares:
-    {{- range $name, $middleware := $middlewares }}
-    - name: {{ $name }}
+    {{- range $middleware := $middlewares }}
+    - name: {{ $middleware.name | quote }}
       namespace: {{ $namespace }}
     {{- end }}
     {{- end }}

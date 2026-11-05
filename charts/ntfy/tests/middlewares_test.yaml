@@ -17,7 +17,10 @@ templates:
 tests:
   - it: should not render any Middlewares resource
     set:
-      ingressRoute.enabled: false
+      ingressRoute:
+        enabled: false
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-certresolver"
     asserts:
       - notExists:
           path: apiVersion
@@ -26,9 +29,13 @@ tests:
   
   - it: should render one Middleware resource
     set:
-      ingressRoute.enabled: true
+      ingressRoute:
+        enabled: true
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-certresolver"
       middlewares:
-        test-middleware:
+        testMiddleware:
+          name: "test-middleware"
           spec:
             middlewareSpec: "1337"
     asserts:

@@ -9,7 +9,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: {{ $middleware.name }}
+  name: {{ $middleware.name | quote }}
   namespace: {{ $namespace }}
   labels: {{- $labels | nindent 4 }}
 spec:

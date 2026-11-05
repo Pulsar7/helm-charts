@@ -17,7 +17,10 @@ templates:
 tests:
   - it: should not render the IngressRoute resource
     set:
-      ingressRoute.enabled: false
+      ingressRoute:
+        enabled: false
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-certresolver"
     asserts:
       - notExists:
           path: apiVersion
@@ -26,7 +29,10 @@ tests:
   
   - it: should render the IngressRoute resource
     set:
-      ingressRoute.enabled: true
+      ingressRoute:
+        enabled: true
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-certresolver"
     asserts:
       - isKind:
           of: IngressRoute
@@ -62,9 +68,13 @@ tests:
   
   - it: should not render the disabled IngressRoute resource with a defined test-middleware
     set:
-      ingressRoute.enabled: true
+      ingressRoute:
+        enabled: true
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-certresolver"
       middlewares:
-        example:
+        exampleMiddleware:
+          name: "example"
           spec:
             foo: baa
     asserts:
