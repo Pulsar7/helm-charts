@@ -5,15 +5,15 @@
 {{- if $middlewares }}
 {{- $namespace := .Release.Namespace | quote -}}
 {{- $labels := (include "ntfy.labels" .) -}}
-{{- range $name, $middleware := $middlewares }}
+{{- range $middleware := $middlewares }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: {{ $name }}
+  name: {{ $middleware.name }}
   namespace: {{ $namespace }}
   labels: {{- $labels | nindent 4 }}
 spec:
-  {{ $middleware.spec | toYaml | nindent 2 }}
+  {{- $middleware.spec | toYaml | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

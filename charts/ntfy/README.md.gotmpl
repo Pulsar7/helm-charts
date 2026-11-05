@@ -1,0 +1,26 @@
+{{ template "chart.header" . }}
+{{ template "chart.description" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+## Ingress
+
+You can optionally enable the `IngressRoute`-resource by enabling `.Values.ingressRoute.enabled` at the Helm-Values.
+Additionally, you can define `Middlewares` at `.Values.middlewares`.
+
+## Authentication
+
+By default a `test-admin` (role: **admin**) and `test-user` (role: **user**) is defined at the `.Values.authentication.authUsers`-block:
+
+```YAML
+defaultSecretValue: |-
+  test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin,test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user
+```
+
+Both (`test-admin` and `test-user`) use the same password: `lol1234`
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}

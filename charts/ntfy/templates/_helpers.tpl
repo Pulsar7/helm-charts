@@ -170,6 +170,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- define "ntfy.validateValues" -}}
 {{- $messages := list -}}
 {{- $messages := append $messages (include "ntfy.validateValues.configFile.serverConfig" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.ingressRoute" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
@@ -178,16 +179,43 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- end }}
 
 {{/*
-Validate values of ntfy - configFile.serverConfig
+Validate values for ntfy - configFile.serverConfig
 */}}
 {{- define "ntfy.validateValues.configFile.serverConfig" -}}
 {{- $messages := list -}}
 {{- $message := "" -}}
 {{- $config := .Values.serverConfig -}}
-
+{{/*
+@benedikt.fichtner: TODO
+*/}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n  > " $messages -}}
 {{- if $message -}}
 {{- printf " ntfy: serverConfig\n   > %s" $message -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate values for ntfy - ingressRoute
+*/}}
+{{- define "ntfy.validateValues.ingressRoute" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- if $ingressRoute.enabled -}}
+{{- if not $ingressRoute.entryPoints -}}
+{{- $messages = append $messages "Missing required `.Values.ingressRoute.entryPoints`-Helm-Value. List cannot be empty." -}}
+{{- end }}
+{{- if not $ingressRoute.routeMatch -}}
+{{- $messages = append $messages "Missing required `.Values.ingressRoute.routeMatch`-Helm-Value." -}}
+{{- end }}
+{{- if not $ingressRoute.certResolver -}}
+{{- $messages = append $messages "Missing required `.Values.ingressRoute.certResolver`-Helm-Value." -}}
+{{- end }}
+{{- end }}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n   > " $messages -}}
+{{- if $message -}}
+{{- printf " ntfy: ingressRoute\n   > %s" $message -}}
 {{- end }}
 {{- end }}

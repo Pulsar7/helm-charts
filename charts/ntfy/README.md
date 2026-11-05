@@ -1,8 +1,24 @@
 # ntfy
 
+Helm chart to deploy ntfy
+
 ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.26.0](https://img.shields.io/badge/AppVersion-v2.26.0-informational?style=flat-square)
 
-Helm chart to deploy ntfy
+## Ingress
+
+You can optionally enable the `IngressRoute`-resource by enabling `.Values.ingressRoute.enabled` at the Helm-Values.
+Additionally, you can define `Middlewares` at `.Values.middlewares`.
+
+## Authentication
+
+By default a `test-admin` (role: **admin**) and `test-user` (role: **user**) is defined at the `.Values.authentication.authUsers`-block:
+
+```YAML
+defaultSecretValue: |-
+  test-admin:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:admin,test-user:$2a$10$1Y//CVdFIQRYNfIITwqZDeqnh0bFSM/Bhxjis5gKItcgU0UrSNWAa:user
+```
+
+Both (`test-admin` and `test-user`) use the same password: `lol1234`
 
 ## Values
 

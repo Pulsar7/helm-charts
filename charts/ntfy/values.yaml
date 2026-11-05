@@ -299,6 +299,14 @@ ingressRoute:
 # ignored when (`ingressRoute.enabled: false`)
 # @section -- IngressRoute/Middlewares specifications
 middlewares: {}
+#
+# e.g.:
+#  exampleMiddleware:
+#    name: "example-middleware"
+#    spec:
+#      headers:
+#        forceSTSHeader: true
+#        stsSeconds: 15552000
 
 
 # =================================================================

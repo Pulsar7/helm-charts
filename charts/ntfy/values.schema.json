@@ -132,7 +132,13 @@
       }
     },
 
-    "middlewares": {"type": "object"},
+    "middlewares": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "spec": {"type": "object"}
+      }
+    },
 
     "serverConfig": {
       "type": "object",
