@@ -61,3 +61,6 @@ tests:
           value:
             - name: test-radicale-middleware
               namespace: NAMESPACE
+      - equal:
+          path: spec.tls.certResolver
+          value: "test-resolver"

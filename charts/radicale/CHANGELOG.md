@@ -22,6 +22,10 @@
   - `.Values.radicaleContainer.readinessProbe`
   - `.Values.radicaleContainer.livenessProbe`
 
+#### Additional Helm-Value validation
+
+This version adds additional Helm values validation checks as template functions. If a check fails, Helm chart rendering fails.
+
 ## `0.2.0` to `0.2.1`
 
 * 
