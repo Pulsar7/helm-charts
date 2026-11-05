@@ -171,6 +171,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- $messages := list -}}
 {{- $messages := append $messages (include "ntfy.validateValues.configFile.serverConfig" .) -}}
 {{- $messages := append $messages (include "ntfy.validateValues.ingressRoute" .) -}}
+{{- $messages := append $messages (include "ntfy.validateValues.middlewares" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
@@ -217,5 +218,30 @@ Validate values for ntfy - ingressRoute
 {{- $message := join "\n   > " $messages -}}
 {{- if $message -}}
 {{- printf " ntfy: ingressRoute\n   > %s" $message -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate values for ntfy - middlewares
+*/}}
+{{- define "ntfy.validateValues.middlewares" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- $middlewares := .Values.middlewares -}}
+{{- if and $ingressRoute.enabled $middlewares -}}
+{{- range $objName, $middleware := $middlewares }}
+{{- if not $middleware.name }}
+{{- $messages = append $messages (printf "Missing required `.Values.middlewares.%s.name`-Helm-Value." $objName) -}}
+{{- end }}
+{{- if not $middleware.spec }}
+{{- $messages = append $messages (printf "Missing required `.Values.middlewares.%s.spec`-Helm-Value object." $objName) -}}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n   > " $messages -}}
+{{- if $message -}}
+{{- printf " ntfy: middlewares\n   > %s" $message -}}
 {{- end }}
 {{- end }}
