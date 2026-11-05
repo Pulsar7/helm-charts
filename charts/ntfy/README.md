@@ -20,6 +20,11 @@ defaultSecretValue: |-
 
 Both (`test-admin` and `test-user`) use the same password: `lol1234`
 
+Currently, the `auth-users`, `auth-tokens` and `auth-access` configuration is stored as environment-variables at the Container.
+In the near future, the implementation may change to an init-container that adjusts the Server-configuration file at initialization instead.
+
+## Config-file
+
 ## Values
 
 ### Pod specifications
