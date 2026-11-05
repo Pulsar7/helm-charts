@@ -46,3 +46,30 @@ tests:
       - equal:
           path: spec.burst
           value: 333
+  
+  - it: should fail to render middlewares with missing middleware-name
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["invalid-test-entrypoint"]
+      middlewares:
+        testRadicaleMiddleware:
+          spec:
+            average: 999
+            period: 777s
+            burst: 333
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `name`-Helm-Value for `testRadicaleMiddleware`-middleware
+  
+  - it: should fail to render middlewares with missing middleware-spec
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["invalid-test-entrypoint"]
+      middlewares:
+        testRadicaleMiddleware:
+          name: "test-radicale-middleware"
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `spec`-Helm-Value for `testRadicaleMiddleware`-middleware

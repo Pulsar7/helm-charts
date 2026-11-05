@@ -125,9 +125,14 @@ Validate values for radicale - middlewares
 {{- $ingressRoute := .Values.ingressRoute -}}
 {{- $middlewares := .Values.middlewares -}}
 {{- if and $ingressRoute.enabled $middlewares -}}
-{{/*
-@benedikt.fichtner: TODO
-*/}}
+{{- range $objName, $middleware := $middlewares -}}
+{{- if not $middleware.name -}}
+{{- $messages = append $messages (printf "Missing required `name`-Helm-Value for `%s`-middleware" $objName) -}}
+{{- end -}}
+{{- if not $middleware.spec -}}
+{{- $messages = append $messages (printf "Missing required `spec`-Helm-Value for `%s`-middleware" $objName) -}}
+{{- end -}}
+{{- end -}}
 {{- end }}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n   > " $messages -}}

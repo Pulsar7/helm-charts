@@ -64,3 +64,22 @@ tests:
       - equal:
           path: spec.tls.certResolver
           value: "test-resolver"
+  
+  - it: should fail to render IngressRoute with missing `entryPoints`
+    set:
+      ingressRoute:
+        enabled: true
+        routeMatch: Host(``)
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `entryPoints`-Helm-Value. List cannot be empty.
+  
+  - it: should fail to render IngressRoute with missing `entryPoints`
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["websecure", "test"]
+        routeMatch: null
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `routeMatch`-Helm-Value.
