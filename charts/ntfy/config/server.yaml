@@ -1,6 +1,5 @@
 {{- $ntfyContainer := .Values.ntfyContainer -}}
-{{- $service := .Values.service -}}
-{{- $ports := $service.ports -}}
+{{- $ntfyContainerPorts := $ntfyContainer.ports -}}
 {{- $config := .Values.serverConfig.dynamicValues -}}
 {{- $rateLimits := $config.rateLimits -}}
 # > https://github.com/binwiederhier/ntfy/blob/v2.18.0/server/server.yml
@@ -27,7 +26,7 @@ base-url: {{ $config.baseURL }}
 # To listen on all interfaces, you may omit the IP address, e.g. ":443".
 # To disable HTTP, set "listen-http" to "-".
 #
-listen-http: ":{{ $ports.http.containerPort }}"
+listen-http: ":{{ $ntfyContainerPorts.http.containerPort }}"
 # listen-https:
 
 # Listen on a Unix socket, e.g. /var/lib/ntfy/ntfy.sock
