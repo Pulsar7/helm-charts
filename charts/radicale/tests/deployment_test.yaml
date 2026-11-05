@@ -51,7 +51,9 @@ tests:
   - it: should render deployment with enabled IngressRoute
     template: templates/deployment.yaml
     set:
-      ingressRoute.enabled: true
+      ingressRoute:
+        enabled: true
+        entryPoints: ["invalid-test-entrypoint"]
     asserts:
       - isKind:
           of: Deployment

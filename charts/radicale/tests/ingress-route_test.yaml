@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# IngressRoute-Unittests Test-Suite for Radicale
+# IngressRoute-Unittests Test-Suite for radicale
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 #
@@ -12,14 +12,20 @@ templates:
   - templates/ingress-route.yaml
 #
 tests:
-  - it: should render enabled ingressroute with test values
-    #
+  - it: should not render IngressRoute
     set:
-      ingressRoute.enabled: true
-      ingressRoute.entryPoints: ["websecure", "test"]
-      ingressRoute.certResolver: "test-resolver"
-      ingressRoute.routeMatch: Host(`test-host`)
-    #
+      ingressRoute.enabled: false
+    asserts:
+      - notExists:
+          path: spec
+
+  - it: should render enabled ingressroute with test values
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["websecure", "test"]
+        certResolver: "test-resolver"
+        routeMatch: Host(`test-host`)
     asserts:
       - isKind:
           of: IngressRoute
@@ -32,3 +38,48 @@ tests:
       - equal:
           path: spec.tls.certResolver
           value: "test-resolver"
+  
+  - it: should render enabled IngressRoute with referenced middlewares
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["websecure", "test"]
+        certResolver: "test-resolver"
+        routeMatch: Host(`test-host`)
+      middlewares:
+        testRadicaleMiddleware:
+          name: test-radicale-middleware
+          spec:
+            average: 999
+            period: 777s
+            burst: 333
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - equal:
+          path: spec.routes[0].middlewares
+          value:
+            - name: test-radicale-middleware
+              namespace: NAMESPACE
+      - equal:
+          path: spec.tls.certResolver
+          value: "test-resolver"
+  
+  - it: should fail to render IngressRoute with missing `entryPoints`
+    set:
+      ingressRoute:
+        enabled: true
+        routeMatch: Host(``)
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `entryPoints`-Helm-Value. List cannot be empty.
+  
+  - it: should fail to render IngressRoute with missing `entryPoints`
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["websecure", "test"]
+        routeMatch: null
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `routeMatch`-Helm-Value.

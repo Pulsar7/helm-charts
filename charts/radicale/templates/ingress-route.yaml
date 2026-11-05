@@ -1,14 +1,15 @@
 {{ include "radicale.validateValues" . }}
 {{- $ingressRoute := .Values.ingressRoute -}}
 {{- $middlewares := .Values.middlewares -}}
-{{- $middlewareNamespace := .Release.Namespace | quote -}}
+{{- $namespace := .Release.Namespace | quote -}}
 {{- if $ingressRoute.enabled }}
-{{- $radicaleContainer := .Values.radicaleContainer -}}
+{{- $service := .Values.service -}}
+{{- $servicePorts := $service.ports -}}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: {{ include "radicale.ingressRouteName" . }}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ $namespace }}
   labels: {{- include "radicale.labels" . | nindent 4 }}
 spec:
   entryPoints: {{- toYaml $ingressRoute.entryPoints | nindent 4 }}
@@ -17,15 +18,17 @@ spec:
     kind: Rule
     services:
     - name: {{ include "radicale.serviceName" . }}
-      port: {{ index $radicaleContainer.service.ports 0 "port" }}
+      port: {{ $service.ports.http.portNumber }}
       scheme: http
     {{- if $middlewares }}
     middlewares:
-    {{- range $middlewares }}
-    - name: {{ .name | quote }}
-      namespace: {{ $middlewareNamespace }}
+    {{- range $middleware := $middlewares }}
+    - name: {{ $middleware.name | quote }}
+      namespace: {{ $namespace }}
     {{- end }}
     {{- end }}
+  {{- with $ingressRoute.certResolver }}
   tls:
-    certResolver: {{ .Values.ingressRoute.certResolver }}
+    certResolver: {{ . }}
+  {{- end }}
 {{- end }}

@@ -1,6 +1,5 @@
 {{ include "radicale.validateValues" . }}
-{{- $radicaleContainer := .Values.radicaleContainer -}}
-{{- $service := $radicaleContainer.service -}}
+{{- $service := .Values.service -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,9 +10,9 @@ spec:
   selector: {{- include "radicale.selectorLabels" . | nindent 4 }}
   type: {{ $service.type }}
   ports:
-  {{- range $service.ports }}
-  - protocol: {{ .protocol }}
-    port: {{ .port }}
-    targetPort: {{ .targetPort }}
-    name: {{ .name }}
+  {{- range $portObjName, $port := $service.ports }}
+  - protocol: {{ $port.protocol }}
+    port: {{ $port.portNumber }}
+    targetPort: {{ $port.targetPort }}
+    name: {{ $portObjName }}
   {{- end }}

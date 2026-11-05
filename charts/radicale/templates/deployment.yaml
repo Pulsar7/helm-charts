@@ -1,7 +1,6 @@
 {{ include "radicale.validateValues" . }}
 {{- $radicaleContainer := .Values.radicaleContainer -}}
-{{- $radicaleContainerLivenessProbe := $radicaleContainer.livenessProbe -}}
-{{- $radicaleContainerReadinessProbe := $radicaleContainer.readinessProbe -}}
+{{- $radicaleContainerPorts := $radicaleContainer.ports -}}
 {{- $persistence := .Values.persistence -}}
 {{- $authentication := .Values.authentication -}}
 {{- $ingressRoute := .Values.ingressRoute -}}
@@ -42,50 +41,26 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- if .Values.imagePullSecrets }}
-      imagePullSecrets: {{- .Values.imagePullSecrets | toYaml | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{- . | toYaml | nindent 8 }}
       {{- end }}
-      {{- if .Values.podSecurityContext }}
-      securityContext: {{- .Values.podSecurityContext | toYaml | nindent 8 }}
+      {{- with .Values.podSecurityContext }}
+      securityContext: {{- . | toYaml | nindent 8 }}
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ include "radicale.containerImage" . }}
         imagePullPolicy: {{ $radicaleContainer.image.pullPolicy }}
         ports:
-        {{- range $radicaleContainer.service.ports }}
-        - name: {{ .name }}
-          containerPort: {{ .containerPort }}
+        {{- range $portName, $port := $radicaleContainerPorts }}
+        - name: {{ $portName }}
+          containerPort: {{ $port.containerPort }}
         {{- end }}
-        {{- if $radicaleContainer.environmentVariables }}
-        env: {{- $radicaleContainer.environmentVariables | toYaml | nindent 8 }}
+        {{- with $radicaleContainer.env }}
+        env: {{- . | toYaml | nindent 8 }}
         {{- end }}
-        {{- if $radicaleContainer.securityContext }}
-        securityContext: {{- $radicaleContainer.securityContext | toYaml | nindent 10 }}
-        {{- end }}
-        {{- with $radicaleContainerLivenessProbe }}
-        {{- if .enabled }}
-        livenessProbe:
-          tcpSocket:
-            port: {{ index $radicaleContainer.service.ports 0 "name" }}
-          initialDelaySeconds: {{ .initialDelaySeconds }}
-          periodSeconds: {{ .periodSeconds }}
-          timeoutSeconds: {{ .timeoutSeconds }}
-          failureThreshold: {{ .failureThreshold }}
-          successThreshold: {{ .successThreshold }}
-        {{- end }}
-        {{- end }}
-        {{- with $radicaleContainerReadinessProbe }}
-        {{- if .enabled }}
-        readinessProbe:
-          tcpSocket:
-            port: {{ index $radicaleContainer.service.ports 0 "name" }}
-          initialDelaySeconds: {{ .initialDelaySeconds }}
-          periodSeconds: {{ .periodSeconds }}
-          timeoutSeconds: {{ .timeoutSeconds }}
-          failureThreshold: {{ .failureThreshold }}
-          successThreshold: {{ .successThreshold }}
-        {{- end }}
+        {{- with $radicaleContainer.securityContext }}
+        securityContext: {{- . | toYaml | nindent 10 }}
         {{- end }}
         {{- with $radicaleContainer.resources }}
         resources: {{ toYaml . | nindent 10 }}
@@ -96,15 +71,30 @@ spec:
           readOnly: true
         - name: data
           mountPath: /data
-        {{- if $radicaleContainer.extraVolumeMounts }}
-        {{- $radicaleContainer.extraVolumeMounts | toYaml | nindent 8 }}
+        {{- with $radicaleContainer.extraVolumeMounts }}
+        {{- . | toYaml | nindent 8 }}
         {{- end }}
-      {{- if .Values.extraContainers }}
-      {{- .Values.extraContainers | toYaml | nindent 6 }}
+        {{- with $radicaleContainer.startupProbe }}
+        startupProbe: {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $radicaleContainer.readinessProbe }}
+        readinessProbe: {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $radicaleContainer.livenessProbe -}}
+        livenessProbe: {{- toYaml . | nindent 10 }}
+        {{- end }}
+      {{- with .Values.extraContainers }}
+      {{- . | toYaml | nindent 6 }}
       {{- end }}
-      nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
-      affinity: {{- toYaml .Values.affinity | nindent 8 }}
-      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{- toYaml  | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: config
         projected:

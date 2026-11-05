@@ -68,29 +68,81 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- define "radicale.validateValues" -}}
 {{- $messages := list -}}
 {{- $messages := append $messages (include "radicale.validateValues.configFile" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.ingressRoute" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.middlewares" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
-{{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
+{{- printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
 {{- end }}
 {{- end }}
 
 {{/*
-Validate values of Radicale - configFile
+Validate values of radicale - configFile
 */}}
 {{- define "radicale.validateValues.configFile" -}}
 {{- $messages := list -}}
 {{- $message := "" -}}
 {{- $config := .Values.configFile -}}
+{{- if and $config.useExistingConfigMap (not $config.configMapName) }}
+{{- $messages = append $messages "Missing required `configMapName` when `useExistingConfigMap: true`" -}}
+{{- end }}
 {{- $messages := without $messages "" -}}
-{{- $message := join "\n  > " $messages -}}
+{{- $message := join "\n   > " $messages -}}
 {{- if $message -}}
 {{- printf " radicale: configFile\n   > %s" $message -}}
 {{- end }}
 {{- end }}
 
 {{/*
-Create the Radicale-Container-Image-URL
+Validate values for radicale - ingressRoute
+*/}}
+{{- define "radicale.validateValues.ingressRoute" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- if $ingressRoute.enabled -}}
+{{- if not $ingressRoute.entryPoints -}}
+{{- $messages = append $messages "Missing required `entryPoints`-Helm-Value. List cannot be empty." -}}
+{{- end }}
+{{- if not $ingressRoute.routeMatch -}}
+{{- $messages = append $messages "Missing required `routeMatch`-Helm-Value." -}}
+{{- end }}
+{{- end }}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n   > " $messages -}}
+{{- if $message -}}
+{{- printf " radicale: ingressRoute\n   > %s" $message -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate values for radicale - middlewares
+*/}}
+{{- define "radicale.validateValues.middlewares" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $ingressRoute := .Values.ingressRoute -}}
+{{- $middlewares := .Values.middlewares -}}
+{{- if and $ingressRoute.enabled $middlewares -}}
+{{- range $objName, $middleware := $middlewares -}}
+{{- if not $middleware.name -}}
+{{- $messages = append $messages (printf "Missing required `name`-Helm-Value for `%s`-middleware" $objName) -}}
+{{- end -}}
+{{- if not $middleware.spec -}}
+{{- $messages = append $messages (printf "Missing required `spec`-Helm-Value for `%s`-middleware" $objName) -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n   > " $messages -}}
+{{- if $message -}}
+{{- printf " radicale: middlewares\n   > %s" $message -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the radicale-Container-Image-URL
 */}}
 {{- define "radicale.containerImage" -}}
 {{- $containerImage := .Values.radicaleContainer.image -}}
@@ -103,15 +155,14 @@ Create Secret-Name
 */}}
 {{- define "radicale.secretName" -}}
 {{- $authentication := .Values.authentication -}}
-{{- $secretName := $authentication.secretName | default (include "radicale.fullname" .) -}}
-{{- printf "%s" $secretName }}
+{{- default (include "radicale.fullname" .) $authentication.secretName -}}
 {{- end }}
 
 {{/*
 Create IngressRoute-Name
 */}}
 {{- define "radicale.ingressRouteName" -}}
-{{- printf "%s" (include "radicale.fullname" .) }}
+{{- (include "radicale.fullname" .) }}
 {{- end }}
 
 {{/*
@@ -119,15 +170,15 @@ Create ConfigMap-Name
 */}}
 {{- define "radicale.configMapName" -}}
 {{- $configFile := .Values.configFile -}}
-{{- $configMapName :=  $configFile.configMapName | default (include "radicale.fullname" .) -}}
-{{- printf "%s" $configMapName }}
+{{- default (include "radicale.fullname" .) $configFile.configMapName -}}
 {{- end }}
 
 {{/*
 Create Service-Name
 */}}
 {{- define "radicale.serviceName" -}}
-{{- printf "%s" (include "radicale.fullname" .) }}
+{{- $service := .Values.service -}}
+{{ default (include "radicale.fullname" .) $service.serviceName }}
 {{- end }}
 
 {{/*

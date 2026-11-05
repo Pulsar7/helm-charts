@@ -24,35 +24,37 @@
         },
         "securityContext": {"type": "object"},
         "resources": {"type": "object"},
-        "service": {
+        "ports": {
           "type": "object",
           "properties": {
-            "type": {"type": "string"},
-            "ports": {"type": "array"}
+            "http": {
+              "type": "object",
+              "properties": {
+                "containerPort": {"type": "integer"},
+                "protocol": {"type": "string"}
+              }
+            }
           }
         },
         "extraVolumeMounts": {"type": "array"},
-        "environmentVariables": {"type": "array"},
-        "livenessProbe": {
+        "env": {"type": "array"},
+        "startupProbe": {"type": "object"},
+        "readinessProbe": {"type": "object"},
+        "livenessProbe": {"type": "object"}
+      }
+    },
+
+    "service": {
+      "type": "object",
+      "properties": {
+        "serviceName": {"type": "string"},
+        "type": {"type": "string"},
+        "http": {
           "type": "object",
           "properties": {
-            "enabled": {"type": "boolean"},
-            "initialDelaySeconds": {"type": "integer"},
-            "periodSeconds": {"type": "integer"},
-            "timeoutSeconds": {"type": "integer"},
-            "failureThreshold": {"type": "integer"},
-            "successThreshold": {"type": "integer"}
-          }
-        },
-        "readinessProbe": {
-          "type": "object",
-          "properties": {
-            "enabled": {"type": "boolean"},
-            "initialDelaySeconds": {"type": "integer"},
-            "periodSeconds": {"type": "integer"},
-            "timeoutSeconds": {"type": "integer"},
-            "failureThreshold": {"type": "integer"},
-            "successThreshold": {"type": "integer"}
+            "portNumber": {"type": "integer"},
+            "targetPort": {"type": "integer"},
+            "protocol": {"type": "string"}
           }
         }
       }
@@ -109,13 +111,14 @@
         "routeMatch": {"type": "string"}
       }
     },
-    "middlewares": {"type": "array"}
+    "middlewares": {"type": "object"}
   },
 
   "required": [
     "replicaCount",
     "strategy",
     "radicaleContainer",
+    "service",
     "authentication",
     "persistence",
     "configFile",
