@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Middlewares-Unittests Test-Suite for Radicale
+# Middlewares-Unittests Test-Suite for radicale
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
@@ -12,20 +12,31 @@ templates:
   - templates/middlewares.yaml
 #
 tests:
-  - it: should render enabled middlewares with test values
-    #
+  - it: should not render middlewares with disabled IngressRoute
     set:
-      ingressRoute.enabled: true
+      ingressRoute.enabled: false
+    asserts:
+      - notExists:
+          path: spec
+
+  - it: should render enabled middlewares with test values
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["invalid-test-entrypoint"]
       middlewares:
-        - name: test-radicale-middleware
+        testRadicaleMiddleware:
+          name: test-radicale-middleware
           spec:
             average: 999
             period: 777s
             burst: 333
-    #
     asserts:
       - isKind:
           of: Middleware
+      - equal:
+          path: metadata.name
+          value: "test-radicale-middleware"
       - equal:
           path: spec.average
           value: 999
@@ -35,12 +46,3 @@ tests:
       - equal:
           path: spec.burst
           value: 333
-  
-  - it: should render disabled middlewares-resources with disabled ingressRoute
-    #
-    set:
-      ingressRoute.enabled: false
-    #
-    asserts:
-      - notExists:
-          path: spec

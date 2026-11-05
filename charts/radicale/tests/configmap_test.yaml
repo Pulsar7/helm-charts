@@ -14,7 +14,9 @@ templates:
 tests:
   - it: should not render configmap resource
     set:
-      configFile.useExistingConfigMap: true
+      configFile:
+        useExistingConfigMap: true
+        configMapName: "test-cm"
     asserts:
       - notExists:
           path: kind

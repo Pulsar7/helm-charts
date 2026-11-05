@@ -12,19 +12,24 @@ templates:
   - templates/service.yaml
 #
 tests:
-  - it: should render service with type ClusterIP
+  - it: should render service with adjusted specs
     set:
-      radicaleContainer.service.type: "ClusterIP"
+      service:
+        type: "InvalidServiceType"
+        serviceName: "test-service"
     asserts:
       - isKind:
           of: Service
       - equal:
+          path: metadata.name
+          value: "test-service"
+      - equal:
           path: spec.type
-          value: "ClusterIP"
-
+          value: "InvalidServiceType"
+      
   - it: should render service with different exposed port
     set:
-      radicaleContainer.service.ports[0].port: 1337
+      service.ports.http.portNumber: 1337
     asserts:
       - equal:
           path: spec.ports[0].port

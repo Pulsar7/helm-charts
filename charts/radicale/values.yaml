@@ -1,6 +1,6 @@
 #------------------------------------------------------------------
 #
-# Values for the Custom Radicale Helm-Chart
+# Values for the Custom radicale Helm-Chart
 #
 #------------------------------------------------------------------
 
@@ -61,23 +61,23 @@ extraContainers: []
 #
 radicaleContainer:
   #
-  # Image specifications of the Radicale-Container
+  # Image specifications of the radicale-Container
   image:
     #
     # -- Container-Image-Repository
-    # @section -- Radicale-Container specifications
+    # @section -- radicale-Container specifications
     repository: "tomsquest/docker-radicale"
     #
     # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
-    # @section -- Radicale-Container specifications
+    # @section -- radicale-Container specifications
     tag: ""
     #
     # -- Container-Image pull-policy
-    # @section -- Radicale-Container specifications
+    # @section -- radicale-Container specifications
     pullPolicy: IfNotPresent
   #
   # -- Container Security Context
-  # @section -- Radicale-Container specifications
+  # @section -- radicale-Container specifications
   securityContext:
     runAsUser: 2999
     runAsGroup: 2999
@@ -86,7 +86,7 @@ radicaleContainer:
     privileged: false
   #
   # -- Container Resources
-  # @section -- Radicale-Container specifications
+  # @section -- radicale-Container specifications
   resources: {}
   #resources:
   #  requests:
@@ -96,91 +96,70 @@ radicaleContainer:
   #    memory: 500Mi
   #    cpu: 500m
   #
-  service:
-    # -- Service Type
-    # @section -- Radicale-Container specifications
-    type: ClusterIP
-    #
-    # @ignored
-    ports:
-      # @ignored
-      - name: http
-        #
-        # reference containerPort
-        # @ignored
-        containerPort: 5232
-        #
-        # -- Exposed Container-Port
-        # @section -- Radicale-Container specifications
-        port: 5232
-        #
-        # reference containerPort by name
-        # @ignored
-        targetPort: http
-        #
-        protocol: TCP
+  # Container-ports
+  ports:
+    http:
+      #
+      # -- Exposed Container-Port
+      # @section -- radicale-Container/ports/http specifications
+      containerPort: 5000
+      #
+      # -- Protocol
+      # @section -- radicale-Container/ports/http specifications
+      protocol: TCP
   #
   # -- Additional Volume-Mounts for Container
-  # @section -- Radicale-Container specifications
+  # @section -- radicale-Container specifications
   extraVolumeMounts: []
   #
   # -- Environment variables for the Container
-  # @section -- Radicale-Container specifications
-  environmentVariables:
+  # @section -- radicale-Container specifications
+  env:
     - name: "TAKE_FILE_OWNERSHIP"
       value: "false"
   #
-  livenessProbe:
-    #
-    # -- Whether to enable the Liveness-Probe
-    # @section -- Radicale-Container-Probes specifications
-    enabled: true
-    #
-    # -- Initial Delay in Seconds
-    # @section -- Radicale-Container-Probes specifications
-    initialDelaySeconds: 30
-    #
-    # -- How often to perform the liveness checks
-    # @section -- Radicale-Container-Probes specifications
-    periodSeconds: 10
-    #
-    # -- Time to wait for a response from the database
-    # @section -- Radicale-Container-Probes specifications
-    timeoutSeconds: 5
-    #
-    # -- Number of consecutive failures before restarting the Pod
-    # @section -- Radicale-Container-Probes specifications
-    failureThreshold: 3
-    #
-    # -- Number of successful checks before considering the Pod healthy (again)
-    # @section -- Radicale-Container-Probes specifications
-    successThreshold: 1
+  # -- Startup-Probe
+  # @section -- radicale-Container specifications
+  startupProbe: {}
   #
-  readinessProbe:
+  # -- Readiness-Probe
+  # @section -- radicale-Container specifications
+  readinessProbe: {}
+  #
+  # -- Liveness-Probe
+  # @section -- radicale-Container specifications
+  livenessProbe: {}
+
+
+# =================================================================
+# Service specifications
+# =================================================================
+service:
+  #
+  # -- Name of the NTFY-Service resource (overrides the default)
+  # @section -- radicale-Service specifications
+  serviceName: ""
+  #
+  # -- Type of the NTFY-Service resource
+  # @section -- radicale-Service specifications
+  type: ClusterIP
+  # @ignored
+  ports:
     #
-    # -- Whether to enable the Readiness-Probe
-    # @section -- Radicale-Container-Probes specifications
-    enabled: true
-    #
-    # -- How long to wait before starting the first readiness Probe after the container starts
-    # @section -- Radicale-Container-Probes specifications
-    initialDelaySeconds: 30
-    #
-    # -- How often to perform the readiness checks after the initial delay
-    # @section -- Radicale-Container-Probes specifications
-    periodSeconds: 5
-    #
-    # -- The maximum amount of time the probe will wait for a response from the application
-    # @section -- Radicale-Container-Probes specifications
-    timeoutSeconds: 2
-    #
-    # -- Number of consecutive failures before restarting the Pod
-    # @section -- Radicale-Container-Probes specifications
-    failureThreshold: 3
-    #
-    # -- Number of successful checks before considering the Pod healthy
-    # @section -- Radicale-Container-Probes specifications
-    successThreshold: 1
+    # HTTP-port
+    http:
+      #
+      # -- Exposed Service-port
+      # @section -- radicale-Service specifications
+      portNumber: 5232
+      #
+      # -- Exposed Container-port name
+      # @section -- radicale-Service specifications
+      targetPort: http
+      #
+      # -- Protocol
+      # @section -- radicale-Service specifications
+      protocol: TCP
 
 
 # =================================================================
@@ -190,15 +169,15 @@ radicaleContainer:
 authentication:
   #
   # -- Whether to use an existing Secret instead
-  # @section -- Radicale-Authentication specifications
+  # @section -- radicale-Authentication specifications
   useExistingSecret: false
   #
-  # -- Name of the Secret (overrides the default Name)
-  # @section -- Radicale-Authentication specifications
+  # -- Name of the Secret (overrides the default)
+  # @section -- radicale-Authentication specifications
   secretName: ""
   #
   # -- Secret-Key Name for Users
-  # @section -- Radicale-Authentication specifications
+  # @section -- radicale-Authentication specifications
   secretKey: "users"
 
 
@@ -210,31 +189,31 @@ persistence:
   #
   # -- Whether to enable persistence for collections-data (enables PVC).
   # Otherwise local ephemeral storage is being used (emptyDir).
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   enabled: true
   #
   # -- SizeLimit for emptyDir (used when persistence is disabled)
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   emptyDirSizeLimit: "1Gi"
   #
   # -- Whether to create a new PVC
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   createPVC: true
   #
   # -- StorageClassName of the PVC
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   storageClassName: ""
   #
   # -- Name of the PVC
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   claimName: ""
   #
   # -- Access-Modes of the PVC
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   accessModes: ["ReadWriteOnce"]
   #
   # -- storage-request for the PVC
-  # @section -- Radicale-Persistence specifications
+  # @section -- radicale-Persistence specifications
   storageRequest: "5Gi"
 
 
@@ -299,31 +278,33 @@ configFile:
 #
 ingressRoute:
   #
-  # -- Whether to enable the IngressRoute for Radicale
-  # @section -- Ingress - IngressRoute specifications
+  # -- Whether to enable the IngressRoute for radicale
+  # @section -- Ingress/IngressRoute specifications
   enabled: false
   #
   # -- Listening for Incoming Connections/Requests
   # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
-  # @section -- Ingress - IngressRoute specifications
-  entryPoints: ["websecure"]
+  # @section -- Ingress/IngressRoute specifications
+  entryPoints: []
   #
   # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
   # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
-  # @section -- Ingress - IngressRoute specifications
+  # @section -- Ingress/IngressRoute specifications
   certResolver: ""
   #
   # -- Route-Match of the IngressRoute
-  # @section -- Ingress - IngressRoute specifications
+  # @section -- Ingress/IngressRoute specifications
   routeMatch: Host(``)
 #
-# -- Traefik Middlewares that should be used by the IngressRoute-rule
-# @section -- Ingress - Middleware specifications
-middlewares: []
+# -- Traefik Middlewares that should be used by the IngressRoute-rule.
+# Gets ignored when `ingressRoute.enabled: false`.
+# @section -- Ingress/Middleware specifications
+middlewares: {}
+#
 # e.g.:
-#  - name: radicale-headers
+#  exampleMiddleware:
+#    name: "example-middleware"
 #    spec:
-#      rateLimit:
-#        average: 100
-#        period: 1s
-#        burst: 200
+#      headers:
+#        forceSTSHeader: true
+#        stsSeconds: 15552000

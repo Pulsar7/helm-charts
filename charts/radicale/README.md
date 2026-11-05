@@ -1,11 +1,11 @@
 # radicale
 
-Custom Helm-Chart to deploy radicale
+Custom Helm chart to deploy radicale
 
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.1.1](https://img.shields.io/badge/AppVersion-3.8.1.1-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.1.1](https://img.shields.io/badge/AppVersion-3.8.1.1-informational?style=flat-square)
 
 ## Values
 
@@ -23,12 +23,12 @@ Custom Helm-Chart to deploy radicale
 | strategy | object | `{"type":"Recreate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
 
-### Radicale-Authentication specifications
+### radicale-Authentication specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | authentication.secretKey | string | `"users"` | Secret-Key Name for Users |
-| authentication.secretName | string | `""` | Name of the Secret (overrides the default Name) |
+| authentication.secretName | string | `""` | Name of the Secret (overrides the default) |
 | authentication.useExistingSecret | bool | `false` | Whether to use an existing Secret instead |
 
 ### Config specifications
@@ -51,22 +51,22 @@ Custom Helm-Chart to deploy radicale
 |-----|------|---------|-------------|
 | extraContainers | list | `[]` | List of sidecar-Containers |
 
-### Ingress - IngressRoute specifications
+### Ingress/IngressRoute specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | ingressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
-| ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for Radicale |
-| ingressRoute.entryPoints | list | `["websecure"]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
+| ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for radicale |
+| ingressRoute.entryPoints | list | `[]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
 | ingressRoute.routeMatch | string | `"Host(``)"` | Route-Match of the IngressRoute |
 
-### Ingress - Middleware specifications
+### Ingress/Middleware specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| middlewares | list | `[]` | Traefik Middlewares that should be used by the IngressRoute-rule |
+| middlewares | object | `{}` | Traefik Middlewares that should be used by the IngressRoute-rule. Gets ignored when `ingressRoute.enabled: false`. |
 
-### Radicale-Persistence specifications
+### radicale-Persistence specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -78,35 +78,34 @@ Custom Helm-Chart to deploy radicale
 | persistence.storageClassName | string | `""` | StorageClassName of the PVC |
 | persistence.storageRequest | string | `"5Gi"` | storage-request for the PVC |
 
-### Radicale-Container specifications
+### radicale-Container specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| radicaleContainer.environmentVariables | list | `[{"name":"TAKE_FILE_OWNERSHIP","value":"false"}]` | Environment variables for the Container |
+| radicaleContainer.env | list | `[{"name":"TAKE_FILE_OWNERSHIP","value":"false"}]` | Environment variables for the Container |
 | radicaleContainer.extraVolumeMounts | list | `[]` | Additional Volume-Mounts for Container |
 | radicaleContainer.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | radicaleContainer.image.repository | string | `"tomsquest/docker-radicale"` | Container-Image-Repository |
 | radicaleContainer.image.tag | string | `""` | Container-Image-Tag (overrides `.Chart.AppVersion`) |
+| radicaleContainer.livenessProbe | object | `{}` | Liveness-Probe |
+| radicaleContainer.readinessProbe | object | `{}` | Readiness-Probe |
 | radicaleContainer.resources | object | `{}` | Container Resources |
 | radicaleContainer.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":2999,"runAsNonRoot":true,"runAsUser":2999}` | Container Security Context |
-| radicaleContainer.service.type | string | `"ClusterIP"` | Service Type |
+| radicaleContainer.startupProbe | object | `{}` | Startup-Probe |
 
-### Radicale-Container-Probes specifications
+### radicale-Container/ports/http specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| radicaleContainer.livenessProbe.enabled | bool | `true` | Whether to enable the Liveness-Probe |
-| radicaleContainer.livenessProbe.failureThreshold | int | `3` | Number of consecutive failures before restarting the Pod |
-| radicaleContainer.livenessProbe.initialDelaySeconds | int | `30` | Initial Delay in Seconds |
-| radicaleContainer.livenessProbe.periodSeconds | int | `10` | How often to perform the liveness checks |
-| radicaleContainer.livenessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy (again) |
-| radicaleContainer.livenessProbe.timeoutSeconds | int | `5` | Time to wait for a response from the database |
-| radicaleContainer.readinessProbe.enabled | bool | `true` | Whether to enable the Readiness-Probe |
-| radicaleContainer.readinessProbe.failureThreshold | int | `3` | Number of consecutive failures before restarting the Pod |
-| radicaleContainer.readinessProbe.initialDelaySeconds | int | `30` | How long to wait before starting the first readiness Probe after the container starts |
-| radicaleContainer.readinessProbe.periodSeconds | int | `5` | How often to perform the readiness checks after the initial delay |
-| radicaleContainer.readinessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy |
-| radicaleContainer.readinessProbe.timeoutSeconds | int | `2` | The maximum amount of time the probe will wait for a response from the application |
+| radicaleContainer.ports.http.containerPort | int | `5000` | Exposed Container-Port |
+| radicaleContainer.ports.http.protocol | string | `"TCP"` | Protocol |
+
+### radicale-Service specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| service.serviceName | string | `""` | Name of the NTFY-Service resource (overrides the default) |
+| service.type | string | `"ClusterIP"` | Type of the NTFY-Service resource |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
