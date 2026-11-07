@@ -5,7 +5,12 @@ Custom Helm chart to deploy radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.1.1](https://img.shields.io/badge/AppVersion-3.8.1.1-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.1.1](https://img.shields.io/badge/AppVersion-3.8.1.1-informational?style=flat-square)
+
+## Authentication
+
+Keep in mind that by default a **Secret**-Resource gets created which stores a default user `test` with the password `lol1234`.
+Please deploy your own Secret with the required users instead of defining them at the `configFile`.
 
 ## Values
 
@@ -97,8 +102,8 @@ Custom Helm chart to deploy radicale
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| radicaleContainer.ports.http.containerPort | int | `5000` | Exposed Container-Port |
-| radicaleContainer.ports.http.protocol | string | `"TCP"` | Protocol |
+| radicaleContainer.ports.http.containerPort | int | `5000` | Exposed Container-port |
+| radicaleContainer.ports.http.name | string | `"http"` | Name of Container-port |
 
 ### radicale-Service specifications
 

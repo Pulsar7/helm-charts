@@ -100,13 +100,13 @@ radicaleContainer:
   ports:
     http:
       #
-      # -- Exposed Container-Port
+      # -- Name of Container-port
+      # @section -- radicale-Container/ports/http specifications
+      name: "http"
+      #
+      # -- Exposed Container-port
       # @section -- radicale-Container/ports/http specifications
       containerPort: 5000
-      #
-      # -- Protocol
-      # @section -- radicale-Container/ports/http specifications
-      protocol: TCP
   #
   # -- Additional Volume-Mounts for Container
   # @section -- radicale-Container specifications
@@ -149,13 +149,19 @@ service:
     # HTTP-port
     http:
       #
+      # -- Name of Service-port
+      # @section -- radicale-Service specifications
+      name: "http"
+      #
       # -- Exposed Service-port
       # @section -- radicale-Service specifications
       portNumber: 5232
       #
-      # -- Exposed Container-port name
+      # -- Exposed Container-port name.
+      # Reference here defined container-port name.
+      # by default: `.Values.radicaleContainer.ports.http.name`
       # @section -- radicale-Service specifications
-      targetPort: http
+      targetPort: "http"
       #
       # -- Protocol
       # @section -- radicale-Service specifications

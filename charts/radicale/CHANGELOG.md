@@ -1,5 +1,14 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.3.0` to `0.3.1`
+
+* __Helm-Values__: Adjust `.Values.radicaleContainer`- and `Service`-ports naming to use dedicated `name`-Helm-Values field instead of interpreting object-name as string
+
+* __Documentation__: Add `Authentication`-section to README
+
+* __Helm unittests__: Add additional `helm-unittest`-Tests
+  * move Deployment-Annotations-check to `Test Deployment/Annotations`-test-suite
+
 ## `0.2.1` to `0.3.0`
 
 > [!CAUTION]

@@ -5,67 +5,41 @@
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 #
 #------------------------------------------------------------------------------
-#
-# Test suite name to show on test result output
 suite: Test Deployment
-#
-# The template files scope to test in this suite
-# Only the selected files will be rendered
 templates:
   - templates/deployment.yaml
-  #
-  # following are required to calculate their checksum
-  - templates/service.yaml
-  - templates/secret.yaml
-  - templates/pvc.yaml
-  - templates/ingress-route.yaml
-  - templates/middlewares.yaml
-  - templates/configmap.yaml
-#
 tests:
-  - it: should render deployment with disabled persistence and without PVC
-    template: templates/deployment.yaml
+  - it: should fail to render Deployment because of missing radicaleContainer port-name
     set:
-      persistence.enabled: false
+      radicaleContainer:
+        ports:
+          testPort:
+            containerPort: 1337
+          anotherTest:
+            containerPort: 8331
     asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - notExists:
-          path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-
-  - it: should render deployment with enabled default created PVC
-    template: templates/deployment.yaml
+      - failedTemplate:
+          errorPattern: "Missing required `name`-field"
+  
+  - it: should fail to render Deployment because of missing radicaleContainer port-containerPorts
     set:
-      persistence.enabled: true
-      persistence.createNewPVC: true
+      radicaleContainer:
+        ports:
+          testPort:
+            name: "test"
+          anotherTest:
+            containerPort: "another-test"
     asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - exists:
-          path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-
-  - it: should render deployment with enabled IngressRoute
-    template: templates/deployment.yaml
+      - failedTemplate:
+          errorPattern: "Missing required `containerPort`-field"
+  
+  - it: should fail to render Deployment because of empty nested radicaleContainer port-maps
     set:
-      ingressRoute:
-        enabled: true
-        entryPoints: ["invalid-test-entrypoint"]
+      radicaleContainer:
+        ports:
+          testPort: {}
+          anotherTest: {}
+          fooBaa: {}
     asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
-
-  - it: should render deployment without IngressRoute
-    template: templates/deployment.yaml
-    set:
-      ingressRoute.enabled: false
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
+      - failedTemplate:
+          errorPattern: "Missing required `containerPort`-field"

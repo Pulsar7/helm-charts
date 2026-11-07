@@ -6,6 +6,11 @@
 
 {{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
 
+## Authentication
+
+Keep in mind that by default a **Secret**-Resource gets created which stores a default user `test` with the password `lol1234`.
+Please deploy your own Secret with the required users instead of defining them at the `configFile`.
+
 {{ template "chart.valuesSection" . }}
 
 {{ template "helm-docs.versionFooter" . }}

@@ -52,8 +52,8 @@ spec:
         image: {{ include "radicale.containerImage" . }}
         imagePullPolicy: {{ $radicaleContainer.image.pullPolicy }}
         ports:
-        {{- range $portName, $port := $radicaleContainerPorts }}
-        - name: {{ $portName }}
+        {{- range $port := $radicaleContainerPorts }}
+        - name: {{ $port.name | quote }}
           containerPort: {{ $port.containerPort }}
         {{- end }}
         {{- with $radicaleContainer.env }}

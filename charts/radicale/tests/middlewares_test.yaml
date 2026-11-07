@@ -7,10 +7,8 @@
 #------------------------------------------------------------------------------
 #
 suite: Test Middlewares
-#
 templates:
   - templates/middlewares.yaml
-#
 tests:
   - it: should not render middlewares with disabled IngressRoute
     set:
