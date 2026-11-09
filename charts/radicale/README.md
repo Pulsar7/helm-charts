@@ -43,9 +43,9 @@ Please deploy your own Secret with the required users instead of defining them a
 | configFile.configMapKey | string | `"config.conf"` | Key to the ConfigMap-item |
 | configFile.configMapName | string | `""` | Name of the existing ConfigMap |
 | configFile.dynamicValues.authSection | string | `"type = htpasswd\nhtpasswd_filename = /config/users\nhtpasswd_encryption = bcrypt"` | `[auth]`-Section |
+| configFile.dynamicValues.extraServerSection | string | `""` | Additional configuration for the `[server]`-Section. `hosts` is configured automatically, based on the configured exposed containerPort for `http`. |
 | configFile.dynamicValues.loggingSection | string | `"level = info"` | `[logging]`-Section |
 | configFile.dynamicValues.rightsSection | string | `"type = owner_only"` | `[rights]`-Section |
-| configFile.dynamicValues.serverSection | string | `"hosts: 0.0.0.0:5232"` | `[server]`-Section |
 | configFile.dynamicValues.storageSection | string | `"type = multifilesystem\nfilesystem_folder = /data/collections"` | `[storage]`-Section |
 | configFile.dynamicValues.webSection | string | `"type = internal"` | `[web]`-Section |
 | configFile.useExistingConfigMap | bool | `false` | Whether to use an existing ConfigMap instead |

@@ -22,9 +22,6 @@ spec:
         {{- if (include "radicale.createConfigMap" .) }}
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- end }}
-        {{- if (include "radicale.createPVC" .) }}
-        checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
-        {{- end }}
         checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
         {{- if $ingressRoute.enabled }}
         checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}

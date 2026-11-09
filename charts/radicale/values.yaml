@@ -155,7 +155,7 @@ service:
       #
       # -- Exposed Service-port
       # @section -- radicale-Service specifications
-      portNumber: 5232
+      portNumber: 5000
       #
       # -- Exposed Container-port name.
       # Reference here defined container-port name.
@@ -244,10 +244,10 @@ configFile:
   # Configure existing 'config'-file (will be ignored, if `useExistingConfigMap: true`)
   dynamicValues:
     #
-    # -- `[server]`-Section
+    # -- Additional configuration for the `[server]`-Section.
+    # `hosts` is configured automatically, based on the configured exposed containerPort for `http`.
     # @section -- Config specifications
-    serverSection: |-
-      hosts: 0.0.0.0:5232
+    extraServerSection: ""
     #
     # -- `[auth]`-Section
     # @section -- Config specifications
