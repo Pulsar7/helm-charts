@@ -1,5 +1,9 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.3.1` to `0.3.2`
+
+* Update `AppVersion` from `3.8.1.1` to `3.8.3`
+
 ## `0.3.0` to `0.3.1`
 
 * __Helm-Values__:
