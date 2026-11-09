@@ -209,7 +209,7 @@ Create Service-Name
 Create PVC-Name for radicale
 */}}
 {{- define "radicale.pvcName" -}}
-{{- $claimName := .Values.persistence.claimName | default (include "radicale.fullname" .) -}}
+{{- $claimName := default (include "radicale.fullname" .) .Values.persistence.claimName -}}
 {{- printf "%s" $claimName }}
 {{- end }}
 

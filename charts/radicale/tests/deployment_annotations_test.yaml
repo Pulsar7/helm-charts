@@ -15,38 +15,11 @@ templates:
   # following are required to calculate their checksum
   - templates/service.yaml
   - templates/secret.yaml
-  - templates/pvc.yaml
   - templates/ingress-route.yaml
   - templates/middlewares.yaml
   - templates/configmap.yaml
 #
 tests:
-  - it: should render deployment without `checksum/pvc` and referenced PVC for the data-volume
-    template: templates/deployment.yaml
-    set:
-      persistence.enabled: false
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - notExists:
-          path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-
-  - it: should render deployment with enabled default created PVC
-    template: templates/deployment.yaml
-    set:
-      persistence:
-        enabled: true
-        createNewPVC: true
-    asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - exists:
-          path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-
   - it: should render deployment with `checksum/ingress-route`
     template: templates/deployment.yaml
     set:

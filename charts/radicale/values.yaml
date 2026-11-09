@@ -202,7 +202,7 @@ persistence:
   # @section -- radicale-Persistence specifications
   emptyDirSizeLimit: "1Gi"
   #
-  # -- Whether to create a new PVC
+  # -- Whether to create a new PVC instead of referencing an existing one.
   # @section -- radicale-Persistence specifications
   createPVC: true
   #
@@ -210,7 +210,8 @@ persistence:
   # @section -- radicale-Persistence specifications
   storageClassName: ""
   #
-  # -- Name of the PVC
+  # -- Name of existing PersistentVolumeClaim.
+  # Gets ignored when `persistence.createPVC: true`
   # @section -- radicale-Persistence specifications
   claimName: ""
   #

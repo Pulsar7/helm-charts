@@ -11,6 +11,7 @@
 
 * __Helm unittests__: Add additional `helm-unittest`-Tests
   * move Deployment-Annotations-check to `Test Deployment/Annotations`-test-suite
+  * move unittests which should result in a failed template of Deployment to `Test Deployment/Failed Template`-test-suite
 
 * Remove `checksum/pvc` annotation from Deployment-manifest template (`deployment.yaml`) 
 

@@ -76,8 +76,8 @@ Please deploy your own Secret with the required users instead of defining them a
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | persistence.accessModes | list | `["ReadWriteOnce"]` | Access-Modes of the PVC |
-| persistence.claimName | string | `""` | Name of the PVC |
-| persistence.createPVC | bool | `true` | Whether to create a new PVC |
+| persistence.claimName | string | `""` | Name of existing PersistentVolumeClaim. Gets ignored when `persistence.createPVC: true` |
+| persistence.createPVC | bool | `true` | Whether to create a new PVC instead of referencing an existing one. |
 | persistence.emptyDirSizeLimit | string | `"1Gi"` | SizeLimit for emptyDir (used when persistence is disabled) |
 | persistence.enabled | bool | `true` | Whether to enable persistence for collections-data (enables PVC). Otherwise local ephemeral storage is being used (emptyDir). |
 | persistence.storageClassName | string | `""` | StorageClassName of the PVC |
