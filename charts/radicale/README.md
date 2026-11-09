@@ -5,7 +5,12 @@ Custom Helm chart to deploy radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.1.1](https://img.shields.io/badge/AppVersion-3.8.1.1-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.1.1](https://img.shields.io/badge/AppVersion-3.8.1.1-informational?style=flat-square)
+
+## Authentication
+
+Keep in mind that by default a **Secret**-Resource gets created which stores a default user `test` with the password `lol1234`.
+Please deploy your own Secret with the required users instead of defining them at the `configFile`.
 
 ## Values
 
@@ -38,9 +43,9 @@ Custom Helm chart to deploy radicale
 | configFile.configMapKey | string | `"config.conf"` | Key to the ConfigMap-item |
 | configFile.configMapName | string | `""` | Name of the existing ConfigMap |
 | configFile.dynamicValues.authSection | string | `"type = htpasswd\nhtpasswd_filename = /config/users\nhtpasswd_encryption = bcrypt"` | `[auth]`-Section |
+| configFile.dynamicValues.extraServerSection | string | `""` | Additional configuration for the `[server]`-Section. `hosts` is configured automatically, based on the configured exposed containerPort for `http`. |
 | configFile.dynamicValues.loggingSection | string | `"level = info"` | `[logging]`-Section |
 | configFile.dynamicValues.rightsSection | string | `"type = owner_only"` | `[rights]`-Section |
-| configFile.dynamicValues.serverSection | string | `"hosts: 0.0.0.0:5232"` | `[server]`-Section |
 | configFile.dynamicValues.storageSection | string | `"type = multifilesystem\nfilesystem_folder = /data/collections"` | `[storage]`-Section |
 | configFile.dynamicValues.webSection | string | `"type = internal"` | `[web]`-Section |
 | configFile.useExistingConfigMap | bool | `false` | Whether to use an existing ConfigMap instead |
@@ -71,8 +76,8 @@ Custom Helm chart to deploy radicale
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | persistence.accessModes | list | `["ReadWriteOnce"]` | Access-Modes of the PVC |
-| persistence.claimName | string | `""` | Name of the PVC |
-| persistence.createPVC | bool | `true` | Whether to create a new PVC |
+| persistence.claimName | string | `""` | Name of existing PersistentVolumeClaim. Gets ignored when `persistence.createPVC: true` |
+| persistence.createPVC | bool | `true` | Whether to create a new PVC instead of referencing an existing one. |
 | persistence.emptyDirSizeLimit | string | `"1Gi"` | SizeLimit for emptyDir (used when persistence is disabled) |
 | persistence.enabled | bool | `true` | Whether to enable persistence for collections-data (enables PVC). Otherwise local ephemeral storage is being used (emptyDir). |
 | persistence.storageClassName | string | `""` | StorageClassName of the PVC |
@@ -97,8 +102,8 @@ Custom Helm chart to deploy radicale
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| radicaleContainer.ports.http.containerPort | int | `5000` | Exposed Container-Port |
-| radicaleContainer.ports.http.protocol | string | `"TCP"` | Protocol |
+| radicaleContainer.ports.http.containerPort | int | `5000` | Exposed Container-port |
+| radicaleContainer.ports.http.name | string | `"http"` | Name of Container-port |
 
 ### radicale-Service specifications
 

@@ -30,8 +30,8 @@
             "http": {
               "type": "object",
               "properties": {
-                "containerPort": {"type": "integer"},
-                "protocol": {"type": "string"}
+                "name": {"type": "string"},
+                "containerPort": {"type": "integer"}
               }
             }
           }
@@ -91,7 +91,7 @@
         "dynamicValues": {
           "type": "object",
           "properties": {
-            "serverSection": {"type": "string"},
+            "extraServerSection": {"type": "string"},
             "authSection": {"type": "string"},
             "rightsSection": {"type": "string"},
             "storageSection": {"type": "string"},

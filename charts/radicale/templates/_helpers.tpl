@@ -70,6 +70,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- $messages := append $messages (include "radicale.validateValues.configFile" .) -}}
 {{- $messages := append $messages (include "radicale.validateValues.ingressRoute" .) -}}
 {{- $messages := append $messages (include "radicale.validateValues.middlewares" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.radicaleContainer.ports" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
@@ -142,6 +143,29 @@ Validate values for radicale - middlewares
 {{- end }}
 
 {{/*
+Validate values for radicale - radicaleContainer.ports
+*/}}
+{{- define "radicale.validateValues.radicaleContainer.ports" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $radicaleContainer := .Values.radicaleContainer -}}
+{{- $ports := $radicaleContainer.ports -}}
+{{- range $objName, $port := $ports -}}
+{{- if not $port.name }}
+{{- $messages = append $messages (printf "Missing required `name`-field for the `%s`-port" $objName) -}}
+{{- end }}
+{{- if not $port.containerPort -}}
+{{- $messages = append $messages (printf "Missing required `containerPort`-field for the `%s`-port" $objName) -}}
+{{- end }}
+{{- end }}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n   > " $messages -}}
+{{- if $message -}}
+{{- printf " radicale: radicaleContainer.ports\n   > %s" $message -}}
+{{- end }}
+{{- end }}
+
+{{/*
 Create the radicale-Container-Image-URL
 */}}
 {{- define "radicale.containerImage" -}}
@@ -185,7 +209,7 @@ Create Service-Name
 Create PVC-Name for radicale
 */}}
 {{- define "radicale.pvcName" -}}
-{{- $claimName := .Values.persistence.claimName | default (include "radicale.fullname" .) -}}
+{{- $claimName := default (include "radicale.fullname" .) .Values.persistence.claimName -}}
 {{- printf "%s" $claimName }}
 {{- end }}
 

@@ -5,25 +5,18 @@
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 #
 #------------------------------------------------------------------------------
-#
-# Test suite name to show on test result output
 suite: Test Deployment
-#
-# The template files scope to test in this suite
-# Only the selected files will be rendered
 templates:
   - templates/deployment.yaml
   #
   # following are required to calculate their checksum
   - templates/service.yaml
   - templates/secret.yaml
-  - templates/pvc.yaml
   - templates/ingress-route.yaml
   - templates/middlewares.yaml
   - templates/configmap.yaml
-#
 tests:
-  - it: should render deployment with disabled persistence and without PVC
+  - it: should render deployment without reference to a PVC for the data-volume
     template: templates/deployment.yaml
     set:
       persistence.enabled: false
@@ -31,41 +24,17 @@ tests:
       - isKind:
           of: Deployment
       - notExists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - notExists:
           path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-
-  - it: should render deployment with enabled default created PVC
+  
+  - it: should render deployment with reference to a PVC for the data-volume
     template: templates/deployment.yaml
     set:
-      persistence.enabled: true
-      persistence.createNewPVC: true
-    asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - exists:
-          path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim
-
-  - it: should render deployment with enabled IngressRoute
-    template: templates/deployment.yaml
-    set:
-      ingressRoute:
+      persistence:
         enabled: true
-        entryPoints: ["invalid-test-entrypoint"]
+        claimName: "test-radicale-data"
     asserts:
       - isKind:
           of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
-
-  - it: should render deployment without IngressRoute
-    template: templates/deployment.yaml
-    set:
-      ingressRoute.enabled: false
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
+      - equal:
+          path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim.claimName
+          value: "test-radicale-data"

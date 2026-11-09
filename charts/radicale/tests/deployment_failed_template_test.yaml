@@ -1,0 +1,45 @@
+#------------------------------------------------------------------------------
+#
+# Deployment/Failed-Template-Unittests Test-Suite for radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+#
+#------------------------------------------------------------------------------
+suite: Test Deployment/Failed Template
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: should fail to render Deployment because of missing radicaleContainer port-name
+    set:
+      radicaleContainer:
+        ports:
+          testPort:
+            containerPort: 1337
+          anotherTest:
+            containerPort: 8331
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `name`-field"
+  
+  - it: should fail to render Deployment because of missing radicaleContainer port-containerPorts
+    set:
+      radicaleContainer:
+        ports:
+          testPort:
+            name: "test"
+          anotherTest:
+            containerPort: "another-test"
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `containerPort`-field"
+  
+  - it: should fail to render Deployment because of empty nested radicaleContainer port-maps
+    set:
+      radicaleContainer:
+        ports:
+          testPort: {}
+          anotherTest: {}
+          fooBaa: {}
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `containerPort`-field"

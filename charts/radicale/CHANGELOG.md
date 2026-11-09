@@ -1,5 +1,20 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.3.0` to `0.3.1`
+
+* __Helm-Values__:
+  - Adjust `.Values.radicaleContainer`- and `Service`-ports naming to use dedicated `name`-Helm-Values field instead of interpreting object-name as string
+  - Rename `.Values.configFile.dynamicValues.serverSection` to `.Values.configFile.dynamicValues.extraServerSection`
+  - `.Values.configFile.dynamicValues.extraServerSection` is empty by default and `host` is configured as `hosts = 0.0.0.0: {{ .Values.radicaleContainer.ports.http.containerPort }}`
+
+* __Documentation__: Add `Authentication`-section to README
+
+* __Helm unittests__: Add additional `helm-unittest`-Tests
+  * move Deployment-Annotations-check to `Test Deployment/Annotations`-test-suite
+  * move unittests which should result in a failed template of Deployment to `Test Deployment/Failed Template`-test-suite
+
+* Remove `checksum/pvc` annotation from Deployment-manifest template (`deployment.yaml`) 
+
 ## `0.2.1` to `0.3.0`
 
 > [!CAUTION]
