@@ -10,11 +10,11 @@ jobs:
   lint-template-test-release:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       #
       # Checkout the repo
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
       #
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v5.0.1
         with:
-          version: v4.1.4
+          version: v4.3.1
       #
       # Lint all charts
       - name: Lint Helm-Charts
