@@ -1,8 +1,13 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.3.2` to `0.3.3`
+
+* Fix: set `appVersion` to `3.8.3.0` - adding the missing `.0`
+  - https://github.com/tomsquest/docker-radicale/releases/tag/3.8.3.0
+
 ## `0.3.1` to `0.3.2`
 
-* Update `AppVersion` from `3.8.1.1` to `3.8.3`
+* Update `AppVersion` from `3.8.1.1` to `3.8.3.0`
 
 ## `0.3.0` to `0.3.1`
 
