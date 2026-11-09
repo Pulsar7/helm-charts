@@ -1,5 +1,10 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.4.0` to `0.4.1`
+
+* Fix: add missing YAML document separators at `Middleware`-manifest template
+to allow multiple `Middleware`-resources
+
 ## `0.3.3` to `0.4.0`
 
 * Update `appVersion` from `3.8.3.0` to `3.9.0.0`
