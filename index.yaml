@@ -300,6 +300,16 @@ entries:
   radicale:
   - apiVersion: v2
     appVersion: 3.9.0.0
+    created: "2026-11-09T17:38:22.313091166Z"
+    description: Custom Helm chart to deploy radicale
+    digest: 8657ba6229333c3b7ebe8cb0778e738a4738fe6e4185d18c971ac4a83dd97321
+    name: radicale
+    type: application
+    urls:
+    - https://github.com/Pulsar7/helm-charts/releases/download/radicale-0.4.1/radicale-0.4.1.tgz
+    version: 0.4.1
+  - apiVersion: v2
+    appVersion: 3.9.0.0
     created: "2026-11-09T16:09:28.411791555Z"
     description: Custom Helm chart to deploy radicale
     digest: ecaa738cb364c1067f4cf5178b15b1818056ed928a263d20102dc0210d6aade4
@@ -508,4 +518,4 @@ entries:
     urls:
     - https://github.com/Pulsar7/helm-charts/releases/download/radicale-0.1.6-alpha/radicale-0.1.6-alpha.tgz
     version: 0.1.6-alpha
-generated: "2026-11-09T16:09:28.411970266Z"
+generated: "2026-11-09T17:38:22.313493319Z"
