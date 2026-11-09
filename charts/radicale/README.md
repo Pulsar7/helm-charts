@@ -5,7 +5,7 @@ Custom Helm chart to deploy radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.3.0](https://img.shields.io/badge/AppVersion-3.8.3.0-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.0.0](https://img.shields.io/badge/AppVersion-3.9.0.0-informational?style=flat-square)
 
 ## Authentication
 
