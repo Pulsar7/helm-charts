@@ -5,7 +5,12 @@
 {{- if $middlewares }}
 {{- $namespace := .Release.Namespace | quote -}}
 {{- $labels := (include "radicale.labels" .) -}}
+{{- $index := 0 -}}
 {{- range $middleware := $middlewares }}
+{{- $index = add $index 1 -}}
+{{- if gt $index 1 }}
+---
+{{- end }}
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
