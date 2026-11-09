@@ -71,3 +71,25 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: Missing required `spec`-Helm-Value for `testRadicaleMiddleware`-middleware
+  
+  - it: should render multiple Middleware resources
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["invalid-test-entrypoint"]
+      middlewares:
+        firstTestRadicaleMiddleware:
+          name: "first-test-radicale-middleware"
+          spec:
+            foo: baa
+        secondTestRadicaleMiddleware:
+          name: "second-test-radicale-middleware"
+          spec:
+            average: 1337
+        thirdTestRadicaleMiddleware:
+          name: "third-test-radicale-middleware"
+          spec:
+            average: 8831
+    asserts:
+      - hasDocuments:
+          count: 3
