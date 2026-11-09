@@ -91,7 +91,7 @@
         "dynamicValues": {
           "type": "object",
           "properties": {
-            "serverSection": {"type": "string"},
+            "extraServerSection": {"type": "string"},
             "authSection": {"type": "string"},
             "rightsSection": {"type": "string"},
             "storageSection": {"type": "string"},
