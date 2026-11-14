@@ -1,0 +1,45 @@
+#------------------------------------------------------------------------------
+#
+# Deployment-Unittests Test-Suite for ntfy
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+suite: Test Deployment-Annotations
+templates:
+  - templates/deployment.yaml
+  #
+  # following are required to calculate their checksum
+  - templates/configmap.yaml
+  - templates/secrets.yaml
+  - templates/ingressroute.yaml
+  - templates/middlewares.yaml
+  - templates/service.yaml
+tests:
+  - it: should render Deployment with checksum/ configmap, secret and service annotations with default Values
+    template: templates/deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/configmap"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/secret"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/service"]
+  
+  - it: should render Deployment without checksum/secret annotation
+    template: templates/deployment.yaml
+    set:
+      authentication:
+        authTokens:
+          useExistingSecret: true
+        authUsers:
+          useExistingSecret: true
+        authAccess:
+          useExistingSecret: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/secret"]

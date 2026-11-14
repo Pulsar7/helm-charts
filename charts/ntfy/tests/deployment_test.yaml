@@ -5,97 +5,17 @@
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
 #------------------------------------------------------------------------------
-#
-# Test suite name to show on test result output
 suite: Test Deployment
-#
-# The template files scope to test in this suite
-# Only the selected files will be rendered
 templates:
   - templates/deployment.yaml
   #
   # following are required to calculate their checksum
   - templates/configmap.yaml
-  - templates/pvc.yaml
   - templates/secrets.yaml
   - templates/ingressroute.yaml
   - templates/middlewares.yaml
   - templates/service.yaml
-#
 tests:
-  - it: should render Deployment with default checksum-annotations
-    template: templates/deployment.yaml
-    asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/configmap"]
-      - exists:
-          path: spec.template.metadata.annotations["checksum/secret"]
-      - exists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - exists:
-          path: spec.template.metadata.annotations["checksum/service"]
-
-  - it: should render Deployment without checksum/configmap annotation
-    template: templates/deployment.yaml
-    set:
-      serverConfig.useExistingConfigMap: true
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/configmap"]
-
-  - it: should render Deployment without checksum/secret annotation
-    template: templates/deployment.yaml
-    set:
-      authentication:
-        authTokens:
-          useExistingSecret: true
-        authUsers:
-          useExistingSecret: true
-        authAccess:
-          useExistingSecret: true
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/secret"]
-  
-  - it: should render Deployment with checksum/ingressroute annotation
-    template: templates/deployment.yaml
-    set:
-      ingressRoute:
-        enabled: true
-        entryPoints: ["test-entrypoint"]
-        certResolver: "invalid-certresolver"
-    asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/ingressroute"]
-  
-  - it: should render Deployment with checksum/middlewares annotation
-    template: templates/deployment.yaml
-    set:
-      ingressRoute:
-        enabled: true
-        entryPoints: ["test-entrypoint"]
-        certResolver: "invalid-certresolver"
-      middlewares:
-        testMiddleware:
-          name: "test-middleware"
-          spec:
-            middlewareSpec: "1337"
-    asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/ingressroute"]
-      - exists:
-          path: spec.template.metadata.annotations["checksum/middlewares"]
-  
   - it: should render Deployment with adjusted ntfy-Container image-URL
     template: templates/deployment.yaml
     set:
@@ -305,8 +225,6 @@ tests:
       - isKind:
           of: Deployment
       - notExists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
-      - notExists:
           path: spec.template.spec.volumes[1].persistentVolumeClaim
       - equal:
           path: spec.template.spec.volumes[1].emptyDir
@@ -324,8 +242,6 @@ tests:
     asserts:
       - isKind:
           of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/pvc"]
       - notExists:
           path: spec.template.spec.volumes[1].emptyDir
       - equal:

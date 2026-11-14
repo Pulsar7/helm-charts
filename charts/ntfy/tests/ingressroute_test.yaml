@@ -5,15 +5,9 @@
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
 #------------------------------------------------------------------------------
-#
-# Test suite name to show on test result output
 suite: Test IngressRoute
-#
-# The template files scope to test in this suite
-# Only the selected files will be rendered
 templates:
   - templates/ingressroute.yaml
-#
 tests:
   - it: should not render the IngressRoute resource
     set:

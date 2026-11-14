@@ -2,7 +2,7 @@
 
 Helm chart to deploy ntfy
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.37.2](https://img.shields.io/badge/AppVersion-v2.37.2-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.37.2](https://img.shields.io/badge/AppVersion-v2.37.2-informational?style=flat-square)
 
 ## Ingress
 
@@ -154,6 +154,7 @@ In the near future, the implementation may change to an init-container that adju
 | serverConfig.dynamicValues.logLevel | string | `"info"` | Defines the default log level |
 | serverConfig.dynamicValues.logLevelOverrides | list | `[]` | Log-level-overrides (for debugging, only use temporarily) |
 | serverConfig.dynamicValues.managerInterval | string | `"1m"` | Interval in which the manager prunes old messages, deletes topics and prints the stats |
+| serverConfig.dynamicValues.metricsListenHttp | string | `""` | Exposes the metrics endpoint via a dedicated [IP]:port. If set, this option implicitly enables metrics as well. |
 | serverConfig.dynamicValues.proxyForwardedHeader | string | `""` | Forwarded Proxy-Header (e.g. "X-Forwarded-For") |
 | serverConfig.dynamicValues.proxyTrustedHosts | string | `""` | A comma-separated list of IP addresses, hostnames or CIDRs that are removed from  the forwarded header to determine the real IP address (e.g. "1.2.3.4, 5.6.7.8") |
 | serverConfig.dynamicValues.rateLimits.globalTopicLimit | int | `15000` | Total number of topics before the server rejects new topics |
