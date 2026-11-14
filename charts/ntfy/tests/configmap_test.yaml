@@ -8,7 +8,6 @@
 suite: Test ConfigMap
 templates:
   - templates/configmap.yaml
-#
 tests:
   - it: should not render ConfigMap-resource
     set:
