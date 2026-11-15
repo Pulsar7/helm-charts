@@ -102,6 +102,19 @@ librefrontierContainer:
   #    memory: 500Mi
   #    cpu: 500m
   #
+  # -- Exposed Container-ports
+  # @section -- Librefrontier-Container specifications
+  ports:
+    http:
+      #
+      # -- Name of exposed http Container-port
+      # @section -- Librefrontier-Container/ports specifications
+      name: "http-api"
+      #
+      # -- Port-number of exposed http Container-port
+      # @section -- Librefrontier-Container/ports specifications
+      containerPort: 80
+  #
   # -- Additional Volume-Mounts for Container
   # @section -- Librefrontier-Container specifications
   extraVolumeMounts: {}
@@ -138,7 +151,7 @@ config:
   #
   # -- LF_API_BASE_URL
   # @section -- Config specifications
-  LFAPIBaseURL: "http://teufel.wifiradiofrontier.com"
+  lfAPIBaseURL: "http://teufel.wifiradiofrontier.com"
   #
   databaseConnectionString:
     #

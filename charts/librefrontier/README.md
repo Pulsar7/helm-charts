@@ -23,6 +23,17 @@ Custom Helm-Chart to deploy Librefrontier
 | strategy | object | `{"type":"RollingUpdate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
 
+### Config specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| config.LFAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
+| config.databaseConnectionString.existingSecret | bool | `false` | Whether to use an existing Secret or a Secret gets created. |
+| config.databaseConnectionString.secretKey | string | `"database-connection-string"` | Secret-key, storing the database-connection-string |
+| config.databaseConnectionString.secretName | string | `"librefrontier-secret"` | Name of the Secret, storing the database-connection-string |
+| config.databaseConnectionString.stringData | string | `""` | When not using an existing-Secret, enter the database-connection-string. |
+| config.ginMode | string | `"release"` | GIN_MODE |
+
 ### Extra Containers
 
 | Key | Type | Default | Description |
@@ -42,16 +53,6 @@ Custom Helm-Chart to deploy Librefrontier
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | initContainers | list | `[]` | Init-Containers |
-
-### Librefrontier-Configuration
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| librefrontierConfig.LFAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
-| librefrontierConfig.databaseConnectionString.existingSecret | bool | `false` | Whether to use an existing Secret or a default Secret should be generated storing a default database-connection-string. |
-| librefrontierConfig.databaseConnectionString.secretName | string | `"librefrontier-secret"` | Name of the Secret, storing the database-connection-string. Secret-Key is 'database-connection-string' |
-| librefrontierConfig.databaseConnectionString.stringData | string | `""` | When not using an existing-Secret, enter the database-connection-string. |
-| librefrontierConfig.ginMode | string | `"release"` | GIN_MODE |
 
 ### Librefrontier-Container specifications
 
