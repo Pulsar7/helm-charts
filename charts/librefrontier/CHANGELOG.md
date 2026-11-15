@@ -1,5 +1,9 @@
 # CHANGELOG for `charts/librefrontier`
 
+## `0.5.2` to `0.5.3`
+
+* __Fix__: Make tls-termination at IngressRoute-manifest templates optional instead of mandatory
+
 ## `0.5.1` to `0.5.2`
 
 * Move `httpWebUI`-Service at Helm-Values to own Service-resource instead of being a port at the `httpAPI`-Service
