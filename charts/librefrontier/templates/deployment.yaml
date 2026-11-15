@@ -26,7 +26,7 @@ spec:
     metadata:
       annotations:
         checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
-        {{- if or $webUIIngressRoute.enabled $httpAPIIngressRoute.enabled }}
+        {{- if (include "librefrontier.createIngressRoute" .) }}
         checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}

@@ -102,7 +102,6 @@ librefrontierContainer:
   #    memory: 500Mi
   #    cpu: 500m
   #
-  #
   # -- Additional Volume-Mounts for Container
   # @section -- Librefrontier-Container specifications
   extraVolumeMounts: {}
@@ -128,34 +127,36 @@ librefrontierContainer:
   livenessProbe: {}
   
 
-
 # =================================================================
 # Librefrontier Configuration
 # =================================================================
-librefrontierConfig:
+config:
   #
   # -- GIN_MODE
-  # @section -- Librefrontier-Configuration
+  # @section -- Config specifications
   ginMode: "release"
   #
   # -- LF_API_BASE_URL
-  # @section -- Librefrontier-Configuration
+  # @section -- Config specifications
   LFAPIBaseURL: "http://teufel.wifiradiofrontier.com"
   #
   databaseConnectionString:
     #
-    # -- Name of the Secret, storing the database-connection-string.
-    # Secret-Key is 'database-connection-string'
-    # @section -- Librefrontier-Configuration
+    # -- Name of the Secret, storing the database-connection-string
+    # @section -- Config specifications
     secretName: librefrontier-secret
     #
-    # -- Whether to use an existing Secret or a default Secret
-    # should be generated storing a default database-connection-string.
-    # @section -- Librefrontier-Configuration
+    # -- Secret-key, storing the database-connection-string
+    # @section -- Config specifications
+    secretKey: "database-connection-string"
+    #
+    # -- Whether to use an existing Secret or a Secret
+    # gets created.
+    # @section -- Config specifications
     existingSecret: false
     #
     # -- When not using an existing-Secret, enter the database-connection-string.
-    # @section -- Librefrontier-Configuration
+    # @section -- Config specifications
     stringData: ""
 
 

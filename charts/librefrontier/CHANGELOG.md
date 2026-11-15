@@ -13,6 +13,7 @@
   - Rename `additionalEnv` to `extraEnv`
   - Rename `additionalArgs` to `extraArgs`
   - Rename `.Values.additionalVolumes` to `.Values.extraVolumes`
+  - Rename `.Values.librefrontierConfig` to `.Values.config`
 
 * Update `AppVersion` from `0.0.2-dev` to `v0.0.3-preview`
 

@@ -68,11 +68,17 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{/*{{- $messages := append $messages (include "librefrontier.validateValues." .) -}}*/}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
-
 {{- if $message -}}
-{{-   printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
-{{- end -}}
-{{- end -}}
+{{- printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Return whether IngressRoute-resource should be created or not
+*/}}
+{{- define "librefrontier.createIngressRoute" -}}
+{{-  -}}
+{{- end }}
 
 {{/*
 Create service-name for the http-API-Service.
