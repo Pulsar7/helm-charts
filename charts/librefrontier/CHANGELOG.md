@@ -1,5 +1,9 @@
 # CHANGELOG for `charts/librefrontier`
 
+## `0.5.1` to `0.5.2`
+
+* Move `httpWebUI`-Service at Helm-Values to own Service-resource instead of being a port at the `httpAPI`-Service
+
 ## `0.5.0` to `0.5.1`
 
 * __Fix__: surround all 'main'-container environment-variables values with double quotes

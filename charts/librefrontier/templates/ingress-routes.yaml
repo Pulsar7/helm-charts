@@ -29,8 +29,12 @@ spec:
       {{- $servicePortNumber := 0 -}}
       {{- range $service := $services -}}
       {{- if eq $service.serviceName $ingressRoute.refServiceName }}
-      {{- $servicePortNumber = $service.portNumber -}}
+      {{- range $servicePort := $service.ports }}
+      {{- if eq $servicePort.servicePortName $ingressRoute.refServicePortName }}
+      {{- $servicePortNumber = $servicePort.portNumber -}}
       {{- break -}}
+      {{- end }}
+      {{- end }}
       {{- end }}
       {{- end }}
       port: {{ $servicePortNumber }}

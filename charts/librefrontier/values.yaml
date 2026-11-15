@@ -186,7 +186,18 @@ services:
         # -- Protocol
         # @section -- Services specifications
         protocol: TCP
-      #
+  #
+  httpWebUI:
+    #
+    # -- Service-Name for the http-Web-UI Service
+    # @section -- Services specifications
+    serviceName: "http-web-ui"
+    #
+    # -- Service-Type
+    # @section -- Services specifications
+    type: ClusterIP
+    #
+    ports:
       httpWebUI:
         #
         # -- Name of the Service-port
@@ -226,6 +237,10 @@ ingressRoutes:
     # -- Name of referenced Service
     # @section -- IngressRoute/httpAPI specifications
     refServiceName: "http-api"
+    #
+    # -- Name of referenced Service-Port
+    # @section -- IngressRoute/httpAPI specifications
+    refServicePortName: "http-api"
     #
     # -- List of entryPoints
     # @section -- IngressRoute/httpAPI specifications
