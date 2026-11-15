@@ -139,6 +139,16 @@ entries:
   ntfy:
   - apiVersion: v2
     appVersion: v2.37.2
+    created: "2026-11-15T00:22:30.232054079Z"
+    description: Helm chart to deploy ntfy
+    digest: b2bebb71fa00b80b17eab091a4e26c4add1357d49eda19a83c1c801dc5a0dd8e
+    name: ntfy
+    type: application
+    urls:
+    - https://github.com/Pulsar7/helm-charts/releases/download/ntfy-0.3.1/ntfy-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
+    appVersion: v2.37.2
     created: "2026-11-05T01:49:03.153813818Z"
     description: Helm chart to deploy ntfy
     digest: a03c972e7339815104d1ae44d460b04a7cca5a5aa7edb2c6eda278e024a74c62
@@ -518,4 +528,4 @@ entries:
     urls:
     - https://github.com/Pulsar7/helm-charts/releases/download/radicale-0.1.6-alpha/radicale-0.1.6-alpha.tgz
     version: 0.1.6-alpha
-generated: "2026-11-09T17:38:22.313493319Z"
+generated: "2026-11-15T00:22:30.232190874Z"
