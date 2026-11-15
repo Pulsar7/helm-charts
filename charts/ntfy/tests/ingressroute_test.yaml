@@ -60,12 +60,13 @@ tests:
       - notExists:
           path: spec.routes[0].middlewares
   
-  - it: should not render the disabled IngressRoute resource with a defined test-middleware
+  - it: should render IngressRoute resource with a defined test-middleware
     set:
       ingressRoute:
         enabled: true
         entryPoints: ["test-entrypoint"]
         certResolver: "invalid-certresolver"
+        routeMatch: "test"
       middlewares:
         exampleMiddleware:
           name: "example"
@@ -77,3 +78,36 @@ tests:
           value:
             - name: example
               namespace: NAMESPACE
+  
+  - it: should not render the enabled IngressRoute with missing entryPoints
+    set:
+      ingressRoute:
+        enabled: true
+        certResolver: "invalid-certresolver"
+        routeMatch: "test"
+        entryPoints: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `.Values.ingressRoute.entryPoints`-Helm-Value. List cannot be empty."
+  
+  - it: should not render the enabled IngressRoute with missing routeMatch
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-certresolver"
+        routeMatch: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `.Values.ingressRoute.routeMatch`-Helm-Value."
+  
+  - it: should not render the enabled IngressRoute with missing certResolver
+    set:
+      ingressRoute:
+        enabled: true
+        entryPoints: ["test-entrypoint"]
+        certResolver: null
+        routeMatch: test
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `.Values.ingressRoute.certResolver`-Helm-Value."

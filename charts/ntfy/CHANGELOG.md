@@ -2,7 +2,7 @@
 
 ## `0.3.0` to `0.3.1`
 
-* __helm-unittests__: Add required helm-unittests for Deployment, default ConfigMap
+* __helm-unittests__: Add required helm-unittests for Deployment, default ConfigMap, IngressRoute
 
 * __Chores__: Improve manifest-template layout
 
