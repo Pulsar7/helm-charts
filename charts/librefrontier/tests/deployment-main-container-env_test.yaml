@@ -25,7 +25,7 @@ tests:
           path: spec.template.spec.containers[0].env[0]
           value:
             name: API_PORT
-            value: 1337
+            value: "1337"
           
   - it: should render Deployment with adjusted ENABLE_GUI
     template: templates/deployment.yaml
@@ -36,7 +36,7 @@ tests:
           path: spec.template.spec.containers[0].env[1]
           value:
             name: ENABLE_GUI
-            value: true
+            value: "true"
   
   - it: should render Deployment with adjusted GUI_PORT
     template: templates/deployment.yaml
@@ -47,7 +47,7 @@ tests:
           path: spec.template.spec.containers[0].env[2]
           value:
             name: GUI_PORT
-            value: 8331
+            value: "8331"
 
   - it: should render Deployment with adjusted GIN_MODE
     template: templates/deployment.yaml
@@ -58,7 +58,7 @@ tests:
           path: spec.template.spec.containers[0].env[3]
           value:
             name: GIN_MODE
-            value: debug
+            value: "debug"
   
   - it: should render Deployment with adjusted LF_API_BASE_URL
     template: templates/deployment.yaml
@@ -119,7 +119,7 @@ tests:
           path: spec.template.spec.containers[0].env[8]
           value:
             name: PROXY_ALL_STREAMS
-            value: false
+            value: "false"
   
   - it: should render Deployment with adjusted MAX_CONCURRENT_STREAMS
     template: templates/deployment.yaml
@@ -130,7 +130,7 @@ tests:
           path: spec.template.spec.containers[0].env[9]
           value:
             name: MAX_CONCURRENT_STREAMS
-            value: 1337
+            value: "1337"
   
   - it: should render Deployment with additional environment variables
     template: templates/deployment.yaml

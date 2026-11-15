@@ -1,5 +1,9 @@
 # CHANGELOG for `charts/librefrontier`
 
+## `0.5.0` to `0.5.1`
+
+* __Fix__: surround all 'main'-container environment-variables values with double quotes
+
 ## `0.4.0-alpha.1` to `0.5.0`
 
 > [!CAUTION]

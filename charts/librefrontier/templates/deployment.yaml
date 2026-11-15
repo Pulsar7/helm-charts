@@ -56,28 +56,28 @@ spec:
         {{- end }}
         env:
         - name: API_PORT
-          value: {{ $librefrontierContainer.ports.httpAPI.containerPort }}
+          value: {{ $librefrontierContainer.ports.httpAPI.containerPort | quote }}
         - name: ENABLE_GUI
-          value: {{ $config.enableGUI }}
+          value: {{ $config.enableGUI | quote }}
         - name: GUI_PORT
-          value: {{ $librefrontierContainer.ports.httpWebUI.containerPort }}
+          value: {{ $librefrontierContainer.ports.httpWebUI.containerPort | quote }}
         - name: GIN_MODE
-          value: {{ $config.ginMode }}
+          value: {{ $config.ginMode | quote }}
         - name: LF_API_BASE_URL
-          value: {{ $config.lfAPIBaseURL }}
+          value: {{ $config.lfAPIBaseURL | quote }}
         - name: LF_DB_CONN_STRING
           valueFrom:
             secretKeyRef:
               name: {{ $config.databaseConnectionString.secretName }}
               key: {{ $config.databaseConnectionString.secretKey }}
         - name: LOG_LEVEL
-          value: {{ $config.logLevel }}
+          value: {{ $config.logLevel | quote }}
         - name: RADIO_BROWSER_URL
-          value: {{ $config.radioBrowserURL }}
+          value: {{ $config.radioBrowserURL | quote }}
         - name: PROXY_ALL_STREAMS
-          value: {{ $config.proxyAllStreams }}
+          value: {{ $config.proxyAllStreams | quote }}
         - name: MAX_CONCURRENT_STREAMS
-          value: {{ $config.maxConcurrentStreams }}
+          value: {{ $config.maxConcurrentStreams | quote  }}
         {{- with $librefrontierContainer.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
