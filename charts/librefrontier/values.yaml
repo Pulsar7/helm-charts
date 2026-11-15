@@ -1,6 +1,6 @@
 #------------------------------------------------------------------
 #
-# Values for the Custom Librefrontier-Helm-Chart
+# Default Helm-Values for the custom Librefrontier Helm chart
 #
 #------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ podLabels: {}
 #
 # -- Additional Volumes
 # @section -- Pod specifications
-additionalVolumes: {}
+extraVolumes: {}
 #
 # -- Kubernetes only schedules the Pod onto nodes that have each of the labels you specify
 # @section -- Pod specifications
@@ -56,155 +56,77 @@ tolerations: []
 # Container specifications
 # =================================================================
 #
-# -- Librefrontier Init-Containers
+# -- Init-Containers
 # @section -- Init-Containers
 initContainers: []
 #
-containers:
-  librefrontier:
+# -- Additional sidecar-Containers
+# @section -- Extra Containers
+extraContainers: []
+#
+librefrontierContainer:
+  #
+  # Image specifications of the Librefrontier-Container
+  image:
     #
-    # Image specifications of the Librefrontier-Container
-    image:
-      #
-      # -- Container-Image-Repository
-      # @section -- Librefrontier-Container specifications
-      repository: ghcr.io/lukas-fichtner/librefrontier
-      #
-      # -- Container-Image-Tag (by default `.Chart.AppVersion` will be used)
-      # @section -- Librefrontier-Container specifications
-      tag: ''
-      #
-      # -- Container-Image pull-policy
-      # @section -- Librefrontier-Container specifications
-      pullPolicy: IfNotPresent
-    #
-    # -- Container Security Context
+    # -- Container-Image-Repository
     # @section -- Librefrontier-Container specifications
-    securityContext:
-      runAsUser: 100
-      runAsGroup: 101
-      allowPrivilegeEscalation: false
-      privileged: false
-      capabilities:
-        drop: ["ALL"]
+    repository: ghcr.io/lukas-fichtner/librefrontier
     #
-    # -- Container resource requests and limits
+    # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
     # @section -- Librefrontier-Container specifications
-    resources: {}
-    #resources:
-    #  requests:
-    #    memory: 200Mi
-    #    cpu: 100m
-    #  limits:
-    #    memory: 500Mi
-    #    cpu: 500m
+    tag: ""
     #
-    services:
-      httpAPI:
-        #
-        # -- HTTP-API Service-type
-        # @section -- Librefrontier-Container HTTP-API-Service specifications
-        type: ClusterIP
-        #
-        # -- HTTP-API Container-Port
-        # @section -- Librefrontier-Container HTTP-API-Service specifications
-        containerPort: 80
-        #
-        # -- HTTP-API internal exposed Port
-        # @section -- Librefrontier-Container HTTP-API-Service specifications
-        port: 80
-        #
-        # -- HTTP-API NodePort (if `services.httpAPI.type: NodePort`)
-        # @section -- Librefrontier-Container HTTP-API-Service specifications
-        nodePort:
-
-      webUI:
-        #
-        # -- Whether to enable the Web-UI Service
-        # @section -- Librefrontier-Container Web-UI-Service specifications
-        enabled: false
-        #
-        # -- Web-UI Service-type
-        # @section -- Librefrontier-Container Web-UI-Service specifications
-        type: ClusterIP
-        #
-        # -- Web-UI Container-Port
-        # @section -- Librefrontier-Container Web-UI-Service specifications
-        containerPort: 8080
-        #
-        # -- Web-UI internal exposed port
-        # @section -- Librefrontier-Container Web-UI-Service specifications
-        port: 8080
-        #
-        # -- Web-UI NodePort (if `services.httpAPI.type: NodePort`)
-        # @section -- Librefrontier-Container Web-UI-Service specifications
-        nodePort:
-    #
-    # -- Additional Volume-Mounts for Container
+    # -- Container-Image pull-policy
     # @section -- Librefrontier-Container specifications
-    additionalVolumeMounts: {}
-    #
-    # -- Additional Environment-variables
-    # @section -- Librefrontier-Container specifications
-    additionalEnv: {}
-    #
-    # -- Additional Arguments
-    # @section -- Librefrontier-Container specifications
-    additionalArgs: {}
-    #
-    probes:
-      #
-      livenessProbe:
-        #
-        # -- Whether to enable the Liveness-Probe
-        # @section -- Librefrontier-Container-Probes specifications
-        enabled: true
-        #
-        # -- Initial Delay in Seconds
-        # @section -- Librefrontier-Container-Probes specifications
-        initialDelaySeconds: 30
-        #
-        # -- How often to perform the liveness checks
-        # @section -- Librefrontier-Container-Probes specifications
-        periodSeconds: 10
-        #
-        # -- Time to wait for a response from the database
-        # @section -- Librefrontier-Container-Probes specifications
-        timeoutSeconds: 5
-        #
-        # -- Number of consecutive failures before restarting the Pod
-        # @section -- Librefrontier-Container-Probes specifications
-        failureThreshold: 3
-        #
-        # -- Number of successful checks before considering the Pod healthy (again)
-        # @section -- Librefrontier-Container-Probes specifications
-        successThreshold: 1
-      #
-      readinessProbe:
-        #
-        # -- Whether to enable the Readiness-Probe
-        # @section -- Librefrontier-Container-Probes specifications
-        enabled: true
-        #
-        # -- How long to wait before starting the first readiness Probe after the container starts
-        # @section -- Librefrontier-Container-Probes specifications
-        initialDelaySeconds: 30
-        #
-        # -- How often to perform the readiness checks after the initial delay
-        # @section -- Librefrontier-Container-Probes specifications
-        periodSeconds: 5
-        #
-        # -- The maximum amount of time the probe will wait for a response from the application
-        # @section -- Librefrontier-Container-Probes specifications
-        timeoutSeconds: 2
-        #
-        # -- Number of consecutive failures before restarting the Pod
-        # @section -- Librefrontier-Container-Probes specifications
-        failureThreshold: 3
-        #
-        # -- Number of successful checks before considering the Pod healthy
-        # @section -- Librefrontier-Container-Probes specifications
-        successThreshold: 1
+    pullPolicy: IfNotPresent
+  #
+  # -- Container Security Context
+  # @section -- Librefrontier-Container specifications
+  securityContext:
+    runAsUser: 100
+    runAsGroup: 101
+    allowPrivilegeEscalation: false
+    privileged: false
+    capabilities:
+      drop: ["ALL"]
+  #
+  # -- Container resource requests and limits
+  # @section -- Librefrontier-Container specifications
+  resources: {}
+  #resources:
+  #  requests:
+  #    memory: 200Mi
+  #    cpu: 100m
+  #  limits:
+  #    memory: 500Mi
+  #    cpu: 500m
+  #
+  #
+  # -- Additional Volume-Mounts for Container
+  # @section -- Librefrontier-Container specifications
+  extraVolumeMounts: {}
+  #
+  # -- Additional Environment-variables
+  # @section -- Librefrontier-Container specifications
+  extraEnv: {}
+  #
+  # -- Additional Arguments
+  # @section -- Librefrontier-Container specifications
+  extraArgs: {}
+  #
+  # --
+  # @section -- Librefrontier-Container specifications
+  startupProbe: {}
+  #
+  # --
+  # @section -- Librefrontier-Container specifications
+  readinessProbe: {}
+  #
+  # --
+  # @section -- Librefrontier-Container specifications
+  livenessProbe: {}
+  
 
 
 # =================================================================

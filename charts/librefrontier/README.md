@@ -1,11 +1,11 @@
 # librefrontier
 
-Custom Helm-Chart for Librefrontier
+Custom Helm-Chart to deploy Librefrontier
 
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.4.0-alpha.1](https://img.shields.io/badge/Version-0.4.0--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.2-dev](https://img.shields.io/badge/AppVersion-v0.0.2--dev-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.3-preview](https://img.shields.io/badge/AppVersion-v0.0.3--preview-informational?style=flat-square)
 
 ## Values
 
@@ -13,8 +13,8 @@ Custom Helm-Chart for Librefrontier
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| additionalVolumes | object | `{}` | Additional Volumes |
 | affinity | object | `{}` | Affinity expand the types of constraints you can define |
+| extraVolumes | object | `{}` | Additional Volumes |
 | nodeSelector | object | `{}` | Kubernetes only schedules the Pod onto nodes that have each of the labels you specify |
 | podAnnotations | object | `{}` | Additional Pod-annotations |
 | podLabels | object | `{}` | Additional Pod-Labels |
@@ -23,54 +23,11 @@ Custom Helm-Chart for Librefrontier
 | strategy | object | `{"type":"RollingUpdate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
 
-### Librefrontier-Container specifications
+### Extra Containers
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.librefrontier.additionalArgs | object | `{}` | Additional Arguments |
-| containers.librefrontier.additionalEnv | object | `{}` | Additional Environment-variables |
-| containers.librefrontier.additionalVolumeMounts | object | `{}` | Additional Volume-Mounts for Container |
-| containers.librefrontier.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
-| containers.librefrontier.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
-| containers.librefrontier.image.tag | string | `""` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
-| containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
-| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":101,"runAsUser":100}` | Container Security Context |
-
-### Librefrontier-Container-Probes specifications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| containers.librefrontier.probes.livenessProbe.enabled | bool | `true` | Whether to enable the Liveness-Probe |
-| containers.librefrontier.probes.livenessProbe.failureThreshold | int | `3` | Number of consecutive failures before restarting the Pod |
-| containers.librefrontier.probes.livenessProbe.initialDelaySeconds | int | `30` | Initial Delay in Seconds |
-| containers.librefrontier.probes.livenessProbe.periodSeconds | int | `10` | How often to perform the liveness checks |
-| containers.librefrontier.probes.livenessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy (again) |
-| containers.librefrontier.probes.livenessProbe.timeoutSeconds | int | `5` | Time to wait for a response from the database |
-| containers.librefrontier.probes.readinessProbe.enabled | bool | `true` | Whether to enable the Readiness-Probe |
-| containers.librefrontier.probes.readinessProbe.failureThreshold | int | `3` | Number of consecutive failures before restarting the Pod |
-| containers.librefrontier.probes.readinessProbe.initialDelaySeconds | int | `30` | How long to wait before starting the first readiness Probe after the container starts |
-| containers.librefrontier.probes.readinessProbe.periodSeconds | int | `5` | How often to perform the readiness checks after the initial delay |
-| containers.librefrontier.probes.readinessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy |
-| containers.librefrontier.probes.readinessProbe.timeoutSeconds | int | `2` | The maximum amount of time the probe will wait for a response from the application |
-
-### Librefrontier-Container HTTP-API-Service specifications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| containers.librefrontier.services.httpAPI.containerPort | int | `80` | HTTP-API Container-Port |
-| containers.librefrontier.services.httpAPI.nodePort | string | `nil` | HTTP-API NodePort (if `services.httpAPI.type: NodePort`) |
-| containers.librefrontier.services.httpAPI.port | int | `80` | HTTP-API internal exposed Port |
-| containers.librefrontier.services.httpAPI.type | string | `"ClusterIP"` | HTTP-API Service-type |
-
-### Librefrontier-Container Web-UI-Service specifications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| containers.librefrontier.services.webUI.containerPort | int | `8080` | Web-UI Container-Port |
-| containers.librefrontier.services.webUI.enabled | bool | `false` | Whether to enable the Web-UI Service |
-| containers.librefrontier.services.webUI.nodePort | string | `nil` | Web-UI NodePort (if `services.httpAPI.type: NodePort`) |
-| containers.librefrontier.services.webUI.port | int | `8080` | Web-UI internal exposed port |
-| containers.librefrontier.services.webUI.type | string | `"ClusterIP"` | Web-UI Service-type |
+| extraContainers | list | `[]` | Additional sidecar-Containers |
 
 ### HTTP-API-IngressRoute specifications
 
@@ -84,7 +41,7 @@ Custom Helm-Chart for Librefrontier
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| initContainers | list | `[]` | Librefrontier Init-Containers |
+| initContainers | list | `[]` | Init-Containers |
 
 ### Librefrontier-Configuration
 
@@ -95,6 +52,22 @@ Custom Helm-Chart for Librefrontier
 | librefrontierConfig.databaseConnectionString.secretName | string | `"librefrontier-secret"` | Name of the Secret, storing the database-connection-string. Secret-Key is 'database-connection-string' |
 | librefrontierConfig.databaseConnectionString.stringData | string | `""` | When not using an existing-Secret, enter the database-connection-string. |
 | librefrontierConfig.ginMode | string | `"release"` | GIN_MODE |
+
+### Librefrontier-Container specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| librefrontierContainer.extraArgs | object | `{}` | Additional Arguments |
+| librefrontierContainer.extraEnv | object | `{}` | Additional Environment-variables |
+| librefrontierContainer.extraVolumeMounts | object | `{}` | Additional Volume-Mounts for Container |
+| librefrontierContainer.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
+| librefrontierContainer.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
+| librefrontierContainer.image.tag | string | `""` | Container-Image-Tag (overrides `.Chart.AppVersion`) |
+| librefrontierContainer.livenessProbe | object | `{}` |  |
+| librefrontierContainer.readinessProbe | object | `{}` |  |
+| librefrontierContainer.resources | object | `{}` | Container resource requests and limits |
+| librefrontierContainer.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":101,"runAsUser":100}` | Container Security Context |
+| librefrontierContainer.startupProbe | object | `{}` |  |
 
 ### Web-UI IngressRoute specifications
 
