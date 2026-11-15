@@ -87,3 +87,17 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: Referenced an invalid Middleware 'non-existend-middleware' at IngressRoute 'http-api-test-ingress-route'
+  
+  - it: should render IngressRoute with correct referenced serviceName
+    set:
+      services.httpAPI.ports.httpAPI.portNumber: 1337
+      ingressRoutes.httpAPI:
+        enabled: true
+        name: "http-api-test-ingress-route"
+        entryPoints: ["test-entrypoint"]
+        certResolver: "invalid-cert-resolver"
+        routeMatch: Invalid routeMatch
+    asserts:
+      - equal:
+          path: spec.routes[0].services[0].port
+          value: 1337
