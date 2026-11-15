@@ -333,6 +333,10 @@ serverConfig:
     # @section -- Server-Config specifications
     extraConfig: ""
     #
+    # -- Public facing base URL of the service
+    # @section -- Server-Config specifications
+    baseURL: ""
+    #
     # -- Whether NTFY is behind a Proxy
     # @section -- Server-Config specifications
     behindProxy: false
@@ -345,10 +349,6 @@ serverConfig:
     # the forwarded header to determine the real IP address (e.g. "1.2.3.4, 5.6.7.8")
     # @section -- Server-Config specifications
     proxyTrustedHosts: ""
-    #
-    # -- Public facing base URL of the service
-    # @section -- Server-Config specifications
-    baseURL: ""
     #
     attachments:
       #
@@ -516,9 +516,10 @@ serverConfig:
     # @section -- Server-Config specifications
     enableMetrics: false
     #
-    # -- Exposes the metrics endpoint via a dedicated [IP]:port
+    # -- Exposes the metrics endpoint via a dedicated [IP]:port.
+    # If set, this option implicitly enables metrics as well.
     # @section -- Server-Config specifications
-    #metricsListenHttp: ":9090"
+    metricsListenHttp: ""
     #
     # -- Defines the default log level
     # @section -- Server-Config specifications

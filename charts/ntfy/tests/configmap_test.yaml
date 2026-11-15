@@ -5,15 +5,9 @@
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
 #------------------------------------------------------------------------------
-#
-# Test suite name to show on test result output
 suite: Test ConfigMap
-#
-# The template files scope to test in this suite
-# Only the selected files will be rendered
 templates:
   - templates/configmap.yaml
-#
 tests:
   - it: should not render ConfigMap-resource
     set:
@@ -30,3 +24,183 @@ tests:
           path: metadata
       - exists:
           path: data
+  
+  - it: should render ConfigMap-resource with adjusted dynamicValues
+    set:
+      serverConfig:
+        configMapItemKey: "serverConfig"
+        dynamicValues:
+          extraConfig: "additional test-config 1337"
+          behindProxy: true
+          proxyForwardedHeader: "foobaa"
+          proxyTrustedHosts: "baa"
+          baseURL: "invalid.baseurl.example"
+          attachments:
+            enabled: true
+            cacheDir: "/tmp/test-cache-dir"
+            totalSizeLimit: "1337TB"
+            fileSizeLimit: "1337GB"
+            expiryDuration: "1337h"
+          rateLimits:
+            visitorSubscriberRateLimiting: true
+            messageSizeLimit: "invalid-test-message-size-limit"
+            messageDelayLimit: "invalid-test-message-delay-limit"
+            globalTopicLimit: 9001
+            visitorSubscriptionLimit: 1337
+            visitorRequestLimitBurst: 7331
+            visitorRequestLimitReplenish: "1337h"
+            visitorRequestLimitExemptHosts: "8.7.6.0/24,1.2.3.4,ntfy.example.com"
+            visitorMessageDailyLimit: 111
+            visitorAttachmentTotalSizeLimit: "1337TiB"
+            visitorAttachmentDailyBandwidthLimit: "8331GiB"
+          authFile: "/invalid/path/auth.file"
+          authDefaultAccess: "invalid-auth-default-access-option"
+          authUsers: ["admin:invalid-password-hash:invalid-user-role"]
+          authAccess: ["admin:Invalid Test Topic:invalid-read-write"]
+          authTokens: ["admin:invalid-token:Invalid Test-Token for admin"]
+          cacheFile: "/tmp/invalid-path/cache.file"
+          cacheDuration: "1337d"
+          cacheBatchSize: 1337
+          cacheBatchTimeout: "1337s"
+          cacheStartupQueries: "invalid test startup queries"
+          managerInterval: "1337d"
+          disallowedTopics: ["InvalidTopic", "HelloWorld"]
+          webRoot: "/invalid-web-root"
+          enableSignup: true
+          requireLogin: true
+          enableLogin: true
+          enableReservations: true
+          enableMetrics: true
+          metricsListenHttp: ":1337"
+          logLevel: "InvalidLogLevel"
+          logLevelOverrides: ["test", "secondtest", "thirdtest"]
+          logFormat: "invalid log format"
+          logFile: "invalid-logfile"
+    asserts:
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "additional test-config 1337"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "behind-proxy: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'proxy-forwarded-header: "foobaa"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "proxy-trusted-hosts: baa"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'base-url: invalid\.baseurl\.example'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'attachment-cache-dir: "/tmp/test-cache-dir"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'attachment-total-size-limit: "1337TB"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'attachment-file-size-limit: "1337GB"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'attachment-expiry-duration: "1337h"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "visitor-subscriber-rate-limiting: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'message-size-limit: "invalid-test-message-size-limit"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'message-delay-limit: "invalid-test-message-delay-limit"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "global-topic-limit: 9001"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "visitor-subscription-limit: 1337"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "visitor-request-limit-burst: 7331"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'visitor-request-limit-replenish: "1337h"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'visitor-request-limit-exempt-hosts: "8.7.6.0/24,1.2.3.4,ntfy.example.com"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'visitor-attachment-total-size-limit: "1337TiB"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'visitor-attachment-daily-bandwidth-limit: "8331GiB"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'auth-file: "/invalid/path/auth.file"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'auth-default-access: "invalid-auth-default-access-option"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "auth-users:\n  - admin:invalid-password-hash:invalid-user-role"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "auth-access:\n  - admin:Invalid Test Topic:invalid-read-write"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "auth-tokens:\n  - admin:invalid-token:Invalid Test-Token for admin"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'cache-file: "/tmp/invalid-path/cache.file"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'cache-duration: "1337d"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "cache-batch-size: 1337"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'cache-batch-timeout: "1337s"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'cache-startup-queries: "invalid test startup queries"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'manager-interval: "1337d"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "disallowed-topics:\n  - InvalidTopic\n  - HelloWorld"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "web-root: /invalid-web-root"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "enable-signup: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "require-login: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "enable-login: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "enable-reservations: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "enable-metrics: true"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: 'metrics-listen-http: ":1337"'
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "log-level: InvalidLogLevel"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "log-level-overrides:\n  - test\n  - secondtest\n  - thirdtest"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "log-format: invalid log format"
+      - matchRegex:
+          path: data.serverConfig
+          pattern: "log-file: invalid-logfile"
+      

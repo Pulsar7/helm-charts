@@ -16,8 +16,8 @@
 # - iOS push notifications for self-hosted servers (to calculate the Firebase poll_request topic)
 # - Matrix Push Gateway (to validate that the pushkey is correct)
 #
-{{- if $config.baseURL }}
-base-url: {{ $config.baseURL }}
+{{- with $config.baseURL }}
+base-url: {{ . }}
 {{- end }}
 
 # Listen address for the HTTP & HTTPS web server. If "listen-https" is set, you must also
@@ -101,11 +101,11 @@ listen-http: ":{{ $ntfyContainerPorts.http.containerPort }}"
 #
 cache-file: "{{ $config.cacheFile }}"
 cache-duration: "{{ $config.cacheDuration }}"
-{{- if $config.cacheStartupQueries }}
-cache-startup-queries: {{ $config.cacheStartupQueries }}
+{{- with $config.cacheStartupQueries }}
+cache-startup-queries: {{ . | quote }}
 {{- end }}
 cache-batch-size: {{ $config.cacheBatchSize }}
-cache-batch-timeout: "{{ $config.cacheBatchTimeout }}"
+cache-batch-timeout: {{ $config.cacheBatchTimeout | quote }}
 
 # If set, access to the ntfy server and API can be controlled on a granular level using
 # the 'ntfy user' and 'ntfy access' commands. See the --help pages for details, or check the docs.
@@ -137,9 +137,9 @@ cache-batch-timeout: "{{ $config.cacheBatchTimeout }}"
 auth-file: "{{ $config.authFile }}"
 auth-default-access: "{{ $config.authDefaultAccess }}"
 # auth-startup-queries:
-auth-users: {{ toYaml $config.authUsers | nindent 2 }}
-auth-access: {{ toYaml $config.authAccess | nindent 2 }}
-auth-tokens: {{ toYaml $config.authTokens | nindent 2 }}
+auth-users: {{- toYaml $config.authUsers | nindent 2 }}
+auth-access: {{- toYaml $config.authAccess | nindent 2 }}
+auth-tokens: {{- toYaml $config.authTokens | nindent 2 }}
 
 # If set, the X-Forwarded-For header (or whatever is configured in proxy-forwarded-header) is used to determine
 # the visitor IP address instead of the remote address of the connection.
@@ -268,7 +268,7 @@ attachment-expiry-duration: "{{ $attachments.expiryDuration }}"
 # Interval in which the manager prunes old messages, deletes topics
 # and prints the stats.
 #
-manager-interval: "{{ $config.managerInterval }}"
+manager-interval: {{ $config.managerInterval | quote }}
 
 # Defines topic names that are not allowed, because they are otherwise used. There are a few default topics
 # that cannot be used (e.g. app, account, settings, ...). To extend the default list, define them here.
@@ -279,7 +279,7 @@ manager-interval: "{{ $config.managerInterval }}"
 #     - pricing
 #     - contact
 #
-disallowed-topics: {{ toYaml $config.disallowedTopics | nindent 2 }}
+disallowed-topics: {{- toYaml $config.disallowedTopics | nindent 2 }}
 
 # Defines the root path of the web app, or disables the web app entirely.
 #
@@ -418,8 +418,8 @@ visitor-subscriber-rate-limiting: {{ $rateLimits.visitorSubscriberRateLimiting }
 #   enables metrics as well, e.g. "10.0.1.1:9090" or ":9090"
 #
 enable-metrics: {{ $config.enableMetrics }}
-{{- if and $config.enableMetrics $config.metricsListenHttp }}
-metrics-listen-http: "{{ $config.metricsListenHttp }}"
+{{- if $config.metricsListenHttp }}
+metrics-listen-http: {{ $config.metricsListenHttp | quote }}
 {{- end }}
 
 # Profiling
@@ -464,7 +464,7 @@ metrics-listen-http: "{{ $config.metricsListenHttp }}"
 #      - "time_taken_ms -> debug"
 #
 log-level: {{ $config.logLevel }}
-log-level-overrides: {{ $config.logLevelOverrides | toYaml | nindent 2 }}
+log-level-overrides: {{- $config.logLevelOverrides | toYaml | nindent 2 }}
 log-format: {{ $config.logFormat }}
 {{- if $config.logFile }}
 log-file: {{ $config.logFile }}
