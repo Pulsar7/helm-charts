@@ -28,6 +28,16 @@ entries:
   librefrontier:
   - apiVersion: v2
     appVersion: v0.0.3-preview
+    created: "2026-11-15T14:05:52.919804789Z"
+    description: Custom Helm-Chart to deploy Librefrontier
+    digest: c510e15dea6220a5e7b13a3603410f3fb1649feacf7c6793e579bd6bcddbbe1a
+    name: librefrontier
+    type: application
+    urls:
+    - https://github.com/Pulsar7/helm-charts/releases/download/librefrontier-0.5.1/librefrontier-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v2
+    appVersion: v0.0.3-preview
     created: "2026-11-15T13:48:05.76068121Z"
     description: Custom Helm-Chart to deploy Librefrontier
     digest: ce11b2d384748c6bab1643b02f497da892f503a99b76953bd720f48262a7af3b
@@ -538,4 +548,4 @@ entries:
     urls:
     - https://github.com/Pulsar7/helm-charts/releases/download/radicale-0.1.6-alpha/radicale-0.1.6-alpha.tgz
     version: 0.1.6-alpha
-generated: "2026-11-15T13:48:05.760781611Z"
+generated: "2026-11-15T14:05:52.919973897Z"
