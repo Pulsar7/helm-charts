@@ -1,57 +1,30 @@
 #------------------------------------------------------------------------------
 #
-# Deployment-Unittests Test-Suite for Librefrontier
+# Deployment-Unittests Test-Suite for librefrontier
 #
 # > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
 # 
 #------------------------------------------------------------------------------
-#
-# Test suite name to show on test result output
 suite: Test Deployment
-#
-# The template files scope to test in this suite
-# Only the selected files will be rendered
 templates:
   - templates/deployment.yaml
   #
   # following are required to calculate their checksum
-  - templates/service.yaml
-  - templates/ingress-route.yaml
-#
+  - templates/secrets.yaml
+  - templates/ingress-routes.yaml
+  - templates/middlewares.yaml
+  - templates/services.yaml
 tests:
-  - it: should render with enabled HTTP-API-IngressRoute-Resource
-    #
+  - it: should render Deployment with adjusted librefrontier-Container image-URL
     template: templates/deployment.yaml
-    #
     set:
-      httpAPIIngressRoute.enabled: true
-    #
+      librefrontierContainer.image:
+        registry: "my-private.registry"
+        repository: "my/private-librefrontier-repo"
+        tag: "1337.1337.1337"
     asserts:
       - isKind:
           of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
-
-  - it: should render with enabled Web-UI-IngressRoute-Resource
-    #
-    template: templates/deployment.yaml
-    #
-    set:
-      webUIIngressRoute.enabled: true
-      containers.librefrontier.services.webUI.enabled: true
-    #
-    asserts:
-      - isKind:
-          of: Deployment
-      - exists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
-
-  - it: should render without any IngressRoute-Resource
-    #
-    template: templates/deployment.yaml
-    #
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.metadata.annotations["checksum/ingress-route"]
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "my-private.registry/my/private-librefrontier-repo:1337.1337.1337"

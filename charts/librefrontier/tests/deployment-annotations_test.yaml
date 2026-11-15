@@ -1,0 +1,74 @@
+#------------------------------------------------------------------------------
+#
+# Deployment-Unittests Test-Suite for librefrontier
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+suite: Test Deployment
+templates:
+  - templates/deployment.yaml
+  #
+  # following are required to calculate their checksum
+  - templates/secrets.yaml
+  - templates/ingress-routes.yaml
+  - templates/middlewares.yaml
+  - templates/services.yaml
+tests:
+  - it: should render Deployment with checksum/services, checksum/ingress-routes and checksum/middlewares annotations
+    template: templates/deployment.yaml
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          entryPoints: ["test-entrypoint"]
+          routeMatch: Invalid routeMatch
+          certResolver: "invalid-cert-resolver"
+      middlewares:
+        exampleMiddleware:
+          name: "example-middleware"
+          spec:
+            headers:
+              forceSTSHeader: true
+              stsSeconds: 15552000
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/services"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/ingress-routes"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/middlewares"]
+  
+  - it: should render Deployment without checksum/ingress-routes and checksum/middlewares annotations
+    template: templates/deployment.yaml
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/services"]
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/ingress-routes"]
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/middlewares"]
+  
+  - it: should render Deployment only without the checksum/middlewares annotation
+    template: templates/deployment.yaml
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          entryPoints: ["test-entrypoint"]
+          routeMatch: Invalid routeMatch
+          certResolver: "invalid-cert-resolver"
+      middlewares: null
+    asserts:
+      - isKind:
+          of: Deployment
+      - exists:
+          path: spec.template.metadata.annotations["checksum/services"]
+      - exists:
+          path: spec.template.metadata.annotations["checksum/ingress-routes"]
+      - notExists:
+          path: spec.template.metadata.annotations["checksum/middlewares"]

@@ -1,11 +1,11 @@
 # librefrontier
 
-Custom Helm-Chart for Librefrontier
+Custom Helm-Chart to deploy Librefrontier
 
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.4.0-alpha.1](https://img.shields.io/badge/Version-0.4.0--alpha.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.2-dev](https://img.shields.io/badge/AppVersion-v0.0.2--dev-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.0.3-preview](https://img.shields.io/badge/AppVersion-v0.0.3--preview-informational?style=flat-square)
 
 ## Values
 
@@ -13,8 +13,8 @@ Custom Helm-Chart for Librefrontier
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| additionalVolumes | object | `{}` | Additional Volumes |
 | affinity | object | `{}` | Affinity expand the types of constraints you can define |
+| extraVolumes | object | `{}` | Additional Volumes |
 | nodeSelector | object | `{}` | Kubernetes only schedules the Pod onto nodes that have each of the labels you specify |
 | podAnnotations | object | `{}` | Additional Pod-annotations |
 | podLabels | object | `{}` | Additional Pod-Labels |
@@ -23,87 +23,94 @@ Custom Helm-Chart for Librefrontier
 | strategy | object | `{"type":"RollingUpdate"}` | The strategy used to replace old Pods by new ones https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | tolerations | list | `[]` | Tolerations allow the scheduler to schedule pods with matching taints |
 
-### Librefrontier-Container specifications
+### Config specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.librefrontier.additionalArgs | object | `{}` | Additional Arguments |
-| containers.librefrontier.additionalEnv | object | `{}` | Additional Environment-variables |
-| containers.librefrontier.additionalVolumeMounts | object | `{}` | Additional Volume-Mounts for Container |
-| containers.librefrontier.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
-| containers.librefrontier.image.repository | string | `"ghcr.io/lukas-fichtner/librefrontier"` | Container-Image-Repository |
-| containers.librefrontier.image.tag | string | `""` | Container-Image-Tag (by default `.Chart.AppVersion` will be used) |
-| containers.librefrontier.resources | object | `{}` | Container resource requests and limits |
-| containers.librefrontier.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":101,"runAsUser":100}` | Container Security Context |
+| config.databaseConnectionString.defaultConnectionString | string | `""` | When not using an existing-Secret, enter the database-connection-string. |
+| config.databaseConnectionString.existingSecret | bool | `false` | Whether to use an existing Secret or a Secret gets created. |
+| config.databaseConnectionString.secretKey | string | `"database-connection-string"` | Secret-key, storing the database-connection-string |
+| config.databaseConnectionString.secretName | string | `"librefrontier-secret"` | Name of the Secret, storing the database-connection-string |
+| config.enableGUI | bool | `false` | ENABLE_GUI |
+| config.ginMode | string | `"release"` | GIN_MODE |
+| config.lfAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
+| config.logLevel | string | `"info"` | LOG_LEVEL |
+| config.maxConcurrentStreams | int | `10` | MAX_CONCURRENT_STREAMS |
+| config.proxyAllStreams | bool | `true` | PROXY_ALL_STREAMS |
+| config.radioBrowserURL | string | `"de1.api.radio-browser.info"` | RADIO_BROWSER_URL |
 
-### Librefrontier-Container-Probes specifications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| containers.librefrontier.probes.livenessProbe.enabled | bool | `true` | Whether to enable the Liveness-Probe |
-| containers.librefrontier.probes.livenessProbe.failureThreshold | int | `3` | Number of consecutive failures before restarting the Pod |
-| containers.librefrontier.probes.livenessProbe.initialDelaySeconds | int | `30` | Initial Delay in Seconds |
-| containers.librefrontier.probes.livenessProbe.periodSeconds | int | `10` | How often to perform the liveness checks |
-| containers.librefrontier.probes.livenessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy (again) |
-| containers.librefrontier.probes.livenessProbe.timeoutSeconds | int | `5` | Time to wait for a response from the database |
-| containers.librefrontier.probes.readinessProbe.enabled | bool | `true` | Whether to enable the Readiness-Probe |
-| containers.librefrontier.probes.readinessProbe.failureThreshold | int | `3` | Number of consecutive failures before restarting the Pod |
-| containers.librefrontier.probes.readinessProbe.initialDelaySeconds | int | `30` | How long to wait before starting the first readiness Probe after the container starts |
-| containers.librefrontier.probes.readinessProbe.periodSeconds | int | `5` | How often to perform the readiness checks after the initial delay |
-| containers.librefrontier.probes.readinessProbe.successThreshold | int | `1` | Number of successful checks before considering the Pod healthy |
-| containers.librefrontier.probes.readinessProbe.timeoutSeconds | int | `2` | The maximum amount of time the probe will wait for a response from the application |
-
-### Librefrontier-Container HTTP-API-Service specifications
+### Extra Containers
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.librefrontier.services.httpAPI.containerPort | int | `80` | HTTP-API Container-Port |
-| containers.librefrontier.services.httpAPI.nodePort | string | `nil` | HTTP-API NodePort (if `services.httpAPI.type: NodePort`) |
-| containers.librefrontier.services.httpAPI.port | int | `80` | HTTP-API internal exposed Port |
-| containers.librefrontier.services.httpAPI.type | string | `"ClusterIP"` | HTTP-API Service-type |
+| extraContainers | list | `[]` | Additional sidecar-Containers |
 
-### Librefrontier-Container Web-UI-Service specifications
+### IngressRoute/Middlewares specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.librefrontier.services.webUI.containerPort | int | `8080` | Web-UI Container-Port |
-| containers.librefrontier.services.webUI.enabled | bool | `false` | Whether to enable the Web-UI Service |
-| containers.librefrontier.services.webUI.nodePort | string | `nil` | Web-UI NodePort (if `services.httpAPI.type: NodePort`) |
-| containers.librefrontier.services.webUI.port | int | `8080` | Web-UI internal exposed port |
-| containers.librefrontier.services.webUI.type | string | `"ClusterIP"` | Web-UI Service-type |
+| ingressRoutes | object | `{"httpAPI":{"certResolver":"","enabled":false,"entryPoints":[],"name":"http-api","refMiddlewares":[],"refServiceName":"http-api","routeMatch":""}}` | Map of IngressRoutes |
+| middlewares | object | `{}` | Map of middlewares added to the IngressRoute |
 
-### HTTP-API-IngressRoute specifications
+### IngressRoute/httpAPI specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| httpAPIIngressRoute.enabled | bool | `false` | Whether to enable the HTTP-API-IngressRoute |
-| httpAPIIngressRoute.entryPoints | list | `["web"]` | Entrypoints for HTTP-API-Service |
-| httpAPIIngressRoute.routeMatch | string | `"PathPrefix(`/`)"` | Match for HTTP-API-Route |
+| ingressRoutes.httpAPI.certResolver | string | `""` | Name of the TLS-cert-resolver |
+| ingressRoutes.httpAPI.enabled | bool | `false` | Whether to create the httpAPI-IngressRoute |
+| ingressRoutes.httpAPI.entryPoints | list | `[]` | List of entryPoints |
+| ingressRoutes.httpAPI.name | string | `"http-api"` | Name of IngressRoute resource |
+| ingressRoutes.httpAPI.refMiddlewares | list | `[]` | List with names of Middlewares |
+| ingressRoutes.httpAPI.refServiceName | string | `"http-api"` | Name of referenced Service |
+| ingressRoutes.httpAPI.routeMatch | string | `""` | Route-Match |
 
 ### Init-Containers
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| initContainers | list | `[]` | Librefrontier Init-Containers |
+| initContainers | list | `[]` | Init-Containers |
 
-### Librefrontier-Configuration
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| librefrontierConfig.LFAPIBaseURL | string | `"http://teufel.wifiradiofrontier.com"` | LF_API_BASE_URL |
-| librefrontierConfig.databaseConnectionString.existingSecret | bool | `false` | Whether to use an existing Secret or a default Secret should be generated storing a default database-connection-string. |
-| librefrontierConfig.databaseConnectionString.secretName | string | `"librefrontier-secret"` | Name of the Secret, storing the database-connection-string. Secret-Key is 'database-connection-string' |
-| librefrontierConfig.databaseConnectionString.stringData | string | `""` | When not using an existing-Secret, enter the database-connection-string. |
-| librefrontierConfig.ginMode | string | `"release"` | GIN_MODE |
-
-### Web-UI IngressRoute specifications
+### Librefrontier-Container specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| webUIIngressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
-| webUIIngressRoute.enabled | bool | `false` | Whether to enable the Web-UI-IngressRoute. requires `services.webUI.enabled: true` otherwise this gets ignored! |
-| webUIIngressRoute.entryPoints | list | `[]` | Entrypoints for Web-UI-Service |
-| webUIIngressRoute.routeMatch | string | `"Host(``)"` | Match for Web-UI-Route |
+| librefrontierContainer.extraArgs | list | `[]` | Additional Arguments for the librefrontier-'main'-Container |
+| librefrontierContainer.extraEnv | list | `[]` | Additional Environment-variables for the librefrontier-'main'-Container |
+| librefrontierContainer.extraVolumeMounts | list | `[]` | Additional Volume-Mounts for the librefrontier-'main'-Container |
+| librefrontierContainer.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
+| librefrontierContainer.image.registry | string | `"ghcr.io"` | Container-Image registry |
+| librefrontierContainer.image.repository | string | `"lukas-fichtner/librefrontier"` | Container-Image repository |
+| librefrontierContainer.image.tag | string | `""` | Container-Image-Tag (overrides `.Chart.AppVersion`) |
+| librefrontierContainer.livenessProbe | object | `{}` |  |
+| librefrontierContainer.ports | object | `{"httpAPI":{"containerPort":80,"name":"http-api"},"httpWebUI":{"containerPort":8080,"name":"http-web-ui"}}` | Exposed Container-ports |
+| librefrontierContainer.readinessProbe | object | `{}` |  |
+| librefrontierContainer.resources | object | `{}` | Container resource requests and limits |
+| librefrontierContainer.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"runAsGroup":101,"runAsUser":100}` | Container Security Context |
+| librefrontierContainer.startupProbe | object | `{}` |  |
+
+### Librefrontier-Container/ports specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| librefrontierContainer.ports.httpAPI.containerPort | int | `80` | Port-number of exposed http Container-port |
+| librefrontierContainer.ports.httpAPI.name | string | `"http-api"` | Name of exposed http Container-port |
+| librefrontierContainer.ports.httpWebUI.containerPort | int | `8080` | Port-number of exposed http Container-port |
+| librefrontierContainer.ports.httpWebUI.name | string | `"http-web-ui"` | Name of exposed http Container-port |
+
+### Services specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| services.httpAPI.ports.httpAPI.portNumber | int | `80` | Exposed Service-port |
+| services.httpAPI.ports.httpAPI.protocol | string | `"TCP"` | Protocol |
+| services.httpAPI.ports.httpAPI.servicePortName | string | `"http-api"` | Name of the Service-port |
+| services.httpAPI.ports.httpAPI.targetPort | string | `"http-api"` | Reference exposed Container-port by its name |
+| services.httpAPI.ports.httpWebUI.portNumber | int | `8080` | Exposed Service-port |
+| services.httpAPI.ports.httpWebUI.protocol | string | `"TCP"` | Protocol |
+| services.httpAPI.ports.httpWebUI.servicePortName | string | `"http-web-ui"` | Name of the Service-port |
+| services.httpAPI.ports.httpWebUI.targetPort | string | `"http-web-ui"` | Reference exposed Container-port by its name |
+| services.httpAPI.serviceName | string | `"http-api"` | Service-Name for the http-API Service |
+| services.httpAPI.type | string | `"ClusterIP"` | Service-Type |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

@@ -1,0 +1,49 @@
+{{ include "librefrontier.validateValues" . }}
+{{- if (include "librefrontier.createIngressRoute" .) }}
+{{- $ingressRoutes := .Values.ingressRoutes -}}
+{{- $services := .Values.services -}}
+{{- $namespace := .Release.Namespace | quote -}}
+{{- $labels := (include "librefrontier.labels" .) -}}
+{{- $index := 0 -}}
+{{- range $ingressRoute := $ingressRoutes }}
+{{- if $ingressRoute.enabled }}
+{{- $index = add $index 1 -}}
+{{- if gt $index 1 }}
+---
+{{- end }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $ingressRoute.name }}
+  namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
+spec:
+  {{- with $ingressRoute.entryPoints }}
+  entryPoints: {{- toYaml . | nindent 2 }}
+  {{- end }}
+  routes:
+  - match: {{ $ingressRoute.routeMatch }}
+    kind: Rule
+    services:
+    - name: {{ $ingressRoute.refServiceName }}
+      {{- $servicePortNumber := 0 -}}
+      {{- range $service := $services -}}
+      {{- if eq $service.serviceName $ingressRoute.refServiceName }}
+      {{- $servicePortNumber = $service.portNumber -}}
+      {{- break -}}
+      {{- end }}
+      {{- end }}
+      port: {{ $servicePortNumber }}
+      scheme: http
+    {{- if $ingressRoute.refMiddlewares }}
+    middlewares:
+    {{- range $middlewareName := $ingressRoute.refMiddlewares }}
+    - name: {{ $middlewareName }}
+      namespace: {{ $namespace }}
+    {{- end }}
+    {{- end }}
+  tls:
+    certResolver: {{ $ingressRoute.certResolver }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,28 @@
+{{ include "librefrontier.validateValues" . }}
+{{- $services := .Values.services -}}
+{{- $namespace := .Release.Namespace | quote -}}
+{{- $labels := (include "librefrontier.labels" .) -}}
+{{- $selectorLabels := (include "librefrontier.selectorLabels" .) -}}
+{{- $index := 0 -}}
+{{- range $service := $services -}}
+{{- $index = add $index 1 -}}
+{{- if gt $index 1 }}
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service.serviceName }}
+  namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
+spec:
+  selector: {{- $selectorLabels | nindent 4 }}
+  type: {{ $service.type }}
+  ports:
+  {{- range $port := $service.ports }}
+  - protocol: {{ $port.protocol }}
+    port: {{ $port.portNumber }}
+    targetPort: {{ .targetPort }}
+    name: {{ $port.servicePortName }}
+  {{- end }}
+{{- end }}
