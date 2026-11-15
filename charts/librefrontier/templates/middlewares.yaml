@@ -1,0 +1,16 @@
+{{ include "librefrontier.validateValues" . }}
+{{- if (include "librefrontier.createMiddleware" .) }}
+{{- $middlewares := .Values.middlewares -}}
+{{- $namespace := .Release.Namespace | quote -}}
+{{- $labels := (include "librefrontier.labels" .) -}}
+{{- range $middleware := $middlewares }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $middleware.name }}
+  namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
+spec:
+  {{- $middleware.spec | toYaml | nindent 2 }}
+{{- end }}
+{{- end }}

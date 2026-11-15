@@ -1,0 +1,153 @@
+#------------------------------------------------------------------------------
+#
+# Deployment/main-container/environment-variables-Unittests 
+# Test-Suite for librefrontier
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+suite: Test Deployment/main-container/environment-variables
+templates:
+  - templates/deployment.yaml
+  #
+  # following are required to calculate their checksum
+  - templates/secrets.yaml
+  - templates/ingress-routes.yaml
+  - templates/middlewares.yaml
+  - templates/services.yaml
+tests:
+  - it: should render Deployment with adjusted API_PORT (via exposed container-ports specs)
+    template: templates/deployment.yaml
+    set:
+      librefrontierContainer.ports.httpAPI.containerPort: 1337
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0]
+          value:
+            name: API_PORT
+            value: 1337
+          
+  - it: should render Deployment with adjusted ENABLE_GUI
+    template: templates/deployment.yaml
+    set:
+      config.enableGUI: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[1]
+          value:
+            name: ENABLE_GUI
+            value: true
+  
+  - it: should render Deployment with adjusted GUI_PORT
+    template: templates/deployment.yaml
+    set:
+      librefrontierContainer.ports.httpWebUI.containerPort: 8331
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[2]
+          value:
+            name: GUI_PORT
+            value: 8331
+
+  - it: should render Deployment with adjusted GIN_MODE
+    template: templates/deployment.yaml
+    set:
+      config.ginMode: "debug"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[3]
+          value:
+            name: GIN_MODE
+            value: debug
+  
+  - it: should render Deployment with adjusted LF_API_BASE_URL
+    template: templates/deployment.yaml
+    set:
+      config.lfAPIBaseURL: "https://invalid.lf-api-base.url.example"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[4]
+          value:
+            name: LF_API_BASE_URL
+            value: "https://invalid.lf-api-base.url.example"
+  
+  - it: should render Deployment with adjusted LF_DB_CONN_STRING
+    template: templates/deployment.yaml
+    set:
+      config.databaseConnectionString:
+        existingSecret: false
+        secretName: "test-invalid-secret"
+        secretKey: "test-database-connection-string-foobaa"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[5]
+          value:
+            name: LF_DB_CONN_STRING
+            valueFrom:
+              secretKeyRef:
+                key: "test-database-connection-string-foobaa"
+                name: "test-invalid-secret"
+  
+  - it: should render Deployment with adjusted LOG_LEVEL
+    template: templates/deployment.yaml
+    set:
+      config.logLevel: "invalidLogLevel"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[6]
+          value:
+            name: LOG_LEVEL
+            value: "invalidLogLevel"
+  
+  - it: should render Deployment with adjusted RADIO_BROWSER_URL
+    template: templates/deployment.yaml
+    set:
+      config.radioBrowserURL: "invalid radio browser url"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[7]
+          value:
+            name: RADIO_BROWSER_URL
+            value: "invalid radio browser url"
+  
+  - it: should render Deployment with adjusted PROXY_ALL_STREAMS
+    template: templates/deployment.yaml
+    set:
+      config.proxyAllStreams: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[8]
+          value:
+            name: PROXY_ALL_STREAMS
+            value: false
+  
+  - it: should render Deployment with adjusted MAX_CONCURRENT_STREAMS
+    template: templates/deployment.yaml
+    set:
+      config.maxConcurrentStreams: 1337
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[9]
+          value:
+            name: MAX_CONCURRENT_STREAMS
+            value: 1337
+  
+  - it: should render Deployment with additional environment variables
+    template: templates/deployment.yaml
+    set:
+      librefrontierContainer.extraEnv:
+        - name: HELLO_WORLD
+          value: "1338 hello world 1337"
+        - name: SECOND_HELLO_WORLD
+          value: "1337 world hello 1338"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[10]
+          value:
+            name: HELLO_WORLD
+            value: "1338 hello world 1337"
+      - equal:
+          path: spec.template.spec.containers[0].env[11]
+          value:
+            name: SECOND_HELLO_WORLD
+            value: "1337 world hello 1338"

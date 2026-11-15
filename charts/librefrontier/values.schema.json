@@ -11,14 +11,116 @@
     "affinity": {"type": "object"},
     "tolerations": {"type": "array"},
     "initContainers": {"type": "array"},
-
+    "extraContainers": {"type": "array"},
     
+    "librefrontierContainer": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "object",
+          "properties": {
+            "registry": {"type": "string"},
+            "repository": {"type": "string"},
+            "tag": {"type": "string"},
+            "pullPolicy": {"type": "string"}
+          }
+        },
+        "securityContext": {"type": "object"},
+        "resources": {"type": "object"},
+        "ports": {
+          "type": "object",
+          "properties": {
+            "http": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "containerPort": {"type": "integer"}
+              }
+            }
+          }
+        },
+        "extraVolumeMounts": {"type": "array"},
+        "extraEnv": {"type": "array"},
+        "extraArgs": {"type": "array"},
+        "startupProbe": {"type": "object"},
+        "readinessProbe": {"type": "object"},
+        "livenessProbe": {"type": "object"}
+      }
+    },
 
-    "librefrontierConfig": {
+    "services": {
+      "type": "object",
+      "properties": {
+        "httpAPI": {
+          "type": "object",
+          "properties": {
+            "serviceName": {"type": "string"},
+            "type": {"type": "string"},
+            "ports": {
+              "type": "object",
+              "properties": {
+                "httpAPI": {
+                  "type": "object",
+                  "properties": {
+                    "servicePortName": {"type": "string"},
+                    "portNumber": {"type": "integer"},
+                    "targetPort": {"type": "string"},
+                    "protocol": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "httpWebUI": {
+          "type": "object",
+          "properties": {
+            "serviceName": {"type": "string"},
+            "type": {"type": "string"},
+            "ports": {
+              "type": "object",
+              "properties": {
+                "httpAPI": {
+                  "type": "object",
+                  "properties": {
+                    "servicePortName": {"type": "string"},
+                    "portNumber": {"type": "integer"},
+                    "targetPort": {"type": "string"},
+                    "protocol": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "ingressRoutes": {
+      "type": "object",
+      "properties": {
+        "httpAPI": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "name": {"type": "string"},
+            "refServiceName": {"type": "string"},
+            "entryPoints": {"type": "array"},
+            "routeMatch": {"type": "string"},
+            "certResolver": {"type": "string"},
+            "refMiddlewares": {"type": "array"}
+          }
+        }
+      }
+    },
+
+    "middlewares": {"type": "object"},
+
+    "config": {
       "type": "object",
       "properties": {
         "ginMode": {"type": "string", "enum": ["release", "debug"]},
-        "LFAPIBaseURL": {"type": "string"},
+        "lfAPIBaseURL": {"type": "string"},
         "databaseConnectionString": {
           "type": "object",
           "properties": {
@@ -28,33 +130,15 @@
           }
         }
       }
-    },
-
-    "httpAPIIngressRoute": {
-        "type": "object",
-        "properties": {
-            "enabled": {"type": "boolean"},
-            "entryPoints": {"type": "array"},
-            "host": {"type": "string"}
-        }
-    },
-    "webUIIngressRoute": {
-        "type": "object",
-        "properties": {
-            "enabled": {"type": "boolean"},
-            "entryPoints": {"type": "array"},
-            "certResolver": {"type": "string"},
-            "host": {"type": "string"}
-        }
     }
   },
 
   "required": [
     "replicaCount",
     "initContainers",
-    "containers",
-    "httpAPIIngressRoute",
-    "webUIIngressRoute"
+    "extraContainers",
+    "librefrontierContainer",
+    "config"
   ],
 
   "title": "Values",

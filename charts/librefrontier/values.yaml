@@ -69,9 +69,13 @@ librefrontierContainer:
   # Image specifications of the Librefrontier-Container
   image:
     #
-    # -- Container-Image-Repository
+    # -- Container-Image registry
     # @section -- Librefrontier-Container specifications
-    repository: ghcr.io/lukas-fichtner/librefrontier
+    registry: ghcr.io
+    #
+    # -- Container-Image repository
+    # @section -- Librefrontier-Container specifications
+    repository: lukas-fichtner/librefrontier
     #
     # -- Container-Image-Tag (overrides `.Chart.AppVersion`)
     # @section -- Librefrontier-Container specifications
@@ -105,7 +109,7 @@ librefrontierContainer:
   # -- Exposed Container-ports
   # @section -- Librefrontier-Container specifications
   ports:
-    http:
+    httpAPI:
       #
       # -- Name of exposed http Container-port
       # @section -- Librefrontier-Container/ports specifications
@@ -114,18 +118,28 @@ librefrontierContainer:
       # -- Port-number of exposed http Container-port
       # @section -- Librefrontier-Container/ports specifications
       containerPort: 80
+    #
+    httpWebUI:
+      #
+      # -- Name of exposed http Container-port
+      # @section -- Librefrontier-Container/ports specifications
+      name: "http-web-ui"
+      #
+      # -- Port-number of exposed http Container-port
+      # @section -- Librefrontier-Container/ports specifications
+      containerPort: 8080
   #
-  # -- Additional Volume-Mounts for Container
+  # -- Additional Volume-Mounts for the librefrontier-'main'-Container
   # @section -- Librefrontier-Container specifications
-  extraVolumeMounts: {}
+  extraVolumeMounts: []
   #
-  # -- Additional Environment-variables
+  # -- Additional Environment-variables for the librefrontier-'main'-Container
   # @section -- Librefrontier-Container specifications
-  extraEnv: {}
+  extraEnv: []
   #
-  # -- Additional Arguments
+  # -- Additional Arguments for the librefrontier-'main'-Container
   # @section -- Librefrontier-Container specifications
-  extraArgs: {}
+  extraArgs: []
   #
   # --
   # @section -- Librefrontier-Container specifications
@@ -138,7 +152,109 @@ librefrontierContainer:
   # --
   # @section -- Librefrontier-Container specifications
   livenessProbe: {}
-  
+
+
+# =================================================================
+# Services specifications
+# =================================================================
+services:
+  httpAPI:
+    #
+    # -- Service-Name for the http-API Service
+    # @section -- Services specifications
+    serviceName: "http-api"
+    #
+    # -- Service-Type
+    # @section -- Services specifications
+    type: ClusterIP
+    #
+    ports:
+      httpAPI:
+        #
+        # -- Name of the Service-port
+        # @section -- Services specifications
+        servicePortName: http-api
+        #
+        # -- Exposed Service-port
+        # @section -- Services specifications
+        portNumber: 80
+        #
+        # -- Reference exposed Container-port by its name
+        # @section -- Services specifications
+        targetPort: http-api
+        #
+        # -- Protocol
+        # @section -- Services specifications
+        protocol: TCP
+      #
+      httpWebUI:
+        #
+        # -- Name of the Service-port
+        # @section -- Services specifications
+        servicePortName: http-web-ui
+        #
+        # -- Exposed Service-port
+        # @section -- Services specifications
+        portNumber: 8080
+        #
+        # -- Reference exposed Container-port by its name
+        # @section -- Services specifications
+        targetPort: http-web-ui
+        #
+        # -- Protocol
+        # @section -- Services specifications
+        protocol: TCP
+
+
+# =================================================================
+# IngressRoutes and Middlewares specifications
+# =================================================================
+#
+# -- Map of IngressRoutes
+# @section -- IngressRoute/Middlewares specifications
+ingressRoutes:
+  httpAPI:
+    #
+    # -- Whether to create the httpAPI-IngressRoute
+    # @section -- IngressRoute/httpAPI specifications
+    enabled: false
+    #
+    # -- Name of IngressRoute resource
+    # @section -- IngressRoute/httpAPI specifications
+    name: "http-api"
+    #
+    # -- Name of referenced Service
+    # @section -- IngressRoute/httpAPI specifications
+    refServiceName: "http-api"
+    #
+    # -- List of entryPoints
+    # @section -- IngressRoute/httpAPI specifications
+    entryPoints: []
+    #
+    # -- Route-Match
+    # @section -- IngressRoute/httpAPI specifications
+    routeMatch: ""
+    #
+    # -- Name of the TLS-cert-resolver
+    # @section -- IngressRoute/httpAPI specifications
+    certResolver: ""
+    #
+    # -- List with names of Middlewares
+    # @section -- IngressRoute/httpAPI specifications
+    refMiddlewares: []
+#
+# -- Map of middlewares added to the IngressRoute
+# @section -- IngressRoute/Middlewares specifications
+middlewares: {}
+#
+# e.g.:
+#  exampleMiddleware:
+#    name: "example-middleware"
+#    spec:
+#      headers:
+#        forceSTSHeader: true
+#        stsSeconds: 15552000
+
 
 # =================================================================
 # Librefrontier Configuration
@@ -148,6 +264,10 @@ config:
   # -- GIN_MODE
   # @section -- Config specifications
   ginMode: "release"
+  #
+  # -- ENABLE_GUI
+  # @section -- Config specifications
+  enableGUI: false
   #
   # -- LF_API_BASE_URL
   # @section -- Config specifications
@@ -170,43 +290,20 @@ config:
     #
     # -- When not using an existing-Secret, enter the database-connection-string.
     # @section -- Config specifications
-    stringData: ""
-
-
-# =================================================================
-# IngressRoutes specifications
-# =================================================================
-#
-httpAPIIngressRoute:
+    defaultConnectionString: ""
   #
-  # -- Whether to enable the HTTP-API-IngressRoute
-  # @section -- HTTP-API-IngressRoute specifications
-  enabled: false
+  # -- LOG_LEVEL
+  # @section -- Config specifications
+  logLevel: "info"
   #
-  # -- Entrypoints for HTTP-API-Service
-  # @section -- HTTP-API-IngressRoute specifications
-  entryPoints: ["web"]
+  # -- RADIO_BROWSER_URL
+  # @section -- Config specifications
+  radioBrowserURL: "de1.api.radio-browser.info"
   #
-  # -- Match for HTTP-API-Route
-  # @section -- HTTP-API-IngressRoute specifications
-  routeMatch: "PathPrefix(`/`)"
-#
-webUIIngressRoute:
+  # -- PROXY_ALL_STREAMS
+  # @section -- Config specifications
+  proxyAllStreams: true
   #
-  # -- Whether to enable the Web-UI-IngressRoute.
-  # requires `services.webUI.enabled: true` otherwise this gets ignored!
-  # @section -- Web-UI IngressRoute specifications
-  enabled: false
-  #
-  # -- Entrypoints for Web-UI-Service
-  # @section -- Web-UI IngressRoute specifications
-  entryPoints: []
-  #
-  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
-  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
-  # @section -- Web-UI IngressRoute specifications
-  certResolver: ""
-  #
-  # -- Match for Web-UI-Route
-  # @section -- Web-UI IngressRoute specifications
-  routeMatch: "Host(``)"
+  # -- MAX_CONCURRENT_STREAMS
+  # @section -- Config specifications
+  maxConcurrentStreams: 10

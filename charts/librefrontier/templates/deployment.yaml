@@ -1,5 +1,5 @@
 {{ include "librefrontier.validateValues" . }}
-{{- $librefrontierContainer := .Values.librefontierContainer -}}
+{{- $librefrontierContainer := .Values.librefrontierContainer -}}
 {{- $config := .Values.config -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -15,9 +15,12 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
+        checksum/services: {{ include (print $.Template.BasePath "/services.yaml") . | sha256sum }}
         {{- if (include "librefrontier.createIngressRoute" .) }}
-        checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
+        checksum/ingress-routes: {{ include (print $.Template.BasePath "/ingress-routes.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if (include "librefrontier.createMiddleware" .) }}
+        checksum/middlewares: {{ include (print $.Template.BasePath "/middlewares.yaml") . | sha256sum }} 
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -34,7 +37,7 @@ spec:
       {{- with .Values.podSecurityContext }}
       securityContext: {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $initContainers }}
+      {{- with .Values.initContainers }}
       initContainers: {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
@@ -43,24 +46,43 @@ spec:
         securityContext: {{- toYaml . | nindent 12 }}
         {{- end }}
         image: {{ include "librefrontier.containerImage" . }}
-        imagePullPolicy: {{ $librefrontierContainer.image.pullPolicy }}
+        {{- with $librefrontierContainer.image.pullPolicy }}
+        imagePullPolicy: {{ . }}
+        {{- end }}
         ports:
-        {{- range $port := $librefrontierContainer.ports -}}
+        {{- range $port := $librefrontierContainer.ports }}
         - name: {{ $port.name }}
           containerPort: {{ $port.containerPort }}
         {{- end }}
         env:
+        - name: API_PORT
+          value: {{ $librefrontierContainer.ports.httpAPI.containerPort }}
+        - name: ENABLE_GUI
+          value: {{ $config.enableGUI }}
+        - name: GUI_PORT
+          value: {{ $librefrontierContainer.ports.httpWebUI.containerPort }}
         - name: GIN_MODE
-          value: {{ $librefrontierConfig.ginMode }}
+          value: {{ $config.ginMode }}
         - name: LF_API_BASE_URL
-          value: {{ $librefrontierConfig.lfAPIBaseURL }}
+          value: {{ $config.lfAPIBaseURL }}
         - name: LF_DB_CONN_STRING
           valueFrom:
             secretKeyRef:
               name: {{ $config.databaseConnectionString.secretName }}
               key: {{ $config.databaseConnectionString.secretKey }}
-        {{- with .Values.extraEnv }}
+        - name: LOG_LEVEL
+          value: {{ $config.logLevel }}
+        - name: RADIO_BROWSER_URL
+          value: {{ $config.radioBrowserURL }}
+        - name: PROXY_ALL_STREAMS
+          value: {{ $config.proxyAllStreams }}
+        - name: MAX_CONCURRENT_STREAMS
+          value: {{ $config.maxConcurrentStreams }}
+        {{- with $librefrontierContainer.extraEnv }}
         {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with $librefrontierContainer.extraArgs }}
+        args: {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- with $librefrontierContainer.resources }}
         resources: {{ toYaml . | nindent 12 }}

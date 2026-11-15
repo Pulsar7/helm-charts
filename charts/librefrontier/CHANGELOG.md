@@ -7,13 +7,11 @@
 >
 > Non backwards-compatible Helm-Values changes affecting Services-, IngressRoutes-, Middlewaress- and Container-specifications.
 
+* Add additional configurable default environment-variables at Deployment-manifest template for the `librefrontierContainer`
+
 * __Helm-Values__:
   - Move „main”-Container specifications from `.Values.containers.librefrontier` to `.Values.librefrontierContainer`
-  - Rename `additionalVolumeMounts` to `extraVolumeMounts`
-  - Rename `additionalEnv` to `extraEnv`
-  - Rename `additionalArgs` to `extraArgs`
-  - Rename `.Values.additionalVolumes` to `.Values.extraVolumes`
-  - Rename `.Values.librefrontierConfig` to `.Values.config`
+  - Please see the commit-history to see all changes
 
 * Update `AppVersion` from `0.0.2-dev` to `v0.0.3-preview`
 

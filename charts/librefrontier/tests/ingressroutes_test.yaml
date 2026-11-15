@@ -1,0 +1,89 @@
+#------------------------------------------------------------------------------
+#
+# IngressRoutes-Unittests Test-Suite for librefrontier
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+# 
+#------------------------------------------------------------------------------
+suite: Test IngressRoutes
+templates:
+  - templates/ingress-routes.yaml
+tests:
+  - it: should render no IngressRoute
+    set:
+      ingressRoutes: null
+    asserts:
+      - notExists:
+          path: apiVersion
+  
+  - it: should render one IngressRoute - configured httpAPI
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          entryPoints: ["test-entrypoint"]
+          routeMatch: Invalid routeMatch
+          certResolver: "invalid-cert-resolver"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.entryPoints
+          value:
+            - "test-entrypoint"
+      - equal:
+          path: spec.routes[0].match
+          value: "Invalid routeMatch"
+      - equal:
+          path: spec.tls.certResolver
+          value: "invalid-cert-resolver"
+  
+  - it: should fail to render one IngressRoute because of missing `entryPoints` - default httpAPI 
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          routeMatch: Invalid routeMatch
+          certResolver: "invalid-cert-resolver"
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `entryPoints`-Helm-Value. List cannot be empty.
+
+  - it: should fail to render one IngressRoute because of missing `routeMatch` - default httpAPI 
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          entryPoints: ["test-entrypoint"]
+          certResolver: "invalid-cert-resolver"
+    asserts:
+      - failedTemplate:
+          errorPattern: Missing required `routeMatch`-Helm-Value.
+  
+  - it: should fail to render one IngressRoute because of invalid `refServiceName` - default httpAPI
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          name: "http-api-test-ingress-route"
+          refServiceName: "non-existend-service"
+          entryPoints: ["test-entrypoint"]
+          certResolver: "invalid-cert-resolver"
+          routeMatch: Invalid routeMatch
+    asserts:
+      - failedTemplate:
+          errorPattern: Referenced an invalid Service 'non-existend-service' at IngressRoute 'http-api-test-ingress-route'
+
+  - it: should fail to render one IngressRoute because of invalid `refMiddlewareNames` - default httpAPI
+    set:
+      ingressRoutes:
+        httpAPI:
+          enabled: true
+          name: "http-api-test-ingress-route"
+          entryPoints: ["test-entrypoint"]
+          certResolver: "invalid-cert-resolver"
+          routeMatch: Invalid routeMatch
+          refMiddlewareNames: ["non-existend-middleware"]
+    asserts:
+      - failedTemplate:
+          errorPattern: Referenced an invalid Middleware 'non-existend-middleware' at IngressRoute 'http-api-test-ingress-route'
