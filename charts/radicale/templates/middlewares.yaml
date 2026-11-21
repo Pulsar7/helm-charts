@@ -1,6 +1,5 @@
 {{ include "radicale.validateValues" . }}
-{{- $ingressRoute := .Values.ingressRoute -}}
-{{- if $ingressRoute.enabled }}
+{{- if (include "radicale.createMiddleware"  .) }}
 {{- $middlewares := .Values.middlewares -}}
 {{- if $middlewares }}
 {{- $namespace := .Release.Namespace | quote -}}

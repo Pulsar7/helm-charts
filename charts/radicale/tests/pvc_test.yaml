@@ -7,19 +7,15 @@
 #------------------------------------------------------------------------------
 #
 suite: Test PVC
-#
 templates:
   - templates/pvc.yaml
-#
 tests:
   - it: should render PVC with enabled and new PVC
-    #
     set:
       persistence.enabled: true
       persistence.createNewPVC: true
       persistence.accessModes: ["readWriteMany"]
       persistence.storageRequest: "17Gi"
-    #
     asserts:
       - isKind:
           of: PersistentVolumeClaim
@@ -31,12 +27,10 @@ tests:
           value: "17Gi"
   
   - it: should render PVC with enabled and new PVC with adjusted name
-    #
     set:
       persistence.enabled: true
       persistence.createNewPVC: true
       persistence.claimName: "my-test-name-pvc"
-    #
     asserts:
       - equal:
           path: metadata.name

@@ -10,20 +10,28 @@ suite: Test IngressRoute
 templates:
   - templates/ingress-route.yaml
 tests:
-  - it: should not render IngressRoute
+  - it: should not render HTTP-IngressRoute
     set:
-      ingressRoute.enabled: false
+      httpIngressRoute.enabled: false
     asserts:
       - notExists:
           path: spec
 
-  - it: should render enabled ingressroute with test values
+  - it: should render enabled HTTP-IngressRoute with adjusted values
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
         entryPoints: ["websecure", "test"]
         certResolver: "test-resolver"
         routeMatch: Host(`test-host`)
+        refMiddlewares: ["test-radicale-middleware"]
+      middlewares:
+        testRadicaleMiddleware:
+          name: test-radicale-middleware
+          spec:
+            average: 999
+            period: 777s
+            burst: 333
     asserts:
       - isKind:
           of: IngressRoute
@@ -36,48 +44,150 @@ tests:
       - equal:
           path: spec.tls.certResolver
           value: "test-resolver"
-  
-  - it: should render enabled IngressRoute with referenced middlewares
-    set:
-      ingressRoute:
-        enabled: true
-        entryPoints: ["websecure", "test"]
-        certResolver: "test-resolver"
-        routeMatch: Host(`test-host`)
-      middlewares:
-        testRadicaleMiddleware:
-          name: test-radicale-middleware
-          spec:
-            average: 999
-            period: 777s
-            burst: 333
-    asserts:
-      - isKind:
-          of: IngressRoute
       - equal:
           path: spec.routes[0].middlewares
           value:
             - name: test-radicale-middleware
               namespace: NAMESPACE
+  
+  - it: should render enabled HTTP-IngressRoute without referenced middlewares
+    set:
+      httpIngressRoute:
+        enabled: true
+        entryPoints: ["websecure", "test"]
+        certResolver: "test-resolver"
+        routeMatch: Host(`test-host`)
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - notExists:
+          path: spec.routes[0].middlewares
       - equal:
           path: spec.tls.certResolver
           value: "test-resolver"
   
-  - it: should fail to render IngressRoute with missing `entryPoints`
+  - it: should render enabled extra-IngressRoute
     set:
-      ingressRoute:
+      httpIngressRoute.enabled: false
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          name: "additional-test-ingressroute"
+          entryPoints: ["hello", "world"]
+          certResolver: "test-resolver"
+          routeMatch: Host(`test-host`)
+          refServiceName: "existing-service-name"
+          refServicePortNumber: 1338
+    asserts:
+      - isKind:
+          of: IngressRoute
+      - equal:
+          path: spec.entryPoints
+          value: ["hello", "world"]
+      - equal:
+          path: spec.routes[0].match
+          value: Host(`test-host`)
+      - equal:
+          path: spec.routes[0].services[0]
+          value:
+            name: "existing-service-name"
+            port: 1338
+            scheme: http
+      - equal:
+          path: spec.tls.certResolver
+          value: "test-resolver"
+
+  - it: should render three IngressRoute-resources (httpIngressRoute and two extra IngressRoutes)
+    set:
+      httpIngressRoute:
         enabled: true
-        routeMatch: Host(``)
+        entryPoints: ["helloworld"]
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          name: "additional-test-ingressroute"
+          entryPoints: ["hello", "world"]
+          certResolver: "test-resolver"
+          routeMatch: Host(`test-host`)
+          refServiceName: "existing-service-name"
+          refServicePortNumber: 1338
+        secondAdditionalTestIngressRoute:
+          name: "additional-test-ingressroute"
+          entryPoints: ["hello", "world"]
+          certResolver: "test-resolver"
+          routeMatch: Host(`test-host`)
+          refServiceName: "existing-service-name"
+          refServicePortNumber: 1338
+    asserts:
+      - hasDocuments:
+          count: 3
+  
+  - it: should fail to render because of missing httpIngressRoute name-field
+    set:
+      httpIngressRoute:
+        enabled: true
+        name: null
     asserts:
       - failedTemplate:
-          errorPattern: Missing required `entryPoints`-Helm-Value. List cannot be empty.
+          errorPattern: "Missing required `name` when `httpIngressRoute: true`"
   
-  - it: should fail to render IngressRoute with missing `entryPoints`
+  - it: should fail to render because of missing httpIngressRoute entryPoints-field
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
-        entryPoints: ["websecure", "test"]
+        entryPoints: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `entryPoints` when `httpIngressRoute: true`"
+  
+  - it: should fail to render because of missing httpIngressRoute routeMatch-field
+    set:
+      httpIngressRoute:
+        enabled: true
         routeMatch: null
     asserts:
       - failedTemplate:
-          errorPattern: Missing required `routeMatch`-Helm-Value.
+          errorPattern: "Missing required `routeMatch` when `httpIngressRoute: true`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          name: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `name` for the extra-IngressRoute `additionalTestIngressRoute`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          entryPoints: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `entryPoints` for the extra-IngressRoute `additionalTestIngressRoute`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          routeMatch: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `routeMatch` for the extra-IngressRoute `additionalTestIngressRoute`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          refServiceName: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `refServiceName` for the extra-IngressRoute `additionalTestIngressRoute`"
+
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          refServicePortNumber: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `refServicePortNumber` for the extra-IngressRoute `additionalTestIngressRoute`"

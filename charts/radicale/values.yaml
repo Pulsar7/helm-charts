@@ -88,7 +88,7 @@ radicaleContainer:
   # -- Container Resources
   # @section -- radicale-Container specifications
   resources: {}
-  #resources:
+  # e.g.:
   #  requests:
   #    memory: 200Mi
   #    cpu: 100m
@@ -96,27 +96,33 @@ radicaleContainer:
   #    memory: 500Mi
   #    cpu: 500m
   #
-  # Container-ports
-  ports:
-    http:
-      #
-      # -- Name of Container-port
-      # @section -- radicale-Container/ports/http specifications
-      name: "http"
-      #
-      # -- Exposed Container-port
-      # @section -- radicale-Container/ports/http specifications
-      containerPort: 5000
+  # -- HTTP-Port specifications
+  # @section -- radicale-Container/ports/httpPort specifications
+  httpPort:
+    #
+    # -- Name of the HTTP-Container port
+    # @section -- radicale-Container/ports/httpPort specifications
+    name: "http"
+    #
+    # -- Exposed port-number of the HTTP-Container port
+    # @section -- radicale-Container/ports/httpPort specifications
+    containerPort: 5000
+  #
+  # -- Expose additional Container-ports
+  # @section -- radicale-Container specifications
+  extraPorts: {}
+  # e.g.:
+  #  additionalPort:
+  #    name: "additional-port"
+  #    containerPort: 1337
   #
   # -- Additional Volume-Mounts for Container
   # @section -- radicale-Container specifications
   extraVolumeMounts: []
   #
-  # -- Environment variables for the Container
+  # -- Additional environment variables for the Container
   # @section -- radicale-Container specifications
-  env:
-    - name: "TAKE_FILE_OWNERSHIP"
-      value: "false"
+  extraEnvs: []
   #
   # -- Startup-Probe
   # @section -- radicale-Container specifications
@@ -134,38 +140,109 @@ radicaleContainer:
 # =================================================================
 # Service specifications
 # =================================================================
-service:
+#
+# -- Specification for the exposed HTTP-Service
+# @section -- HTTP-Service specifications
+httpService:
   #
-  # -- Name of the NTFY-Service resource (overrides the default)
-  # @section -- radicale-Service specifications
-  serviceName: ""
+  # -- Name of the HTTP-Service
+  # @section -- HTTP-Service specifications
+  serviceName: "http"
   #
   # -- Type of the NTFY-Service resource
-  # @section -- radicale-Service specifications
+  # @section -- HTTP-Service specifications
   type: ClusterIP
-  # @ignored
-  ports:
+  #
+  # -- Additional specifications for the Service
+  # @section -- HTTP-Service specifications
+  additionalSpecs: {}
+  #
+  # HTTP-port
+  httpPort:
     #
-    # HTTP-port
-    http:
-      #
-      # -- Name of Service-port
-      # @section -- radicale-Service specifications
-      name: "http"
-      #
-      # -- Exposed Service-port
-      # @section -- radicale-Service specifications
-      portNumber: 5000
-      #
-      # -- Exposed Container-port name.
-      # Reference here defined container-port name.
-      # by default: `.Values.radicaleContainer.ports.http.name`
-      # @section -- radicale-Service specifications
-      targetPort: "http"
-      #
-      # -- Protocol
-      # @section -- radicale-Service specifications
-      protocol: TCP
+    # -- Name of Service-port
+    # @section -- HTTP-Service specifications
+    name: "http"
+    #
+    # -- Exposed Service-port
+    # @section -- HTTP-Service specifications
+    portNumber: 5000
+    #
+    # -- Protocol
+    # @section -- HTTP-Service specifications
+    protocol: TCP
+#
+# -- Additional Services
+# @section -- Additional-Service specifications
+extraServices: {}
+# e.g.:
+#  additionalService:
+#    name: "name-of-additional-service"
+#    type: "ClusterIP"
+#    additionalSpecs: {}
+#    ports:
+#      testPort:
+#        name: "service-test-port-name"
+#        portNumber: 1337
+#        targetPort: 1338
+#        protocol: TCP
+
+
+# =================================================================
+# Ingress specifications
+# =================================================================
+#
+httpIngressRoute:
+  #
+  # -- Whether to enable the HTTP-IngressRoute for radicale
+  # @section -- Ingress/HTTP-IngressRoute specifications
+  enabled: false
+  #
+  # -- Name of the HTTP-IngressRoute for radicale
+  # @section -- Ingress/HTTP-IngressRoute specifications
+  name: "http"
+  #
+  # -- Listening for Incoming Connections/Requests
+  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
+  # @section -- Ingress/HTTP-IngressRoute specifications
+  entryPoints: []
+  #
+  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
+  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
+  # @section -- Ingress/HTTP-IngressRoute specifications
+  certResolver: ""
+  #
+  # -- Route-Match of the IngressRoute
+  # @section -- Ingress/HTTP-IngressRoute specifications
+  routeMatch: Host(``)
+  #
+  # -- Reference Middleware
+  # @section -- Ingress/HTTP-IngressRoute specifications
+  refMiddlewares: []
+#
+# -- Define additional IngressRoute-resources
+# @section -- Ingress/IngressRoute specifications
+extraIngressRoutes: {}
+#  testIngressRoute:
+#    name: "test-ingress-route-name"
+#    entryPoints: ["web"]
+#    certResolver: "my-certresolver"
+#    routeMatch: Host(`test.localhost`)
+#    refServiceName: "referenced-service-name"
+#    refServicePortNumber: 1337
+#    refMiddlewares: []
+#
+# -- Traefik Middlewares that should be used by the IngressRoute-rule.
+# @section -- Ingress/Middleware specifications
+middlewares: {}
+#
+# e.g.:
+#  exampleMiddleware:
+#    name: "example-middleware"
+#    spec:
+#      headers:
+#        forceSTSHeader: true
+#        stsSeconds: 15552000
 
 
 # =================================================================
@@ -277,41 +354,3 @@ configFile:
     # @section -- Config specifications
     loggingSection: |-
       level = info
-
-
-# =================================================================
-# Ingress specifications
-# =================================================================
-#
-ingressRoute:
-  #
-  # -- Whether to enable the IngressRoute for radicale
-  # @section -- Ingress/IngressRoute specifications
-  enabled: false
-  #
-  # -- Listening for Incoming Connections/Requests
-  # https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/
-  # @section -- Ingress/IngressRoute specifications
-  entryPoints: []
-  #
-  # -- Name of the Certificate Resolver to use to generate automatic TLS certificates.
-  # https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/
-  # @section -- Ingress/IngressRoute specifications
-  certResolver: ""
-  #
-  # -- Route-Match of the IngressRoute
-  # @section -- Ingress/IngressRoute specifications
-  routeMatch: Host(``)
-#
-# -- Traefik Middlewares that should be used by the IngressRoute-rule.
-# Gets ignored when `ingressRoute.enabled: false`.
-# @section -- Ingress/Middleware specifications
-middlewares: {}
-#
-# e.g.:
-#  exampleMiddleware:
-#    name: "example-middleware"
-#    spec:
-#      headers:
-#        forceSTSHeader: true
-#        stsSeconds: 15552000

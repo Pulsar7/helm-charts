@@ -1,5 +1,12 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.4.1` to `0.5.0`
+
+> [!CAUTION]
+> **Breaking changes**
+
+
+
 ## `0.4.0` to `0.4.1`
 
 * Fix: add missing YAML document separators at `Middleware`-manifest template
