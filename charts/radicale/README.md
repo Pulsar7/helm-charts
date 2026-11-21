@@ -5,7 +5,7 @@ Custom Helm chart to deploy radicale
 > [!IMPORTANT]
 > Only configured for Traefik-Ingress, since **IngressRoute** is being used.
 
-![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.0.0](https://img.shields.io/badge/AppVersion-3.9.0.0-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.0.0](https://img.shields.io/badge/AppVersion-3.9.0.0-informational?style=flat-square)
 
 ## Authentication
 
@@ -60,16 +60,42 @@ Please deploy your own Secret with the required users instead of defining them a
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| ingressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
-| ingressRoute.enabled | bool | `false` | Whether to enable the IngressRoute for radicale |
-| ingressRoute.entryPoints | list | `[]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
-| ingressRoute.routeMatch | string | `"Host(``)"` | Route-Match of the IngressRoute |
+| extraIngressRoutes | object | `{}` | Define additional IngressRoute-resources |
+
+### Additional-Service specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| extraServices | object | `{}` | Additional Services |
+
+### Ingress/HTTP-IngressRoute specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| httpIngressRoute.certResolver | string | `""` | Name of the Certificate Resolver to use to generate automatic TLS certificates. https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/overview/ |
+| httpIngressRoute.enabled | bool | `false` | Whether to enable the HTTP-IngressRoute for radicale |
+| httpIngressRoute.entryPoints | list | `[]` | Listening for Incoming Connections/Requests https://doc.traefik.io/traefik/reference/install-configuration/entrypoints/ |
+| httpIngressRoute.name | string | `"http"` | Name of the HTTP-IngressRoute for radicale |
+| httpIngressRoute.refMiddlewares | list | `[]` | Reference Middleware |
+| httpIngressRoute.routeMatch | string | `"Host(``)"` | Route-Match of the IngressRoute |
+
+### HTTP-Service specifications
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| httpService | object | `{"additionalSpecs":{},"httpPort":{"name":"http","portNumber":5000,"protocol":"TCP"},"serviceName":"http","type":"ClusterIP"}` | Specification for the exposed HTTP-Service |
+| httpService.additionalSpecs | object | `{}` | Additional specifications for the Service |
+| httpService.httpPort.name | string | `"http"` | Name of Service-port |
+| httpService.httpPort.portNumber | int | `5000` | Exposed Service-port |
+| httpService.httpPort.protocol | string | `"TCP"` | Protocol |
+| httpService.serviceName | string | `"http"` | Name of the HTTP-Service |
+| httpService.type | string | `"ClusterIP"` | Type of the NTFY-Service resource |
 
 ### Ingress/Middleware specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| middlewares | object | `{}` | Traefik Middlewares that should be used by the IngressRoute-rule. Gets ignored when `ingressRoute.enabled: false`. |
+| middlewares | object | `{}` | Traefik Middlewares that should be used by the IngressRoute-rule. |
 
 ### radicale-Persistence specifications
 
@@ -87,7 +113,8 @@ Please deploy your own Secret with the required users instead of defining them a
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| radicaleContainer.env | list | `[{"name":"TAKE_FILE_OWNERSHIP","value":"false"}]` | Environment variables for the Container |
+| radicaleContainer.extraEnvs | list | `[]` | Additional environment variables for the Container |
+| radicaleContainer.extraPorts | object | `{}` | Expose additional Container-ports |
 | radicaleContainer.extraVolumeMounts | list | `[]` | Additional Volume-Mounts for Container |
 | radicaleContainer.image.pullPolicy | string | `"IfNotPresent"` | Container-Image pull-policy |
 | radicaleContainer.image.repository | string | `"tomsquest/docker-radicale"` | Container-Image-Repository |
@@ -98,19 +125,13 @@ Please deploy your own Secret with the required users instead of defining them a
 | radicaleContainer.securityContext | object | `{"allowPrivilegeEscalation":false,"privileged":false,"runAsGroup":2999,"runAsNonRoot":true,"runAsUser":2999}` | Container Security Context |
 | radicaleContainer.startupProbe | object | `{}` | Startup-Probe |
 
-### radicale-Container/ports/http specifications
+### radicale-Container/ports/httpPort specifications
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| radicaleContainer.ports.http.containerPort | int | `5000` | Exposed Container-port |
-| radicaleContainer.ports.http.name | string | `"http"` | Name of Container-port |
-
-### radicale-Service specifications
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| service.serviceName | string | `""` | Name of the NTFY-Service resource (overrides the default) |
-| service.type | string | `"ClusterIP"` | Type of the NTFY-Service resource |
+| radicaleContainer.httpPort | object | `{"containerPort":5000,"name":"http"}` | HTTP-Port specifications |
+| radicaleContainer.httpPort.containerPort | int | `5000` | Exposed port-number of the HTTP-Container port |
+| radicaleContainer.httpPort.name | string | `"http"` | Name of the HTTP-Container port |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

@@ -12,7 +12,7 @@ templates:
 tests:
   - it: should render service with adjusted specs
     set:
-      service:
+      httpService:
         type: "InvalidServiceType"
         serviceName: "test-service"
     asserts:
@@ -27,8 +27,25 @@ tests:
       
   - it: should render service with different exposed port
     set:
-      service.ports.http.portNumber: 1337
+      httpService.httpPort.portNumber: 1337
     asserts:
       - equal:
           path: spec.ports[0].port
           value: 1337
+
+  - it: should render an additional service
+    set:
+      extraServices:
+        additionalService:
+          name: "name-of-additional-service"
+          type: "ClusterIP"
+          additionalSpecs: {}
+          ports:
+            testPort:
+              name: "service-test-port-name"
+              portNumber: 1337
+              targetPort: 1338
+              protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 2

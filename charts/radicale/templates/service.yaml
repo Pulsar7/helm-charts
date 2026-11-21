@@ -1,18 +1,55 @@
 {{ include "radicale.validateValues" . }}
-{{- $service := .Values.service -}}
+{{- $radicaleContainer := .Values.radicaleContainer -}}
+{{- $radicaleContainerHttpPort := $radicaleContainer.httpPort -}}
+{{- $httpService := .Values.httpService -}}
+{{- $httpServicehttpPort := $httpService.httpPort -}}
+{{- $extraServices := .Values.extraServices -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "radicale.serviceName" . }}
+  name: {{ $httpService.serviceName }}
   namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "radicale.labels" . | nindent 4 }}
 spec:
   selector: {{- include "radicale.selectorLabels" . | nindent 4 }}
-  type: {{ $service.type }}
+  type: {{ $httpService.type }}
   ports:
-  {{- range $port := $service.ports }}
+  - protocol: {{ $httpServicehttpPort.protocol }}
+    port: {{ $httpServicehttpPort.portNumber }}
+    targetPort: {{ $radicaleContainerHttpPort.containerPort }}
+    name: {{ $httpServicehttpPort.name }}
+  {{- with $httpService.additionalSpecs }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+{{- if $extraServices }}
+---
+{{- $namespace := (.Release.Namespace | quote) -}}
+{{- $labels := (include "radicale.labels" .) -}}
+{{- $selectorLabels := (include "radicale.selectorLabels" .) -}}
+{{- $index := 0 -}}
+{{- range $extraService := $extraServices }}
+{{- $index = add $index 1 -}}
+{{- if gt $index 1 }}
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $extraService.name }}
+  namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
+spec:
+  selector: {{- $selectorLabels | nindent 4 }}
+  type: {{ $extraService.type }}
+  ports:
+  {{- range $port := $extraService.ports }}
   - protocol: {{ $port.protocol }}
     port: {{ $port.portNumber }}
     targetPort: {{ $port.targetPort }}
     name: {{ $port.name }}
   {{- end }}
+  {{- with $extraService.additionalSpecs }}
+  {{- . | toYaml | nindent 2 }}
+  {{- end }}
+{{- end }}
+{{- end }}

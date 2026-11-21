@@ -24,18 +24,14 @@
         },
         "securityContext": {"type": "object"},
         "resources": {"type": "object"},
-        "ports": {
+        "httpPort": {
           "type": "object",
           "properties": {
-            "http": {
-              "type": "object",
-              "properties": {
-                "name": {"type": "string"},
-                "containerPort": {"type": "integer"}
-              }
-            }
+            "name": {"type": "string"},
+            "containerPort": {"type": "integer", "minimum": 0}
           }
         },
+        "extraPorts": {"type": "object"},
         "extraVolumeMounts": {"type": "array"},
         "env": {"type": "array"},
         "startupProbe": {"type": "object"},
@@ -44,21 +40,36 @@
       }
     },
 
-    "service": {
+    "httpService": {
       "type": "object",
       "properties": {
         "serviceName": {"type": "string"},
         "type": {"type": "string"},
-        "http": {
+        "additionalSpecs": {"type": "object"},
+        "httpPort": {
           "type": "object",
           "properties": {
-            "portNumber": {"type": "integer"},
-            "targetPort": {"type": "integer"},
+            "name": {"type": "string"},
+            "portNumber": {"type": "integer", "minimum": 0},
             "protocol": {"type": "string"}
           }
         }
       }
     },
+    "extraServices": {"type": "object"},
+
+    "httpIngressRoute": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "entryPoints": {"type": "array"},
+        "certResolver": {"type": "string"},
+        "routeMatch": {"type": "string"},
+        "refMiddlewares": {"type": "array"}
+      }
+    },
+    "extraIngressRoutes": {"type": "object"},
+    "middlewares": {"type": "object"},
 
     "authentication": {
       "type": "object",
@@ -100,29 +111,18 @@
           }
         }
       }
-    },
-
-    "ingressRoute": {
-      "type": "object",
-      "properties": {
-        "enabled": {"type": "boolean"},
-        "entryPoints": {"type": "array"},
-        "certResolver": {"type": "string"},
-        "routeMatch": {"type": "string"}
-      }
-    },
-    "middlewares": {"type": "object"}
+    }
   },
 
   "required": [
     "replicaCount",
     "strategy",
     "radicaleContainer",
-    "service",
+    "httpService",
+    "httpIngressRoute",
     "authentication",
     "persistence",
-    "configFile",
-    "middlewares"
+    "configFile"
   ],
 
   "title": "Values",
