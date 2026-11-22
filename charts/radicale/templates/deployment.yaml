@@ -1,9 +1,9 @@
 {{ include "radicale.validateValues" . }}
 {{- $radicaleContainer := .Values.radicaleContainer -}}
-{{- $radicaleContainerPorts := $radicaleContainer.ports -}}
+{{- $radicaleContainerHttpPort := $radicaleContainer.httpPort -}}
+{{- $extraRadicaleContainerPorts := $radicaleContainer.extraPorts -}}
 {{- $persistence := .Values.persistence -}}
 {{- $authentication := .Values.authentication -}}
-{{- $ingressRoute := .Values.ingressRoute -}}
 {{- $configFile := .Values.configFile -}}
 apiVersion: apps/v1
 kind: Deployment
@@ -23,8 +23,11 @@ spec:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- end }}
         checksum/service: {{ include (print $.Template.BasePath "/service.yaml") . | sha256sum }}
-        {{- if $ingressRoute.enabled }}
+        {{- if (include "radicale.createIngressRoute" .) }}
         checksum/ingress-route: {{ include (print $.Template.BasePath "/ingress-route.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if (include "radicale.createMiddleware" .) }}
+        checksum/middleware: {{ include (print $.Template.BasePath "/middlewares.yaml") . | sha256sum }}
         {{- end }}
         {{- if (include "radicale.createSecret" .) }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
@@ -49,12 +52,17 @@ spec:
         image: {{ include "radicale.containerImage" . }}
         imagePullPolicy: {{ $radicaleContainer.image.pullPolicy }}
         ports:
-        {{- range $port := $radicaleContainerPorts }}
-        - name: {{ $port.name | quote }}
+        - name: {{ $radicaleContainerHttpPort.name }}
+          containerPort: {{ $radicaleContainerHttpPort.containerPort }}
+        {{- range $port := $extraRadicaleContainerPorts }}
+        - name: {{ $port.name }}
           containerPort: {{ $port.containerPort }}
         {{- end }}
+        env:
+        - name: "TAKE_FILE_OWNERSHIP"
+          value: "false"
         {{- with $radicaleContainer.env }}
-        env: {{- . | toYaml | nindent 8 }}
+        {{- . | toYaml | nindent 8 }}
         {{- end }}
         {{- with $radicaleContainer.securityContext }}
         securityContext: {{- . | toYaml | nindent 10 }}

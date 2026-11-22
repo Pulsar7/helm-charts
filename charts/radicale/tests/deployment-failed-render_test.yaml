@@ -1,0 +1,48 @@
+#------------------------------------------------------------------------------
+#
+# Deployment/failed-render-Unittests Test-Suite for radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+#
+#------------------------------------------------------------------------------
+suite: Test Deployment/failed-render
+templates:
+  - templates/deployment.yaml
+tests:
+  - it: should fail to render deployment with missing 'name'-field at httpPort-spec
+    set:
+      radicaleContainer:
+        httpPort:
+          name: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `name`-field for the `radicaleContainer.httpPort`"
+  
+  - it: should fail to render deployment with missing 'containerPort'-field at httpPort-spec
+    set:
+      radicaleContainer.httpPort.containerPort: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `containerPort`-field for the `radicaleContainer.httpPort`"
+  
+  - it: should fail to render deployment with missing 'name'-field at extraPorts-spec
+    set:
+      radicaleContainer:
+        extraPorts:
+          additionalPort:
+            name: null
+            containerPort: 1337
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing `name`-field for the `radicaleContainer.extraPorts.additionalPort`"
+  
+  - it: should fail to render deployment with missing 'containerPort'-field at extraPorts-spec
+    set:
+      radicaleContainer:
+        extraPorts:
+          additionalPort:
+            name: "hello-world-additional-port"
+            containerPort: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing `containerPort`-field for the `radicaleContainer.extraPorts.additionalPort`"

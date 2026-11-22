@@ -1,34 +1,72 @@
 {{ include "radicale.validateValues" . }}
-{{- $ingressRoute := .Values.ingressRoute -}}
-{{- $middlewares := .Values.middlewares -}}
+{{- $httpIngressRoute := .Values.httpIngressRoute -}}
 {{- $namespace := .Release.Namespace | quote -}}
-{{- if $ingressRoute.enabled }}
-{{- $service := .Values.service -}}
-{{- $servicePorts := $service.ports -}}
+{{- $extraIngressRoutes := .Values.extraIngressRoutes -}}
+{{- if $httpIngressRoute.enabled }}
+{{- $httpService := .Values.httpService -}}
+{{- $httpServicePort := $httpService.httpPort -}}
+{{- $httpIngressRouteRefMiddlewares := $httpIngressRoute.refMiddlewares -}}
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ include "radicale.ingressRouteName" . }}
-  namespace: {{ $namespace }}
+  name: {{ $httpIngressRoute.name }}
+  namespace: {{ .Release.Namespace | quote }}
   labels: {{- include "radicale.labels" . | nindent 4 }}
 spec:
-  entryPoints: {{- toYaml $ingressRoute.entryPoints | nindent 4 }}
+  entryPoints: {{- toYaml $httpIngressRoute.entryPoints | nindent 4 }}
   routes:
-  - match: {{ $ingressRoute.routeMatch }}
+  - match: {{ $httpIngressRoute.routeMatch }}
     kind: Rule
     services:
-    - name: {{ include "radicale.serviceName" . }}
-      port: {{ $service.ports.http.portNumber }}
+    - name: 
+      port: {{ $httpServicePort.portNumber }}
       scheme: http
-    {{- if $middlewares }}
+    {{- with $httpIngressRouteRefMiddlewares }}
     middlewares:
-    {{- range $middleware := $middlewares }}
-    - name: {{ $middleware.name | quote }}
+    {{- range $middlewareName := . }}
+    - name: {{ $middlewareName }}
       namespace: {{ $namespace }}
     {{- end }}
     {{- end }}
-  {{- with $ingressRoute.certResolver }}
+  {{- with $httpIngressRoute.certResolver }}
   tls:
     certResolver: {{ . }}
   {{- end }}
+{{- end }}
+{{- if $extraIngressRoutes }}
+---
+{{- $labels := (include "radicale.labels" .) -}}
+{{- $index := 0 -}}
+{{- range $extraIngressRoute := $extraIngressRoutes }}
+{{- $index = add $index 1 -}}
+{{- if gt $index 1 }}
+---
+{{- end }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $extraIngressRoute.name }}
+  namespace: {{ $namespace }}
+  labels: {{- $labels | nindent 4 }}
+spec:
+  entryPoints: {{- toYaml $extraIngressRoute.entryPoints | nindent 4 }}
+  routes:
+  - match: {{ $extraIngressRoute.routeMatch }}
+    kind: Rule
+    services:
+    - name: {{ $extraIngressRoute.refServiceName }}
+      port: {{ $extraIngressRoute.refServicePortNumber }}
+      scheme: http
+    {{- with $extraIngressRoute.refMiddlewares }}
+    middlewares:
+    {{- range $middlewareName := . }}
+    - name: {{ $middlewareName }}
+      namespace: {{ $namespace }}
+    {{- end }}
+    {{- end }}
+  {{- with $extraIngressRoute.certResolver }}
+  tls:
+    certResolver: {{ . }}
+  {{- end }}
+{{- end }}
 {{- end }}

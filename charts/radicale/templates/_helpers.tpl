@@ -68,9 +68,9 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- define "radicale.validateValues" -}}
 {{- $messages := list -}}
 {{- $messages := append $messages (include "radicale.validateValues.configFile" .) -}}
-{{- $messages := append $messages (include "radicale.validateValues.ingressRoute" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.ingressRoutes" .) -}}
 {{- $messages := append $messages (include "radicale.validateValues.middlewares" .) -}}
-{{- $messages := append $messages (include "radicale.validateValues.radicaleContainer.ports" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.exposedRadicaleContainerPorts" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
@@ -96,24 +96,60 @@ Validate values of radicale - configFile
 {{- end }}
 
 {{/*
-Validate values for radicale - ingressRoute
+Validate values of radicale - IngressRoutes
+
+> Checks whether the required IngressRoute-fields are given:
+
+  * name
+  * entryPoints
+  * routeMatch
+
+And for extra-IngressRoutes additionally:
+
+  * refServiceName
+  * refServicePortNumber
 */}}
-{{- define "radicale.validateValues.ingressRoute" -}}
+{{- define "radicale.validateValues.ingressRoutes" -}}
 {{- $messages := list -}}
 {{- $message := "" -}}
-{{- $ingressRoute := .Values.ingressRoute -}}
-{{- if $ingressRoute.enabled -}}
-{{- if not $ingressRoute.entryPoints -}}
-{{- $messages = append $messages "Missing required `entryPoints`-Helm-Value. List cannot be empty." -}}
+{{- if (include "radicale.createIngressRoute" .) -}}
+{{- $httpIngressRoute := .Values.httpIngressRoute -}}
+{{- $extraIngressRoutes := .Values.extraIngressRoutes -}}
+{{- if $httpIngressRoute.enabled -}}
+{{- if not $httpIngressRoute.name -}}
+{{- $messages = append $messages "Missing required `name` when `httpIngressRoute: true`" -}}
 {{- end }}
-{{- if not $ingressRoute.routeMatch -}}
-{{- $messages = append $messages "Missing required `routeMatch`-Helm-Value." -}}
+{{- if not $httpIngressRoute.entryPoints -}}
+{{- $messages = append $messages "Missing required `entryPoints` when `httpIngressRoute: true`" -}}
+{{- end }}
+{{- if not $httpIngressRoute.routeMatch -}}
+{{- $messages = append $messages "Missing required `routeMatch` when `httpIngressRoute: true`" -}}
+{{- end }}
+{{- end }}
+{{- if $extraIngressRoutes -}}
+{{- range $objName, $extraIngressRoute := $extraIngressRoutes -}}
+{{- if not $extraIngressRoute.name -}}
+{{- $messages = append $messages (printf "Missing required `name` for the extra-IngressRoute `%s`" $objName) -}}
+{{- end }}
+{{- if not $extraIngressRoute.entryPoints -}}
+{{- $messages = append $messages (printf "Missing required `entryPoints` for the extra-IngressRoute `%s`" $objName) -}}
+{{- end }}
+{{- if not $extraIngressRoute.routeMatch -}}
+{{- $messages = append $messages (printf "Missing required `routeMatch` for the extra-IngressRoute `%s`" $objName) -}}
+{{- end }}
+{{- if not $extraIngressRoute.refServiceName -}}
+{{- $messages = append $messages (printf "Missing required `refServiceName` for the extra-IngressRoute `%s`" $objName) -}}
+{{- end }}
+{{- if not $extraIngressRoute.refServicePortNumber -}}
+{{- $messages = append $messages (printf "Missing required `refServicePortNumber` for the extra-IngressRoute `%s`" $objName) -}}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n   > " $messages -}}
 {{- if $message -}}
-{{- printf " radicale: ingressRoute\n   > %s" $message -}}
+{{- printf " radicale: ingressRoutes\n   > %s" $message -}}
 {{- end }}
 {{- end }}
 
@@ -123,17 +159,16 @@ Validate values for radicale - middlewares
 {{- define "radicale.validateValues.middlewares" -}}
 {{- $messages := list -}}
 {{- $message := "" -}}
-{{- $ingressRoute := .Values.ingressRoute -}}
 {{- $middlewares := .Values.middlewares -}}
-{{- if and $ingressRoute.enabled $middlewares -}}
+{{- if and (include "radicale.createIngressRoute" .) $middlewares -}}
 {{- range $objName, $middleware := $middlewares -}}
 {{- if not $middleware.name -}}
 {{- $messages = append $messages (printf "Missing required `name`-Helm-Value for `%s`-middleware" $objName) -}}
-{{- end -}}
+{{- end }}
 {{- if not $middleware.spec -}}
 {{- $messages = append $messages (printf "Missing required `spec`-Helm-Value for `%s`-middleware" $objName) -}}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n   > " $messages -}}
@@ -143,25 +178,34 @@ Validate values for radicale - middlewares
 {{- end }}
 
 {{/*
-Validate values for radicale - radicaleContainer.ports
+Validate values of radicale - exposed radicaleContainer-ports
 */}}
-{{- define "radicale.validateValues.radicaleContainer.ports" -}}
+{{- define "radicale.validateValues.exposedRadicaleContainerPorts" -}}
 {{- $messages := list -}}
 {{- $message := "" -}}
 {{- $radicaleContainer := .Values.radicaleContainer -}}
-{{- $ports := $radicaleContainer.ports -}}
-{{- range $objName, $port := $ports -}}
-{{- if not $port.name }}
-{{- $messages = append $messages (printf "Missing required `name`-field for the `%s`-port" $objName) -}}
+{{- $httpPort := $radicaleContainer.httpPort -}}
+{{- $extraPorts := $radicaleContainer.extraPorts -}}
+{{- if not $httpPort.name -}}
+{{- $messages = append $messages "Missing required `name`-field for the `radicaleContainer.httpPort`" -}}
 {{- end }}
-{{- if not $port.containerPort -}}
-{{- $messages = append $messages (printf "Missing required `containerPort`-field for the `%s`-port" $objName) -}}
+{{- if not $httpPort.containerPort -}}
+{{- $messages = append $messages "Missing required `containerPort`-field for the `radicaleContainer.httpPort`" -}}
+{{- end }}
+{{- if $extraPorts -}}
+{{- range $objName, $extraPort := $extraPorts -}}
+{{- if not $extraPort.name -}}
+{{- $messages = append $messages (printf "Missing `name`-field for the `radicaleContainer.extraPorts.%s`" $objName) -}}
+{{- end }}
+{{- if not $extraPort.containerPort -}}
+{{- $messages = append $messages (printf "Missing `containerPort`-field for the `radicaleContainer.extraPorts.%s`" $objName) -}}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n   > " $messages -}}
 {{- if $message -}}
-{{- printf " radicale: radicaleContainer.ports\n   > %s" $message -}}
+{{- printf " radicale: exposedRadicaleContainerPorts\n   > %s" $message -}}
 {{- end }}
 {{- end }}
 
@@ -183,13 +227,6 @@ Create Secret-Name
 {{- end }}
 
 {{/*
-Create IngressRoute-Name
-*/}}
-{{- define "radicale.ingressRouteName" -}}
-{{- (include "radicale.fullname" .) }}
-{{- end }}
-
-{{/*
 Create ConfigMap-Name
 */}}
 {{- define "radicale.configMapName" -}}
@@ -198,19 +235,32 @@ Create ConfigMap-Name
 {{- end }}
 
 {{/*
-Create Service-Name
-*/}}
-{{- define "radicale.serviceName" -}}
-{{- $service := .Values.service -}}
-{{ default (include "radicale.fullname" .) $service.serviceName }}
-{{- end }}
-
-{{/*
 Create PVC-Name for radicale
 */}}
 {{- define "radicale.pvcName" -}}
 {{- $claimName := default (include "radicale.fullname" .) .Values.persistence.claimName -}}
 {{- printf "%s" $claimName }}
+{{- end }}
+
+{{/*
+Create boolean whether the a IngressRoute-Resource needs to be created or not
+*/}}
+{{- define "radicale.createIngressRoute" -}}
+{{- $httpIngressRoute := .Values.httpIngressRoute -}}
+{{- $extraIngressRoutes := .Values.extraIngressRoutes -}}
+{{- if or $httpIngressRoute.enabled $extraIngressRoutes -}}
+true
+{{- end }}
+{{- end }}
+
+{{/*
+Create boolean whether the a Middleware-Resource needs to be created or not
+*/}}
+{{- define "radicale.createMiddleware" -}}
+{{- $middlewares := .Values.middlewares -}}
+{{- if and $middlewares (include "radicale.createIngressRoute" .) -}}
+true
+{{- end }}
 {{- end }}
 
 {{/*

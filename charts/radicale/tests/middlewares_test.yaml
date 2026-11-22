@@ -10,16 +10,16 @@ suite: Test Middlewares
 templates:
   - templates/middlewares.yaml
 tests:
-  - it: should not render middlewares with disabled IngressRoute
+  - it: should not render Middleware without created IngressRoute
     set:
-      ingressRoute.enabled: false
+      httpIngressRoute.enabled: false
     asserts:
       - notExists:
           path: spec
 
-  - it: should render enabled middlewares with test values
+  - it: should render enabled Middleware with test values
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
         entryPoints: ["invalid-test-entrypoint"]
       middlewares:
@@ -47,7 +47,7 @@ tests:
   
   - it: should fail to render middlewares with missing middleware-name
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
         entryPoints: ["invalid-test-entrypoint"]
       middlewares:
@@ -62,7 +62,7 @@ tests:
   
   - it: should fail to render middlewares with missing middleware-spec
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
         entryPoints: ["invalid-test-entrypoint"]
       middlewares:
@@ -74,7 +74,7 @@ tests:
   
   - it: should render multiple Middleware resources
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
         entryPoints: ["invalid-test-entrypoint"]
       middlewares:

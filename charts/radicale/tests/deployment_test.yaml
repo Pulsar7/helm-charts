@@ -38,3 +38,42 @@ tests:
       - equal:
           path: spec.template.spec.volumes[?(@.name=="data")].persistentVolumeClaim.claimName
           value: "test-radicale-data"
+
+  - it: should render deployment with adjusted exposed httPort-specs
+    template: templates/deployment.yaml
+    set:
+      radicaleContainer:
+        httpPort:
+          name: "foo-baa"
+          containerPort: 1337
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: "foo-baa"
+              containerPort: 1337
+  
+  - it: should render deployment with extraPorts
+    template: templates/deployment.yaml
+    set:
+      radicaleContainer:
+        httpPort:
+          name: "hello-world"
+          containerPort: 1337
+        extraPorts:
+          additionalPort:
+            name: "additional-port"
+            containerPort: 1338
+          secondAdditionalPort:
+            name: "second-additional-port"
+            containerPort: 1339
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value:
+            - name: "hello-world"
+              containerPort: 1337
+            - name: "additional-port"
+              containerPort: 1338
+            - name: "second-additional-port"
+              containerPort: 1339

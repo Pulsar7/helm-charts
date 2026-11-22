@@ -23,7 +23,7 @@ tests:
   - it: should render deployment with `checksum/ingress-route`
     template: templates/deployment.yaml
     set:
-      ingressRoute:
+      httpIngressRoute:
         enabled: true
         entryPoints: ["invalid-test-entrypoint"]
     asserts:
@@ -35,7 +35,7 @@ tests:
   - it: should render deployment without `checksum/ingress-route`
     template: templates/deployment.yaml
     set:
-      ingressRoute.enabled: false
+      httpIngressRoute.enabled: false
     asserts:
       - isKind:
           of: Deployment
