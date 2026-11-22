@@ -70,6 +70,7 @@ See e.g.: https://github.com/bitnami/charts/blob/d9f6e8974fc9c8cbc64146e1632f704
 {{- $messages := append $messages (include "radicale.validateValues.configFile" .) -}}
 {{- $messages := append $messages (include "radicale.validateValues.ingressRoutes" .) -}}
 {{- $messages := append $messages (include "radicale.validateValues.middlewares" .) -}}
+{{- $messages := append $messages (include "radicale.validateValues.exposedRadicaleContainerPorts" .) -}}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n" $messages -}}
 {{- if $message -}}
@@ -173,6 +174,38 @@ Validate values for radicale - middlewares
 {{- $message := join "\n   > " $messages -}}
 {{- if $message -}}
 {{- printf " radicale: middlewares\n   > %s" $message -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate values of radicale - exposed radicaleContainer-ports
+*/}}
+{{- define "radicale.validateValues.exposedRadicaleContainerPorts" -}}
+{{- $messages := list -}}
+{{- $message := "" -}}
+{{- $radicaleContainer := .Values.radicaleContainer -}}
+{{- $httpPort := $radicaleContainer.httpPort -}}
+{{- $extraPorts := $radicaleContainer.extraPorts -}}
+{{- if not $httpPort.name -}}
+{{- $messages = append $messages "Missing required `name`-field for the `radicaleContainer.httpPort`" -}}
+{{- end }}
+{{- if not $httpPort.containerPort -}}
+{{- $messages = append $messages "Missing required `containerPort`-field for the `radicaleContainer.httpPort`" -}}
+{{- end }}
+{{- if $extraPorts -}}
+{{- range $objName, $extraPort := $extraPorts -}}
+{{- if not $extraPort.name -}}
+{{- $messages = append $messages (printf "Missing `name`-field for the `radicaleContainer.extraPorts.%s`" $objName) -}}
+{{- end }}
+{{- if not $extraPort.containerPort -}}
+{{- $messages = append $messages (printf "Missing `containerPort`-field for the `radicaleContainer.extraPorts.%s`" $objName) -}}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- $messages := without $messages "" -}}
+{{- $message := join "\n   > " $messages -}}
+{{- if $message -}}
+{{- printf " radicale: exposedRadicaleContainerPorts\n   > %s" $message -}}
 {{- end }}
 {{- end }}
 

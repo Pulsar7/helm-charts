@@ -5,7 +5,17 @@
 > [!CAUTION]
 > **Breaking changes**
 
+* __Helm-Values__:
+  - Remove `radicaleContainer.ports` and define primary default `httpPort` at `radicaleContainer.httpPort`
+  - Option to add additional exposed `radicaleContainer`-ports at `radicaleContainer.extraPorts`
+  - Remove `services` and define primary default `httpService`-map
+  - Option to add additional Services at `extraServices`
+  - Remove `ingressRoutes` and define primary default `httpIngressRoute`-map
+  - Option to add additoinal IngressRoutes at `extraIngressRoutes`
 
+* Add helm-unittests
+
+* Add Helm-Value validation template-functions
 
 ## `0.4.0` to `0.4.1`
 
