@@ -18,7 +18,7 @@ spec:
   - match: {{ $httpIngressRoute.routeMatch }}
     kind: Rule
     services:
-    - name: 
+    - name: {{ $httpService.serviceName }}
       port: {{ $httpServicePort.portNumber }}
       scheme: http
     {{- with $httpIngressRouteRefMiddlewares }}

@@ -1,5 +1,11 @@
 # CHANGELOG for `charts/radicale`
 
+## `0.5.0` to `0.5.1`
+
+* __Fix__: add name of http-Service to http-IngressRoute
+
+* Add missing helm unittest Service-reference check for http-IngressRoute
+
 ## `0.4.1` to `0.5.0`
 
 > [!CAUTION]

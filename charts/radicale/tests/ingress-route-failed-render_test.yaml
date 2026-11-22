@@ -1,0 +1,83 @@
+#------------------------------------------------------------------------------
+#
+# IngressRoute/failed-render-Unittests Test-Suite for radicale
+#
+# > https://github.com/helm-unittest/helm-unittest/blob/main/DOCUMENT.md
+#
+#------------------------------------------------------------------------------
+#
+suite: Test IngressRoute/failed-render
+templates:
+  - templates/ingress-route.yaml
+tests:
+  - it: should fail to render because of missing httpIngressRoute name-field
+    set:
+      httpIngressRoute:
+        enabled: true
+        name: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `name` when `httpIngressRoute: true`"
+  
+  - it: should fail to render because of missing httpIngressRoute entryPoints-field
+    set:
+      httpIngressRoute:
+        enabled: true
+        entryPoints: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `entryPoints` when `httpIngressRoute: true`"
+  
+  - it: should fail to render because of missing httpIngressRoute routeMatch-field
+    set:
+      httpIngressRoute:
+        enabled: true
+        routeMatch: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `routeMatch` when `httpIngressRoute: true`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          name: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `name` for the extra-IngressRoute `additionalTestIngressRoute`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          entryPoints: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `entryPoints` for the extra-IngressRoute `additionalTestIngressRoute`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          routeMatch: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `routeMatch` for the extra-IngressRoute `additionalTestIngressRoute`"
+  
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          refServiceName: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `refServiceName` for the extra-IngressRoute `additionalTestIngressRoute`"
+
+  - it: should fail to render because of missing name-field at an extraIngressRoute
+    set:
+      extraIngressRoutes:
+        additionalTestIngressRoute:
+          refServicePortNumber: null
+    asserts:
+      - failedTemplate:
+          errorPattern: "Missing required `refServicePortNumber` for the extra-IngressRoute `additionalTestIngressRoute`"
