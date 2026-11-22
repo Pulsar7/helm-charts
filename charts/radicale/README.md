@@ -83,12 +83,12 @@ Please deploy your own Secret with the required users instead of defining them a
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| httpService | object | `{"additionalSpecs":{},"httpPort":{"name":"http","portNumber":5000,"protocol":"TCP"},"serviceName":"http","type":"ClusterIP"}` | Specification for the exposed HTTP-Service |
+| httpService | object | `{"additionalSpecs":{},"httpPort":{"name":"http","portNumber":5000,"protocol":"TCP"},"serviceName":"radicale-http","type":"ClusterIP"}` | Specification for the exposed HTTP-Service |
 | httpService.additionalSpecs | object | `{}` | Additional specifications for the Service |
 | httpService.httpPort.name | string | `"http"` | Name of Service-port |
 | httpService.httpPort.portNumber | int | `5000` | Exposed Service-port |
 | httpService.httpPort.protocol | string | `"TCP"` | Protocol |
-| httpService.serviceName | string | `"http"` | Name of the HTTP-Service |
+| httpService.serviceName | string | `"radicale-http"` | Name of the HTTP-Service |
 | httpService.type | string | `"ClusterIP"` | Type of the NTFY-Service resource |
 
 ### Ingress/Middleware specifications

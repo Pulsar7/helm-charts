@@ -163,11 +163,11 @@ Validate values for radicale - middlewares
 {{- range $objName, $middleware := $middlewares -}}
 {{- if not $middleware.name -}}
 {{- $messages = append $messages (printf "Missing required `name`-Helm-Value for `%s`-middleware" $objName) -}}
-{{- end -}}
+{{- end }}
 {{- if not $middleware.spec -}}
 {{- $messages = append $messages (printf "Missing required `spec`-Helm-Value for `%s`-middleware" $objName) -}}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- $messages := without $messages "" -}}
 {{- $message := join "\n   > " $messages -}}

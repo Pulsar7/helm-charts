@@ -147,7 +147,7 @@ httpService:
   #
   # -- Name of the HTTP-Service
   # @section -- HTTP-Service specifications
-  serviceName: "http"
+  serviceName: "radicale-http"
   #
   # -- Type of the NTFY-Service resource
   # @section -- HTTP-Service specifications
